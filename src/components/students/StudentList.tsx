@@ -305,9 +305,15 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${attendanceColor}`}>
-                          {((student.attendancePercentage || 0) * 100).toFixed(0)}%
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${attendanceColor}`}>
+                            {((student.attendancePercentage || 0) * 100).toFixed(0)}%
+                          </span>
+                          <span className="text-xs text-gray-400">/</span>
+                          <span className="text-xs text-gray-500">
+                            {(100 - ((student.attendancePercentage || 0) * 100)).toFixed(0)}%
+                          </span>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {student.gradeAverage !== null && student.gradeAverage !== undefined

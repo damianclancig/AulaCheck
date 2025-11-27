@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Course, Student } from '@/types/models';
 import { auth } from '@/lib/firebase/client';
 import { StudentList } from '@/components/students/StudentList';
+import { AttendanceSheet } from '@/components/attendance/AttendanceSheet';
 import { AddStudentModal } from '@/components/students/AddStudentModal';
 import { EditStudentModal } from '@/components/students/EditStudentModal';
 import { AttendanceModal } from '@/components/attendance/AttendanceModal';
@@ -22,7 +23,9 @@ import {
   Download,
   Edit,
   Link2,
-  Users
+  Users,
+  List,
+  Table
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -50,6 +53,16 @@ export default function CourseDetailPage() {
 
   const { data: students, mutate: mutateStudents } = useSWR<(Student & { attendancePercentage: number; gradeAverage: number | null })[]>(
     courseId ? `/api/courses/${courseId}/students` : null,
+    fetcher
+  );
+
+  const [viewMode, setViewMode] = useState<'list' | 'sheet'>('list');
+  
+  const { data: attendanceData } = useSWR<{
+    dates: string[];
+    records: Record<string, Record<string, 'present' | 'absent' | 'late'>>;
+  }>(
+    courseId && viewMode === 'sheet' ? `/api/courses/${courseId}/attendance-records` : null,
     fetcher
   );
 
@@ -254,12 +267,42 @@ export default function CourseDetailPage() {
 
       {/* Tabs / Content */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200 px-6 py-4">
+        <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h3 className="font-semibold text-gray-900">Listado de Alumnos</h3>
+          
+          {/* View Mode Toggle */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <List className="w-4 h-4" />
+              <span className="hidden sm:inline">Lista</span>
+            </button>
+            <button
+              onClick={() => setViewMode('sheet')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'sheet'
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Table className="w-4 h-4" />
+              <span className="hidden sm:inline">Planilla</span>
+            </button>
+          </div>
         </div>
         
         <div className="p-6">
-          {students ? (
+          {!students ? (
+            <div className="p-8 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
+            </div>
+          ) : viewMode === 'list' ? (
             <StudentList 
               students={students} 
               onDeleteStudent={handleDeleteStudent}
@@ -269,9 +312,17 @@ export default function CourseDetailPage() {
               }}
             />
           ) : (
-            <div className="p-8 text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
-            </div>
+            attendanceData ? (
+              <AttendanceSheet
+                students={students}
+                dates={attendanceData.dates}
+                records={attendanceData.records}
+              />
+            ) : (
+              <div className="p-8 text-center">
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
+              </div>
+            )
           )}
         </div>
       </div>
