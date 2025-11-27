@@ -23,12 +23,15 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                {course.institutionName}
+              <p className="text-xs text-gray-500 mb-1">
+                <span className="font-semibold">Institución:</span> {course.institutionName}
               </p>
-              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
-                {course.name}
-              </h3>
+              <div>
+                <span className="text-xs font-semibold text-gray-500">Curso:</span>
+                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                  {course.name}
+                </h3>
+              </div>
             </div>
             <div className="bg-indigo-50 text-indigo-700 text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 ml-2">
               {course.meta.studentCount} alumnos

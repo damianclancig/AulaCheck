@@ -172,14 +172,15 @@ export default function CourseDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-1">
           <Link 
             href="/dashboard" 
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500 flex-shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <div>
+          
+          <div className="flex-1">
             <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">
               {course.institutionName}
             </p>
@@ -187,19 +188,19 @@ export default function CourseDetailPage() {
               <h1 className="text-2xl font-bold text-gray-900">{course.name}</h1>
               <button
                 onClick={() => setIsEditCourseModalOpen(true)}
-                className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                 title="Editar curso"
               >
-                <Edit className="w-4 h-4" />
+                <Edit className="w-6 h-6" />
               </button>
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm mt-1">
               {course.description || 'Sin descripción'} • {students?.length || 0} alumnos
             </p>
           </div>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto">
+        <div className="flex flex-wrap justify-evenly gap-2 w-full md:w-auto">
           <button
             onClick={() => setIsAttendanceModalOpen(true)}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm font-medium whitespace-nowrap"
@@ -238,28 +239,29 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
             <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
               <CalendarCheck className="w-5 h-5" />
             </div>
             <h3 className="font-medium text-gray-700">Asistencia Promedio</h3>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-gray-900 text-center md:text-left">
             {((course.meta.avgAttendance || 0) * 100).toFixed(1)}%
           </p>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
             <div className="p-2 bg-green-50 text-green-600 rounded-lg">
               <GraduationCap className="w-5 h-5" />
             </div>
             <h3 className="font-medium text-gray-700">Promedio General</h3>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-gray-900 text-center md:text-left">
             {course.meta.avgGrade ? course.meta.avgGrade.toFixed(2) : '-'}
           </p>
         </div>
