@@ -1,8 +1,8 @@
 'use client';
 
 import { Student } from '@/types/models';
-import { MoreVertical, Mail, Phone, Trash2, UserCog } from 'lucide-react';
-import { useState } from 'react';
+import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X } from 'lucide-react';
+import { useState, useMemo } from 'react';
 
 interface StudentListProps {
   students: (Student & { attendancePercentage?: number; gradeAverage?: number | null })[];
@@ -10,216 +10,441 @@ interface StudentListProps {
   onEditStudent: (student: Student) => void;
 }
 
+type SortField = 'name' | 'attendance' | 'grade';
+type SortDirection = 'asc' | 'desc';
+
 export function StudentList({ students, onDeleteStudent, onEditStudent }: StudentListProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+
+  // Filter and sort students
+  const filteredAndSortedStudents = useMemo(() => {
+    // Filter by search query
+    let filtered = students.filter(student => {
+      const query = searchQuery.toLowerCase();
+      return (
+        student.firstName.toLowerCase().includes(query) ||
+        student.lastName.toLowerCase().includes(query) ||
+        student.email?.toLowerCase().includes(query) ||
+        student.externalId?.toLowerCase().includes(query)
+      );
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      let comparison = 0;
+
+      if (sortField === 'name') {
+        // Sort by lastName, then firstName
+        const lastNameCompare = a.lastName.localeCompare(b.lastName);
+        comparison = lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
+      } else if (sortField === 'attendance') {
+        comparison = (a.attendancePercentage || 0) - (b.attendancePercentage || 0);
+      } else if (sortField === 'grade') {
+        const aGrade = a.gradeAverage ?? -1;
+        const bGrade = b.gradeAverage ?? -1;
+        comparison = aGrade - bGrade;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    return filtered;
+  }, [students, searchQuery, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New field, default to asc
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
+    }
+    return sortDirection === 'asc' ? 
+      <ArrowUp className="w-4 h-4 text-indigo-600" /> : 
+      <ArrowDown className="w-4 h-4 text-indigo-600" />;
+  };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Alumno
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Contacto
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Asistencia
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Promedio
-              </th>
-              <th scope="col" className="relative px-6 py-3">
-                <span className="sr-only">Acciones</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {students.map((student) => {
-              const attendanceColor = 
-                (student.attendancePercentage || 0) >= 0.75 ? 'text-green-600 bg-green-50' :
-                (student.attendancePercentage || 0) >= 0.60 ? 'text-yellow-600 bg-yellow-50' :
-                'text-red-600 bg-red-50';
-
-              return (
-                <tr key={student._id.toString()} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-medium">
-                        {student.firstName[0]}{student.lastName[0]}
+    <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex-1 w-full max-w-md relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por nombre, apellido, email o legajo..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            {/* Mobile Sort Button */}
+            <div className="relative md:hidden flex-1">
+              <button
+                onClick={() => setSortMenuOpen(!sortMenuOpen)}
+                className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2 text-sm font-medium"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                Ordenar
+              </button>
+              {sortMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setSortMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                    <div className="py-1">
+                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
+                        Ordenar por
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {student.lastName}, {student.firstName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Legajo: {student.externalId || '-'}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      {student.email || '-'}
-                    </div>
-                    <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      {student.phone || '-'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${attendanceColor}`}>
-                      {((student.attendancePercentage || 0) * 100).toFixed(0)}%
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {student.gradeAverage !== null && student.gradeAverage !== undefined
-                      ? student.gradeAverage.toFixed(2)
-                      : '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="relative">
                       <button
-                        onClick={() => setOpenMenuId(openMenuId === student._id.toString() ? null : student._id.toString())}
-                        className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                        onClick={() => {
+                          handleSort('name');
+                          setSortMenuOpen(false);
+                        }}
+                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        <MoreVertical className="w-5 h-5" />
+                        <span>Alumno (A-Z)</span>
+                        {sortField === 'name' && <Check className="w-4 h-4 text-indigo-600" />}
                       </button>
-                      
-                      {openMenuId === student._id.toString() && (
-                        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                          <div className="py-1" role="menu">
+                      <button
+                        onClick={() => {
+                          handleSort('attendance');
+                          setSortMenuOpen(false);
+                        }}
+                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <span>Asistencia</span>
+                        {sortField === 'attendance' && <Check className="w-4 h-4 text-indigo-600" />}
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleSort('grade');
+                          setSortMenuOpen(false);
+                        }}
+                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <span>Promedio</span>
+                        {sortField === 'grade' && <Check className="w-4 h-4 text-indigo-600" />}
+                      </button>
+                      <div className="border-t border-gray-100 my-1"></div>
+                      <button
+                        onClick={() => {
+                          setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+                        }}
+                        className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        <span>Dirección</span>
+                        {sortDirection === 'asc' ? (
+                          <ArrowUp className="w-4 h-4 text-indigo-600" />
+                        ) : (
+                          <ArrowDown className="w-4 h-4 text-indigo-600" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="text-sm text-gray-500 whitespace-nowrap">
+              {filteredAndSortedStudents.length} de {students.length} alumnos
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th 
+                  scope="col" 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('name')}
+                >
+                  <div className="flex items-center gap-2">
+                    Alumno
+                    <SortIcon field="name" />
+                  </div>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Contacto
+                </th>
+                <th 
+                  scope="col" 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('attendance')}
+                >
+                  <div className="flex items-center gap-2">
+                    Asistencia
+                    <SortIcon field="attendance" />
+                  </div>
+                </th>
+                <th 
+                  scope="col" 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('grade')}
+                >
+                  <div className="flex items-center gap-2">
+                    Promedio
+                    <SortIcon field="grade" />
+                  </div>
+                </th>
+                <th scope="col" className="relative px-6 py-3">
+                  <span className="sr-only">Acciones</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredAndSortedStudents.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                    {searchQuery ? 'No se encontraron alumnos con ese criterio' : 'No hay alumnos inscritos'}
+                  </td>
+                </tr>
+              ) : (
+                filteredAndSortedStudents.map((student) => {
+                  const attendanceColor = 
+                    (student.attendancePercentage || 0) >= 0.75 ? 'text-green-600 bg-green-50' :
+                    (student.attendancePercentage || 0) >= 0.60 ? 'text-yellow-600 bg-yellow-50' :
+                    'text-red-600 bg-red-50';
+
+                  return (
+                    <tr key={student._id.toString()} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <span className="text-indigo-600 font-medium text-sm">
+                              {student.firstName[0]}{student.lastName[0]}
+                            </span>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {student.lastName}, {student.firstName}
+                            </div>
+                            {student.externalId && (
+                              <div className="text-sm text-gray-500">
+                                Legajo: {student.externalId}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="space-y-1">
+                          {student.email && (
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Mail className="w-4 h-4 mr-2" />
+                              {student.email}
+                            </div>
+                          )}
+                          {student.phone && (
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Phone className="w-4 h-4 mr-2" />
+                              {student.phone}
+                            </div>
+                          )}
+                          {!student.email && !student.phone && (
+                            <span className="text-sm text-gray-400">Sin contacto</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${attendanceColor}`}>
+                          {((student.attendancePercentage || 0) * 100).toFixed(0)}%
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {student.gradeAverage !== null && student.gradeAverage !== undefined
+                          ? student.gradeAverage.toFixed(2)
+                          : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="relative">
+                          <button
+                            onClick={() => setOpenMenuId(openMenuId === student._id.toString() ? null : student._id.toString())}
+                            className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </button>
+                          {openMenuId === student._id.toString() && (
+                            <>
+                              <div
+                                className="fixed inset-0 z-10"
+                                onClick={() => setOpenMenuId(null)}
+                              />
+                              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                                <div className="py-1">
+                                  <button
+                                    onClick={() => {
+                                      onEditStudent(student);
+                                      setOpenMenuId(null);
+                                    }}
+                                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                  >
+                                    <UserCog className="w-4 h-4 mr-3" />
+                                    Editar
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      onDeleteStudent(student._id.toString());
+                                      setOpenMenuId(null);
+                                    }}
+                                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-3" />
+                                    Dar de baja
+                                  </button>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {filteredAndSortedStudents.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center text-gray-500">
+            {searchQuery ? 'No se encontraron alumnos con ese criterio' : 'No hay alumnos inscritos'}
+          </div>
+        ) : (
+          filteredAndSortedStudents.map((student) => {
+            const attendanceColor = 
+              (student.attendancePercentage || 0) >= 0.75 ? 'text-green-600 bg-green-50' :
+              (student.attendancePercentage || 0) >= 0.60 ? 'text-yellow-600 bg-yellow-50' :
+              'text-red-600 bg-red-50';
+
+            return (
+              <div key={student._id.toString()} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0 h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <span className="text-indigo-600 font-medium">
+                        {student.firstName[0]}{student.lastName[0]}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {student.lastName}, {student.firstName}
+                      </h3>
+                      {student.externalId && (
+                        <p className="text-sm text-gray-500">Legajo: {student.externalId}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <button
+                      onClick={() => setOpenMenuId(openMenuId === student._id.toString() ? null : student._id.toString())}
+                      className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                    </button>
+                    {openMenuId === student._id.toString() && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setOpenMenuId(null)}
+                        />
+                        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                          <div className="py-1">
                             <button
                               onClick={() => {
                                 onEditStudent(student);
                                 setOpenMenuId(null);
                               }}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
-                              <UserCog className="w-4 h-4" /> Editar
+                              <UserCog className="w-4 h-4 mr-3" />
+                              Editar
                             </button>
                             <button
                               onClick={() => {
                                 onDeleteStudent(student._id.toString());
                                 setOpenMenuId(null);
                               }}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                             >
-                              <Trash2 className="w-4 h-4" /> Dar de baja
+                              <Trash2 className="w-4 h-4 mr-3" />
+                              Dar de baja
                             </button>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Card View */}
-      <div className="md:hidden divide-y divide-gray-200">
-        {students.map((student) => {
-          const attendanceColor = 
-            (student.attendancePercentage || 0) >= 0.75 ? 'text-green-600 bg-green-50' :
-            (student.attendancePercentage || 0) >= 0.60 ? 'text-yellow-600 bg-yellow-50' :
-            'text-red-600 bg-red-50';
-
-          return (
-            <div key={student._id.toString()} className="p-4 space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-medium flex-shrink-0">
-                    {student.firstName[0]}{student.lastName[0]}
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">
-                      {student.lastName}, {student.firstName}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Legajo: {student.externalId || '-'}
-                    </div>
+                      </>
+                    )}
                   </div>
                 </div>
-                <div className="relative">
-                  <button
-                    onClick={() => setOpenMenuId(openMenuId === student._id.toString() ? null : student._id.toString())}
-                    className="text-gray-400 hover:text-gray-600 focus:outline-none p-1"
-                  >
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
-                  
-                  {openMenuId === student._id.toString() && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                      <div className="py-1" role="menu">
-                        <button
-                          onClick={() => {
-                            onEditStudent(student);
-                            setOpenMenuId(null);
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                        >
-                          <UserCog className="w-4 h-4" /> Editar
-                        </button>
-                        <button
-                          onClick={() => {
-                            onDeleteStudent(student._id.toString());
-                            setOpenMenuId(null);
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                        >
-                          <Trash2 className="w-4 h-4" /> Dar de baja
-                        </button>
-                      </div>
+
+                <div className="space-y-2 mb-3">
+                  {student.email && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                      {student.email}
+                    </div>
+                  )}
+                  {student.phone && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                      {student.phone}
                     </div>
                   )}
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <span className="truncate">{student.email || '-'}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Phone className="w-4 h-4 text-gray-400" />
-                    <span>{student.phone || '-'}</span>
-                  </div>
-                </div>
-                <div className="space-y-2 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <span className="text-xs text-gray-500">Asistencia:</span>
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${attendanceColor}`}>
-                      {((student.attendancePercentage || 0) * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-end gap-2">
-                    <span className="text-xs text-gray-500">Promedio:</span>
-                    <span className="font-medium text-gray-900">
-                      {student.gradeAverage !== null && student.gradeAverage !== undefined
-                        ? student.gradeAverage.toFixed(2)
-                        : '-'}
-                    </span>
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Asistencia</p>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${attendanceColor}`}>
+                        {((student.attendancePercentage || 0) * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Promedio</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {student.gradeAverage !== null && student.gradeAverage !== undefined
+                          ? student.gradeAverage.toFixed(2)
+                          : '-'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
-
-      {students.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          No hay alumnos inscritos en este curso.
-        </div>
-      )}
     </div>
   );
 }

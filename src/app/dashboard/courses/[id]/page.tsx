@@ -7,6 +7,7 @@ import { Course, Student } from '@/types/models';
 import { auth } from '@/lib/firebase/client';
 import { StudentList } from '@/components/students/StudentList';
 import { AddStudentModal } from '@/components/students/AddStudentModal';
+import { EditStudentModal } from '@/components/students/EditStudentModal';
 import { AttendanceModal } from '@/components/attendance/AttendanceModal';
 import { GradeModal } from '@/components/grades/GradeModal';
 import { EditCourseModal } from '@/components/courses/EditCourseModal';
@@ -59,6 +60,8 @@ export default function CourseDetailPage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isJoinRequestsModalOpen, setIsJoinRequestsModalOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState(false);
 
   // Fetch pending join requests count
   useEffect(() => {
@@ -259,7 +262,10 @@ export default function CourseDetailPage() {
           <StudentList 
             students={students} 
             onDeleteStudent={handleDeleteStudent}
-            onEditStudent={(student) => console.log('Edit', student)} // TODO: Implement edit
+            onEditStudent={(student) => {
+              setSelectedStudent(student);
+              setIsEditStudentModalOpen(true);
+            }}
           />
         ) : (
           <div className="p-8 text-center">
@@ -331,6 +337,21 @@ export default function CourseDetailPage() {
         onRequestProcessed={() => {
           mutateStudents();
           // Refresh pending count
+        }}
+      />
+
+      {/* EditStudentModal */}
+      <EditStudentModal
+        isOpen={isEditStudentModalOpen}
+        onClose={() => {
+          setIsEditStudentModalOpen(false);
+          setSelectedStudent(null);
+        }}
+        student={selectedStudent}
+        onStudentUpdated={() => {
+          mutateStudents();
+          setIsEditStudentModalOpen(false);
+          setSelectedStudent(null);
         }}
       />
     </div>
