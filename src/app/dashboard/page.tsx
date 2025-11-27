@@ -42,8 +42,8 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
-        <div>
+      <div className="flex flex-col md:flex-row md:justify-between items-center mb-8 gap-4">
+        <div className="text-center md:text-left">
           <h2 className="text-2xl font-bold text-gray-900">Mis Cursos</h2>
           <p className="text-gray-500 mt-1">Gestiona tus clases y alumnos desde aquí.</p>
         </div>
