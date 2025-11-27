@@ -3,6 +3,9 @@
 import { Student } from '@/types/models';
 import { AttendanceIcon } from './AttendanceIcon';
 import { useEffect, useRef, useState } from 'react';
+import { Check, XCircle, Clock, X as XIcon, Info } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { auth } from '@/lib/firebase/client';
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
@@ -10,18 +13,39 @@ interface AttendanceSheetProps {
   students: Student[];
   dates: string[];
   records: Record<string, Record<string, AttendanceStatus>>;
+  onUpdate?: () => void;
 }
 
-export function AttendanceSheet({ students, dates, records }: AttendanceSheetProps) {
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  studentId: string;
+  date: string;
+  currentStatus?: AttendanceStatus;
+}
+
+export function AttendanceSheet({ students, dates, records, onUpdate }: AttendanceSheetProps) {
+  const params = useParams();
+  const courseId = params.id as string;
   const [visibleStudents, setVisibleStudents] = useState(20);
   const observerRef = useRef<HTMLDivElement>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    studentId: '',
+    date: '',
+  });
+  const [updating, setUpdating] = useState(false);
 
   // Infinite scroll logic
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && visibleStudents < students.length) {
-          setVisibleStudents(prev => Math.min(prev + 20, students.length));
+        const totalStudents = students.length;
+        if (entries[0].isIntersecting && visibleStudents < totalStudents) {
+          setVisibleStudents(prev => Math.min(prev + 20, totalStudents));
         }
       },
       { threshold: 0.1 }
@@ -34,12 +58,113 @@ export function AttendanceSheet({ students, dates, records }: AttendanceSheetPro
     return () => observer.disconnect();
   }, [visibleStudents, students.length]);
 
+  // Close context menu on click outside
+  useEffect(() => {
+    const handleClick = () => setContextMenu(prev => ({ ...prev, visible: false }));
+    if (contextMenu.visible) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu.visible]);
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return `${date.getDate()}/${date.getMonth() + 1}`;
   };
 
-  const displayedStudents = students.slice(0, visibleStudents);
+  // Sort students alphabetically by last name, then first name
+  const sortedStudents = [...students].sort((a, b) => {
+    const lastNameCompare = a.lastName.localeCompare(b.lastName);
+    return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
+  });
+
+  const displayedStudents = sortedStudents.slice(0, visibleStudents);
+
+  const handleContextMenu = (e: React.MouseEvent, studentId: string, date: string, currentStatus?: AttendanceStatus) => {
+    e.preventDefault();
+    
+    // Dimensiones estimadas del menú contextual
+    const menuWidth = 160;
+    const menuHeight = currentStatus ? 200 : 150; // Más alto si tiene la opción de eliminar
+    
+    // Obtener dimensiones de la ventana
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Calcular posición X (horizontal)
+    let x = e.clientX;
+    if (x + menuWidth > windowWidth) {
+      // Si se sale por la derecha, mostrar a la izquierda del cursor
+      x = e.clientX - menuWidth;
+    }
+    
+    // Calcular posición Y (vertical)
+    let y = e.clientY;
+    if (y + menuHeight > windowHeight) {
+      // Si se sale por abajo, posicionar para que el borde inferior quede cerca del cursor
+      y = e.clientY - menuHeight + 20; // El borde inferior queda ~20px arriba del cursor
+    }
+    
+    // Asegurar que no se salga por los bordes superior e izquierdo
+    x = Math.max(10, x);
+    y = Math.max(10, y);
+    
+    setContextMenu({
+      visible: true,
+      x,
+      y,
+      studentId,
+      date,
+      currentStatus,
+    });
+  };
+
+  const handleStatusChange = async (newStatus: AttendanceStatus | null) => {
+    setContextMenu(prev => ({ ...prev, visible: false }));
+    setUpdating(true);
+
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      
+      if (newStatus === null) {
+        // Delete attendance record
+        const response = await fetch(
+          `/api/courses/${courseId}/attendance/${contextMenu.studentId}?date=${contextMenu.date}`,
+          {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (!response.ok) throw new Error('Error al eliminar registro');
+      } else {
+        // Update attendance record
+        const response = await fetch(`/api/courses/${courseId}/attendance`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            date: contextMenu.date,
+            records: [{ studentId: contextMenu.studentId, status: newStatus }],
+          }),
+        });
+
+        if (!response.ok) throw new Error('Error al actualizar asistencia');
+      }
+
+      // Refresh data
+      if (onUpdate) {
+        onUpdate();
+      }
+    } catch (error) {
+      console.error('Error updating attendance:', error);
+      alert('Error al actualizar la asistencia');
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   if (dates.length === 0) {
     return (
@@ -53,10 +178,69 @@ export function AttendanceSheet({ students, dates, records }: AttendanceSheetPro
   return (
     <div className="space-y-4">
       {/* Info header */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <span>{students.length} alumnos</span>
-        <span>{dates.length} clases registradas</span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <span>{students.length} alumnos</span>
+          <span>•</span>
+          <span>{dates.length} clases registradas</span>
+        </div>
+        
+        {/* Help text */}
+        <div className="flex items-start gap-2 text-xs text-gray-500 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+          <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+          <span>
+            <span className="hidden sm:inline">Click derecho sobre un ícono para editar. </span>
+            <span className="sm:hidden">Mantén presionado para editar. </span>
+          </span>
+        </div>
       </div>
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div
+          className="fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 min-w-[160px]"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => handleStatusChange('present')}
+            disabled={updating}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-700"
+          >
+            <Check className="w-4 h-4 text-green-600" />
+            <span className="font-medium">Presente</span>
+          </button>
+          <button
+            onClick={() => handleStatusChange('absent')}
+            disabled={updating}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-700"
+          >
+            <XCircle className="w-4 h-4 text-red-600" />
+            <span className="font-medium">Ausente</span>
+          </button>
+          <button
+            onClick={() => handleStatusChange('late')}
+            disabled={updating}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-700"
+          >
+            <Clock className="w-4 h-4 text-yellow-600" />
+            <span className="font-medium">Tarde</span>
+          </button>
+          {contextMenu.currentStatus && (
+            <>
+              <div className="border-t border-gray-100 my-1" />
+              <button
+                onClick={() => handleStatusChange(null)}
+                disabled={updating}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-600"
+              >
+                <XIcon className="w-4 h-4" />
+                <span className="font-medium">Eliminar registro</span>
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Desktop table */}
       <div className="hidden md:block overflow-x-auto border border-gray-200 rounded-lg">
@@ -80,26 +264,57 @@ export function AttendanceSheet({ students, dates, records }: AttendanceSheetPro
                   {formatDate(date)}
                 </th>
               ))}
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200 bg-gray-100">
+                Estadística
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {displayedStudents.map((student) => (
-              <tr key={student._id.toString()} className="hover:bg-gray-50">
-                <td className="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
-                  {student.lastName}, {student.firstName}
-                </td>
-                {dates.map((date) => {
-                  const status = records[student._id.toString()]?.[date];
-                  return (
-                    <td key={date} className="px-4 py-4 text-center">
-                      <div className="flex justify-center">
-                        <AttendanceIcon status={status} size="md" />
+            {displayedStudents.map((student) => {
+              const studentRecords = records[student._id.toString()] || {};
+              const totalClasses = dates.length;
+              const presentCount = dates.filter(date => studentRecords[date] === 'present').length;
+              const absentCount = dates.filter(date => studentRecords[date] === 'absent').length;
+              const lateCount = dates.filter(date => studentRecords[date] === 'late').length;
+              const presentPercentage = totalClasses > 0 ? ((presentCount / totalClasses) * 100).toFixed(0) : '0';
+              const absentPercentage = totalClasses > 0 ? ((absentCount / totalClasses) * 100).toFixed(0) : '0';
+
+              return (
+                <tr key={student._id.toString()} className="hover:bg-gray-50">
+                  <td className="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
+                    {student.lastName}, {student.firstName}
+                  </td>
+                  {dates.map((date) => {
+                    const status = studentRecords[date];
+                    return (
+                      <td 
+                        key={date} 
+                        className="px-4 py-4 text-center cursor-context-menu"
+                        onContextMenu={(e) => handleContextMenu(e, student._id.toString(), date, status)}
+                      >
+                        <div className="flex justify-center">
+                          <AttendanceIcon status={status} size="md" />
+                        </div>
+                      </td>
+                    );
+                  })}
+                  <td className="px-6 py-4 text-center border-l border-gray-200 bg-gray-50">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-center gap-2 text-xs">
+                        <span className="text-green-700 font-semibold">{presentCount}</span>
+                        <span className="text-gray-400">/</span>
+                        <span className="text-red-700 font-semibold">{absentCount}</span>
                       </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+                      <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                        <span>{presentPercentage}%</span>
+                        <span className="text-gray-300">/</span>
+                        <span>{absentPercentage}%</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         
@@ -113,31 +328,81 @@ export function AttendanceSheet({ students, dates, records }: AttendanceSheetPro
 
       {/* Mobile view */}
       <div className="md:hidden space-y-4">
-        {displayedStudents.map((student) => (
-          <div key={student._id.toString()} className="bg-white border border-gray-200 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-900 mb-3">
-              {student.lastName}, {student.firstName}
-            </h4>
-            <div className="space-y-2">
-              {dates.slice(0, 5).map((date) => {
-                const status = records[student._id.toString()]?.[date];
-                return (
-                  <div key={date} className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">
-                      {new Date(date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}
-                    </span>
-                    <AttendanceIcon status={status} size="sm" />
-                  </div>
-                );
-              })}
-              {dates.length > 5 && (
-                <p className="text-xs text-gray-400 mt-2">
-                  +{dates.length - 5} clases más
-                </p>
-              )}
+        {displayedStudents.map((student) => {
+          const studentRecords = records[student._id.toString()] || {};
+          const totalClasses = dates.length;
+          const presentCount = dates.filter(date => studentRecords[date] === 'present').length;
+          const absentCount = dates.filter(date => studentRecords[date] === 'absent').length;
+          const presentPercentage = totalClasses > 0 ? ((presentCount / totalClasses) * 100).toFixed(0) : '0';
+          const absentPercentage = totalClasses > 0 ? ((absentCount / totalClasses) * 100).toFixed(0) : '0';
+
+          return (
+            <div key={student._id.toString()} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              {/* Student Header */}
+              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                <h4 className="font-semibold text-gray-900">
+                  {student.lastName}, {student.firstName}
+                </h4>
+              </div>
+
+              {/* Attendance Table */}
+              <div className="p-3">
+                <div className="space-y-1">
+                  {dates.slice(0, 10).map((date) => {
+                    const status = studentRecords[date];
+                    return (
+                      <div 
+                        key={date} 
+                        className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+                        onContextMenu={(e) => handleContextMenu(e, student._id.toString(), date, status)}
+                        onTouchStart={(e) => {
+                          const touch = e.touches[0];
+                          const timer = setTimeout(() => {
+                            handleContextMenu(
+                              { preventDefault: () => {}, clientX: touch.clientX, clientY: touch.clientY } as any,
+                              student._id.toString(),
+                              date,
+                              status
+                            );
+                          }, 500);
+                          e.currentTarget.addEventListener('touchend', () => clearTimeout(timer), { once: true });
+                        }}
+                      >
+                        {/* Date and Icon - Left */}
+                        <div className="flex items-center gap-3">
+                          <AttendanceIcon status={status} size="sm" />
+                          <span className="text-sm text-gray-600">
+                            {new Date(date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}
+                          </span>
+                        </div>
+
+                        {/* Statistics - Right */}
+                        <div className="flex flex-col items-end gap-0.5">
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-green-700 font-semibold">{presentCount}</span>
+                            <span className="text-gray-300">/</span>
+                            <span className="text-red-700 font-semibold">{absentCount}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                            <span>{presentPercentage}%</span>
+                            <span className="text-gray-300">/</span>
+                            <span>{absentPercentage}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {dates.length > 10 && (
+                  <p className="text-xs text-gray-400 mt-3 text-center">
+                    +{dates.length - 10} clases más
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         
         {/* Infinite scroll trigger */}
         {visibleStudents < students.length && (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { useParams, useRouter } from 'next/navigation';
 import { Course, Student } from '@/types/models';
 import { auth } from '@/lib/firebase/client';
@@ -317,6 +317,11 @@ export default function CourseDetailPage() {
                 students={students}
                 dates={attendanceData.dates}
                 records={attendanceData.records}
+                onUpdate={() => {
+                  mutateStudents();
+                  // Trigger re-fetch of attendance data by mutating the SWR cache
+                  mutate(`/api/courses/${courseId}/attendance-records`);
+                }}
               />
             ) : (
               <div className="p-8 text-center">
