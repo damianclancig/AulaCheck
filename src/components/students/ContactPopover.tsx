@@ -55,18 +55,30 @@ export function ContactPopover({
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
       
-      // Position below the trigger, centered horizontally if possible
-      // But ensure it doesn't go off screen
+      // Dimensiones estimadas del popover
+      const popoverHeight = 250; // Altura aproximada del popover
+      const popoverWidth = 280;
+      
+      // Calcular posición horizontal (centrado si es posible)
       let left = rect.left + scrollX - 100; // Center roughly
       if (left < 10) left = 10;
       
       // Check right edge
-      if (left + 280 > window.innerWidth) {
-        left = window.innerWidth - 290;
+      if (left + popoverWidth > window.innerWidth) {
+        left = window.innerWidth - popoverWidth - 10;
+      }
+
+      // Calcular posición vertical (arriba o abajo según espacio disponible)
+      let top = rect.bottom + scrollY + 8; // Por defecto, abajo del botón
+      
+      // Verificar si se sale por el borde inferior
+      if (rect.bottom + popoverHeight > window.innerHeight) {
+        // Si se sale por abajo, mostrar arriba del botón
+        top = rect.top + scrollY - popoverHeight - 8;
       }
 
       setPosition({
-        top: rect.bottom + scrollY + 8,
+        top: top,
         left: left,
       });
     }
