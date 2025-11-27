@@ -2,7 +2,8 @@
 
 import { Student } from '@/types/models';
 import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import { ContactPopover } from './ContactPopover';
 
 interface StudentListProps {
   students: (Student & { attendancePercentage?: number; gradeAverage?: number | null })[];
@@ -12,6 +13,50 @@ interface StudentListProps {
 
 type SortField = 'name' | 'attendance' | 'grade';
 type SortDirection = 'asc' | 'desc';
+
+function ContactTrigger({ student }: { student: Student }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const hasEmail = !!student.email;
+  const hasPhone = !!student.phone;
+
+  if (!hasEmail && !hasPhone) {
+    return (
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-300">
+        <Mail className="w-4 h-4" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg transition-colors ${
+          isOpen ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-gray-100 text-gray-500'
+        }`}
+        title="Ver contacto"
+      >
+        {hasEmail && <Mail className={`w-4 h-4 ${hasPhone ? 'mr-0.5' : ''}`} />}
+        {hasPhone && <Phone className="w-4 h-4" />}
+      </button>
+
+      <ContactPopover
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        triggerRef={triggerRef}
+        email={student.email}
+        phone={student.phone}
+        studentName={`${student.firstName} ${student.lastName}`}
+      />
+    </>
+  );
+}
 
 export function StudentList({ students, onDeleteStudent, onEditStudent }: StudentListProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -76,9 +121,9 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Search Bar */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-1 w-full max-w-md relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -191,8 +236,8 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                     <SortIcon field="name" />
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contacto
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                  <Mail className="w-4 h-4 mx-auto" />
                 </th>
                 <th 
                   scope="col" 
@@ -227,7 +272,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                   </td>
                 </tr>
               ) : (
-                filteredAndSortedStudents.map((student) => {
+                filteredAndSortedStudents.map((student, index) => {
                   const attendanceColor = 
                     (student.attendancePercentage || 0) >= 0.75 ? 'text-green-600 bg-green-50' :
                     (student.attendancePercentage || 0) >= 0.60 ? 'text-yellow-600 bg-yellow-50' :
@@ -254,23 +299,9 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="space-y-1">
-                          {student.email && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Mail className="w-4 h-4 mr-2" />
-                              {student.email}
-                            </div>
-                          )}
-                          {student.phone && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Phone className="w-4 h-4 mr-2" />
-                              {student.phone}
-                            </div>
-                          )}
-                          {!student.email && !student.phone && (
-                            <span className="text-sm text-gray-400">Sin contacto</span>
-                          )}
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <div className="flex justify-center">
+                          <ContactTrigger student={student} />
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -297,7 +328,11 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                                 className="fixed inset-0 z-10"
                                 onClick={() => setOpenMenuId(null)}
                               />
-                              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                              <div 
+                                className={`absolute right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 ${
+                                  index >= filteredAndSortedStudents.length - 2 ? 'bottom-full mb-2' : 'mt-2'
+                                }`}
+                              >
                                 <div className="py-1">
                                   <button
                                     onClick={() => {
@@ -341,7 +376,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
             {searchQuery ? 'No se encontraron alumnos con ese criterio' : 'No hay alumnos inscritos'}
           </div>
         ) : (
-          filteredAndSortedStudents.map((student) => {
+          filteredAndSortedStudents.map((student, index) => {
             const attendanceColor = 
               (student.attendancePercentage || 0) >= 0.75 ? 'text-green-600 bg-green-50' :
               (student.attendancePercentage || 0) >= 0.60 ? 'text-yellow-600 bg-yellow-50' :
@@ -378,7 +413,11 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                           className="fixed inset-0 z-10"
                           onClick={() => setOpenMenuId(null)}
                         />
-                        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                        <div 
+                          className={`absolute right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 ${
+                            index >= filteredAndSortedStudents.length - 2 ? 'bottom-full mb-2' : 'mt-2'
+                          }`}
+                        >
                           <div className="py-1">
                             <button
                               onClick={() => {
@@ -407,19 +446,13 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                   </div>
                 </div>
 
-                <div className="space-y-2 mb-3">
-                  {student.email && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                      {student.email}
-                    </div>
-                  )}
-                  {student.phone && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                      {student.phone}
-                    </div>
-                  )}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <ContactTrigger student={student} />
+                    <span className="text-sm text-gray-500">
+                      {student.email || student.phone ? 'Ver contacto' : 'Sin contacto'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">

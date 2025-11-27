@@ -258,20 +258,22 @@ export default function CourseDetailPage() {
           <h3 className="font-semibold text-gray-900">Listado de Alumnos</h3>
         </div>
         
-        {students ? (
-          <StudentList 
-            students={students} 
-            onDeleteStudent={handleDeleteStudent}
-            onEditStudent={(student) => {
-              setSelectedStudent(student);
-              setIsEditStudentModalOpen(true);
-            }}
-          />
-        ) : (
-          <div className="p-8 text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
-          </div>
-        )}
+        <div className="p-6">
+          {students ? (
+            <StudentList 
+              students={students} 
+              onDeleteStudent={handleDeleteStudent}
+              onEditStudent={(student) => {
+                setSelectedStudent(student);
+                setIsEditStudentModalOpen(true);
+              }}
+            />
+          ) : (
+            <div className="p-8 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* AddStudentModal */}
