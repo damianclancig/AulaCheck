@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AulaCheck
 
-## Getting Started
+Sistema de gestión de asistencias y calificaciones para docentes.
 
-First, run the development server:
+## Tecnologías
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend**: Next.js 15 (App Router)
+- **Autenticación**: Firebase Authentication (Google OAuth)
+- **Base de Datos**: MongoDB Atlas
+- **Lenguaje**: TypeScript
+- **Estilos**: Tailwind CSS
+
+## Configuración
+
+1. Clonar el repositorio
+2. Copiar `.env.example` a `.env.local` y completar con tus credenciales:
+   ```bash
+   cp .env.example .env.local
+   ```
+3. Instalar dependencias:
+   ```bash
+   npm install
+   ```
+4. Ejecutar en desarrollo:
+   ```bash
+   npm run dev
+   ```
+
+## Variables de Entorno
+
+Ver `.env.example` para la lista completa de variables requeridas.
+
+### Firebase
+
+- Crear proyecto en [Firebase Console](https://console.firebase.google.com/)
+- Habilitar Google Authentication
+- Descargar Service Account JSON para Firebase Admin SDK
+
+### MongoDB Atlas
+
+- Crear cluster en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+- Obtener connection string
+- Crear base de datos `aulacheck`
+
+## Estructura del Proyecto
+
+```
+src/
+├── app/                    # App Router pages y layouts
+│   ├── api/               # Route Handlers (API endpoints)
+│   ├── dashboard/         # Dashboard del docente
+│   ├── courses/           # Gestión de cursos
+│   └── login/             # Página de login
+├── components/            # Componentes React reutilizables
+├── lib/                   # Utilidades y configuraciones
+│   ├── firebase/          # Firebase client y admin
+│   ├── mongodb/           # Cliente MongoDB
+│   ├── auth/              # Middleware de autenticación
+│   └── calculations/      # Funciones de cálculo
+└── types/                 # Tipos TypeScript
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Funcionalidades
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- ✅ Autenticación con Google
+- ✅ Gestión de cursos
+- ✅ Gestión de alumnos
+- ✅ Registro de asistencia
+- ✅ Calificaciones y promedios
+- ✅ Exportación a CSV
+- ✅ Responsive design
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Licencia
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
