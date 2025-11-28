@@ -48,36 +48,36 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
   
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         Teléfono / WhatsApp (Opcional)
       </label>
       
       <div className="flex gap-2">
         {/* Prefix */}
         <div className="w-24 flex-shrink-0">
-          <div className="w-full h-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 font-medium flex items-center justify-center select-none">
+          <div className="w-full h-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium flex items-center justify-center select-none">
             🇦🇷 +54 9
           </div>
         </div>
 
         {/* Number Input */}
         <div className="flex-1 relative">
-          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="11 1234 5678"
             value={inputValue}
             onChange={handleChange}
             onBlur={() => setTouched(true)}
-            className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 ${
-              !isValid ? 'border-red-500' : 'border-gray-300'
+            className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-900 ${
+              !isValid ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
             }`}
           />
         </div>
       </div>
 
       {/* Help Text */}
-      <div className="mt-1 text-xs text-gray-500">
+      <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
         <p>Ingresa el código de área y número (sin 0 ni 15)</p>
       </div>
 

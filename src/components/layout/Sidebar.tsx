@@ -42,18 +42,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar component */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col lg:h-full",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col lg:h-full",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200">
+        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center">
-            <GraduationCap className="h-8 w-8 text-indigo-600 mr-3" />
-            <span className="text-xl font-bold text-gray-900">AulaCheck</span>
+            <GraduationCap className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
+            <span className="text-xl font-bold text-gray-900 dark:text-white">AulaCheck</span>
           </div>
           {/* Close button for mobile */}
           <button 
             onClick={onClose}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <span className="sr-only">Cerrar sidebar</span>
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -73,14 +73,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   onClick={() => onClose()} // Close sidebar on navigation (mobile)
                   className={cn(
                     isActive
-                      ? 'bg-indigo-50 text-indigo-600'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                      ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200',
                     'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors'
                   )}
                 >
                   <item.icon
                     className={cn(
-                      isActive ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500',
+                      isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400',
                       'mr-3 flex-shrink-0 h-5 w-5 transition-colors'
                     )}
                     aria-hidden="true"
@@ -92,15 +92,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </nav>
         </div>
 
-        <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+        <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-gray-800 p-4">
           <button
             onClick={() => signOut()}
             className="flex-shrink-0 w-full group block"
           >
             <div className="flex items-center">
-              <LogOut className="inline-block h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+              <LogOut className="inline-block h-5 w-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
                   Cerrar Sesión
                 </p>
               </div>

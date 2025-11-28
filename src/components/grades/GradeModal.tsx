@@ -72,12 +72,12 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-900">Nueva Calificación</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Nueva Calificación</h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -85,7 +85,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label htmlFor="assessment" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="assessment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Nombre de la Evaluación *
             </label>
             <input
@@ -94,14 +94,14 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
               required
               value={assessment}
               onChange={(e) => setAssessment(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
               placeholder="Ej: Parcial 1"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Fecha *
               </label>
               <input
@@ -110,11 +110,11 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
               />
             </div>
             <div>
-              <label htmlFor="weight" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Peso (1-10) *
               </label>
               <input
@@ -125,13 +125,13 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
                 max="10"
                 value={weight}
                 onChange={(e) => setWeight(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="student" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="student" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Alumno *
             </label>
             <select
@@ -139,7 +139,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
               required
               value={selectedStudentId}
               onChange={(e) => setSelectedStudentId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
             >
               <option value="">Seleccionar alumno...</option>
               {students.map((student) => (
@@ -151,7 +151,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
           </div>
 
           <div>
-            <label htmlFor="score" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="score" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Nota (0-10) *
             </label>
             <input
@@ -163,7 +163,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
               step="0.01"
               value={score}
               onChange={(e) => setScore(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-lg font-medium text-gray-900"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-lg font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800"
               placeholder="0.00"
             />
           </div>
@@ -172,7 +172,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
             >
               Cerrar
             </button>

@@ -103,27 +103,27 @@ export function ContactPopover({
   return (
     <div 
       ref={popoverRef}
-      className="absolute z-50 w-72 bg-white rounded-xl shadow-xl border border-gray-100 animate-in fade-in zoom-in-95 duration-200"
+      className="absolute z-50 w-72 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 animate-in fade-in zoom-in-95 duration-200 transition-colors"
       style={{ top: position.top, left: position.left }}
     >
       <div className="p-4 space-y-4">
-        <h3 className="text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2">
           Contacto de {studentName}
         </h3>
 
         {email ? (
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               <Mail className="w-4 h-4 text-indigo-500" />
               Email
             </div>
-            <div className="bg-gray-50 p-2 rounded-lg flex items-center justify-between group">
-              <span className="text-sm text-gray-600 truncate mr-2 select-all">
+            <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg flex items-center justify-between group">
+              <span className="text-sm text-gray-600 dark:text-gray-300 truncate mr-2 select-all">
                 {email}
               </span>
               <button
                 onClick={() => handleCopy(email, 'email')}
-                className="text-gray-400 hover:text-indigo-600 transition-colors p-1 rounded-md hover:bg-white shadow-sm"
+                className="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1 rounded-md hover:bg-white dark:hover:bg-gray-700 shadow-sm"
                 title="Copiar email"
               >
                 {copiedEmail ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -131,7 +131,7 @@ export function ContactPopover({
             </div>
             <a
               href={`mailto:${email}`}
-              className="block w-full text-center py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+              className="block w-full text-center py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
             >
               Enviar Correo
             </a>
@@ -140,17 +140,17 @@ export function ContactPopover({
 
         {phone ? (
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               <Phone className="w-4 h-4 text-green-500" />
               Teléfono / WhatsApp
             </div>
-            <div className="bg-gray-50 p-2 rounded-lg flex items-center justify-between group">
-              <span className="text-sm text-gray-600 truncate mr-2 select-all">
+            <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg flex items-center justify-between group">
+              <span className="text-sm text-gray-600 dark:text-gray-300 truncate mr-2 select-all">
                 {formattedPhone}
               </span>
               <button
                 onClick={() => handleCopy(formattedPhone, 'phone')}
-                className="text-gray-400 hover:text-green-600 transition-colors p-1 rounded-md hover:bg-white shadow-sm"
+                className="text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 rounded-md hover:bg-white dark:hover:bg-gray-700 shadow-sm"
                 title="Copiar teléfono"
               >
                 {copiedPhone ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -169,7 +169,7 @@ export function ContactPopover({
         ) : null}
 
         {!email && !phone && (
-          <div className="text-center py-4 text-sm text-gray-500">
+          <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
             No hay datos de contacto registrados.
           </div>
         )}

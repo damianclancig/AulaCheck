@@ -168,7 +168,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
 
   if (dates.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
         <p>No hay registros de asistencia para este curso.</p>
         <p className="text-sm mt-2">Comienza tomando asistencia para ver la planilla.</p>
       </div>
@@ -179,15 +179,15 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
     <div className="space-y-4">
       {/* Info header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <span>{students.length} alumnos</span>
           <span>•</span>
           <span>{dates.length} clases registradas</span>
         </div>
         
         {/* Help text */}
-        <div className="flex items-start gap-2 text-xs text-gray-500 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-          <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 transition-colors">
+          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
           <span>
             <span className="hidden sm:inline">Click derecho sobre un ícono para editar. </span>
             <span className="sm:hidden">Mantén presionado para editar. </span>
@@ -198,41 +198,41 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
       {/* Context Menu */}
       {contextMenu.visible && (
         <div
-          className="fixed bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 min-w-[160px]"
+          className="fixed bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-50 min-w-[160px] transition-colors"
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={() => handleStatusChange('present')}
             disabled={updating}
-            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-700"
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-colors"
           >
-            <Check className="w-4 h-4 text-green-600" />
+            <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
             <span className="font-medium">Presente</span>
           </button>
           <button
             onClick={() => handleStatusChange('absent')}
             disabled={updating}
-            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-700"
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-colors"
           >
-            <XCircle className="w-4 h-4 text-red-600" />
+            <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
             <span className="font-medium">Ausente</span>
           </button>
           <button
             onClick={() => handleStatusChange('late')}
             disabled={updating}
-            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-700"
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-colors"
           >
-            <Clock className="w-4 h-4 text-yellow-600" />
+            <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
             <span className="font-medium">Tarde</span>
           </button>
           {contextMenu.currentStatus && (
             <>
-              <div className="border-t border-gray-100 my-1" />
+              <div className="border-t border-gray-100 dark:border-gray-800 my-1" />
               <button
                 onClick={() => handleStatusChange(null)}
                 disabled={updating}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3 disabled:opacity-50 text-gray-600"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-600 dark:text-gray-400 transition-colors"
               >
                 <XIcon className="w-4 h-4" />
                 <span className="font-medium">Eliminar registro</span>
@@ -243,17 +243,17 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
       )}
 
       {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50 sticky top-0 z-10">
+      <div className="hidden md:block overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
             <tr>
-              <th className="sticky left-0 z-20 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+              <th className="sticky left-0 z-20 bg-gray-50 dark:bg-gray-800 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
                 Alumno
               </th>
               {dates.map((date) => (
                 <th
                   key={date}
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
                   title={new Date(date).toLocaleDateString('es-AR', { 
                     weekday: 'long', 
                     year: 'numeric', 
@@ -264,12 +264,12 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                   {formatDate(date)}
                 </th>
               ))}
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200 bg-gray-100">
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-l border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
                 Estadística
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
             {displayedStudents.map((student) => {
               const studentRecords = records[student._id.toString()] || {};
               const totalClasses = dates.length;
@@ -280,8 +280,8 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
               const absentPercentage = totalClasses > 0 ? ((absentCount / totalClasses) * 100).toFixed(0) : '0';
 
               return (
-                <tr key={student._id.toString()} className="hover:bg-gray-50">
-                  <td className="sticky left-0 z-10 bg-white px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
+                <tr key={student._id.toString()} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">
                     {student.lastName}, {student.firstName}
                   </td>
                   {dates.map((date) => {
@@ -298,16 +298,16 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                       </td>
                     );
                   })}
-                  <td className="px-6 py-4 text-center border-l border-gray-200 bg-gray-50">
+                  <td className="px-6 py-4 text-center border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-center gap-2 text-xs">
-                        <span className="text-green-700 font-semibold">{presentCount}</span>
-                        <span className="text-gray-400">/</span>
-                        <span className="text-red-700 font-semibold">{absentCount}</span>
+                        <span className="text-green-700 dark:text-green-400 font-semibold">{presentCount}</span>
+                        <span className="text-gray-400 dark:text-gray-600">/</span>
+                        <span className="text-red-700 dark:text-red-400 font-semibold">{absentCount}</span>
                       </div>
-                      <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                      <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>{presentPercentage}%</span>
-                        <span className="text-gray-300">/</span>
+                        <span className="text-gray-300 dark:text-gray-600">/</span>
                         <span>{absentPercentage}%</span>
                       </div>
                     </div>
@@ -320,7 +320,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
         
         {/* Infinite scroll trigger */}
         {visibleStudents < students.length && (
-          <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400">
+          <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
             Cargando más alumnos...
           </div>
         )}
@@ -337,10 +337,10 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
           const absentPercentage = totalClasses > 0 ? ((absentCount / totalClasses) * 100).toFixed(0) : '0';
 
           return (
-            <div key={student._id.toString()} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div key={student._id.toString()} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-colors">
               {/* Student Header */}
-              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                <h4 className="font-semibold text-gray-900">
+              <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <h4 className="font-semibold text-gray-900 dark:text-white">
                   {student.lastName}, {student.firstName}
                 </h4>
               </div>
@@ -353,7 +353,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                     return (
                       <div 
                         key={date} 
-                        className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
+                        className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0"
                         onContextMenu={(e) => handleContextMenu(e, student._id.toString(), date, status)}
                         onTouchStart={(e) => {
                           const touch = e.touches[0];
@@ -371,7 +371,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                         {/* Date and Icon - Left */}
                         <div className="flex items-center gap-3">
                           <AttendanceIcon status={status} size="sm" />
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
                             {new Date(date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}
                           </span>
                         </div>
@@ -379,13 +379,13 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                         {/* Statistics - Right */}
                         <div className="flex flex-col items-end gap-0.5">
                           <div className="flex items-center gap-1.5 text-xs">
-                            <span className="text-green-700 font-semibold">{presentCount}</span>
-                            <span className="text-gray-300">/</span>
-                            <span className="text-red-700 font-semibold">{absentCount}</span>
+                            <span className="text-green-700 dark:text-green-400 font-semibold">{presentCount}</span>
+                            <span className="text-gray-300 dark:text-gray-600">/</span>
+                            <span className="text-red-700 dark:text-red-400 font-semibold">{absentCount}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                             <span>{presentPercentage}%</span>
-                            <span className="text-gray-300">/</span>
+                            <span className="text-gray-300 dark:text-gray-600">/</span>
                             <span>{absentPercentage}%</span>
                           </div>
                         </div>
@@ -395,7 +395,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                 </div>
 
                 {dates.length > 10 && (
-                  <p className="text-xs text-gray-400 mt-3 text-center">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center">
                     +{dates.length - 10} clases más
                   </p>
                 )}
@@ -406,7 +406,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
         
         {/* Infinite scroll trigger */}
         {visibleStudents < students.length && (
-          <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400">
+          <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
             Cargando más alumnos...
           </div>
         )}

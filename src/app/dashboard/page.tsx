@@ -44,8 +44,8 @@ export default function DashboardPage() {
     <div>
       <div className="flex flex-col md:flex-row md:justify-between items-center mb-8 gap-4">
         <div className="text-center md:text-left">
-          <h2 className="text-2xl font-bold text-gray-900">Mis Cursos</h2>
-          <p className="text-gray-500 mt-1">Gestiona tus clases y alumnos desde aquí.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Mis Cursos</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Gestiona tus clases y alumnos desde aquí.</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -63,17 +63,17 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white rounded-xl border border-gray-200 border-dashed">
-          <div className="bg-indigo-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-dashed transition-colors duration-200">
+          <div className="bg-indigo-50 dark:bg-indigo-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-8 h-8 text-indigo-400" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No tienes cursos creados</h3>
-          <p className="text-gray-500 max-w-sm mx-auto mb-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No tienes cursos creados</h3>
+          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">
             Comienza creando tu primer curso para gestionar asistencias y calificaciones.
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="text-indigo-600 font-medium hover:text-indigo-700 hover:underline"
+            className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline"
           >
             Crear mi primer curso &rarr;
           </button>

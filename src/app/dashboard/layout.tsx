@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default function DashboardLayout({
   children,
@@ -34,32 +35,33 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden transition-colors duration-200">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       <div className="flex-1 flex flex-col overflow-hidden w-full">
-        <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-8 flex-shrink-0">
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 flex items-center justify-between px-4 sm:px-8 flex-shrink-0 transition-colors duration-200">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-500 hover:text-gray-700 focus:outline-none"
+              className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
             >
               <span className="sr-only">Abrir menú</span>
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 truncate">
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 truncate">
               {/* El título podría ser dinámico según la página */}
               Bienvenido, {user.displayName?.split(' ')[0]}
             </h1>
           </div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             {user.photoURL && (
               <img
                 src={user.photoURL}
                 alt={user.displayName || 'User'}
-                className="h-8 w-8 rounded-full border border-gray-200"
+                className="h-8 w-8 rounded-full border border-gray-200 dark:border-gray-700"
               />
             )}
           </div>
