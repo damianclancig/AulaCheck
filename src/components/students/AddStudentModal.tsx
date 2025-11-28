@@ -124,12 +124,12 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-900">Agregar Alumno</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Agregar Alumno</h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -137,14 +137,14 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
 
         <form onSubmit={handleSubmitAndAddAnother} className="p-6 space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Nombre *
               </label>
               <input
@@ -161,8 +161,8 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
                     setFieldErrors(prev => ({ ...prev, firstName: 'Este campo es obligatorio' }));
                   }
                 }}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 ${
-                  fieldErrors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${
+                  fieldErrors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
                 }`}
               />
               {fieldErrors.firstName && (
@@ -170,7 +170,7 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
               )}
             </div>
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Apellido *
               </label>
               <input
@@ -186,8 +186,8 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
                     setFieldErrors(prev => ({ ...prev, lastName: 'Este campo es obligatorio' }));
                   }
                 }}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 ${
-                  fieldErrors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${
+                  fieldErrors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
                 }`}
               />
               {fieldErrors.lastName && (
@@ -197,7 +197,7 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
           </div>
 
           <div>
-            <label htmlFor="externalId" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="externalId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Legajo / ID (Opcional)
             </label>
             <input
@@ -205,12 +205,12 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
               id="externalId"
               value={formData.externalId}
               onChange={(e) => setFormData({ ...formData, externalId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Email (Opcional)
             </label>
             <input
@@ -226,8 +226,8 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
                   setFieldErrors(prev => ({ ...prev, email: 'El formato del email no es válido' }));
                 }
               }}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 ${
-                fieldErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-indigo-500'
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${
+                fieldErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
               }`}
             />
             {fieldErrors.email && (
@@ -244,14 +244,14 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-indigo-600 bg-white border border-indigo-300 rounded-lg hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800 border border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 flex items-center gap-2 transition-colors"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               Guardar y Agregar Otro

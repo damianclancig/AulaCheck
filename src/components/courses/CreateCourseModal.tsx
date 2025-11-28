@@ -48,19 +48,19 @@ export function CreateCourseModal({ isOpen, onClose, onCourseCreated }: CreateCo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-900">Nuevo Curso</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Nuevo Curso</h2>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="mx-6 mt-6 bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+          <div className="mx-6 mt-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
             {error}
           </div>
         )}

@@ -137,26 +137,26 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 flex-shrink-0">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Tomar Asistencia</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Tomar Asistencia</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {students.length} alumnos registrados
             </p>
           </div>
           <button 
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Date Picker */}
-        <div className="p-6 border-b border-gray-100 bg-gray-50 flex-shrink-0">
-          <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 flex-shrink-0 transition-colors">
+          <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Fecha de la clase
           </label>
           <input
@@ -164,7 +164,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
             id="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900"
+            className="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900"
           />
         </div>
 
@@ -174,14 +174,14 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
             const status = attendanceMap[student._id.toString()];
             
             return (
-              <div key={student._id.toString()} className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-lg hover:border-gray-200 transition-colors">
+              <div key={student._id.toString()} className="flex items-center justify-between p-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-medium text-sm">
+                  <div className="h-10 w-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-medium text-sm">
                     {student.firstName[0]}{student.lastName[0]}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{student.lastName}, {student.firstName}</p>
-                    <p className="text-xs text-gray-500">Legajo: {student.externalId || '-'}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{student.lastName}, {student.firstName}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Legajo: {student.externalId || '-'}</p>
                   </div>
                 </div>
 
@@ -191,8 +191,8 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                     className={cn(
                       "p-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all",
                       status === 'present' 
-                        ? "bg-green-100 text-green-700 ring-2 ring-green-500 ring-offset-1" 
-                        : status ? "bg-gray-50 text-gray-400" : "bg-green-50/30 text-green-600/60 hover:bg-green-50"
+                        ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-2 ring-green-500 dark:ring-green-600 ring-offset-1" 
+                        : status ? "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-600" : "bg-green-50/30 dark:bg-green-900/10 text-green-600/60 dark:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20"
                     )}
                   >
                     <Check className="w-4 h-4" />
@@ -204,8 +204,8 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                     className={cn(
                       "p-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all",
                       status === 'late' 
-                        ? "bg-yellow-100 text-yellow-700 ring-2 ring-yellow-500 ring-offset-1" 
-                        : status ? "bg-gray-50 text-gray-400" : "bg-yellow-50/30 text-yellow-600/60 hover:bg-yellow-50"
+                        ? "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 ring-2 ring-yellow-500 dark:ring-yellow-600 ring-offset-1" 
+                        : status ? "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-600" : "bg-yellow-50/30 dark:bg-yellow-900/10 text-yellow-600/60 dark:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20"
                     )}
                   >
                     <Clock className="w-4 h-4" />
@@ -217,8 +217,8 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                     className={cn(
                       "p-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all",
                       status === 'absent' 
-                        ? "bg-red-100 text-red-700 ring-2 ring-red-500 ring-offset-1" 
-                        : status ? "bg-gray-50 text-gray-400" : "bg-red-50/30 text-red-600/60 hover:bg-red-50"
+                        ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 ring-2 ring-red-500 dark:ring-red-600 ring-offset-1" 
+                        : status ? "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-600" : "bg-red-50/30 dark:bg-red-900/10 text-red-600/60 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                     )}
                   >
                     <XCircle className="w-4 h-4" />
@@ -232,7 +232,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
 
         {/* MOBILE CAROUSEL VIEW */}
         <div 
-          className="md:hidden flex-1 flex flex-col items-center justify-center p-6 bg-gray-50"
+          className="md:hidden flex-1 flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-800 transition-colors"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -240,28 +240,28 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
           {currentStudent && (
             <div 
               className={cn(
-                "w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col items-center text-center space-y-6 transition-all duration-500",
+                "w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center text-center space-y-6 transition-all duration-500",
                 isTransitioning ? "opacity-0 scale-95 translate-x-8" : "opacity-100 scale-100 translate-x-0"
               )} 
               key={currentIndex}
             >
               
               {/* Progress Indicator */}
-              <div className="w-full flex justify-between text-xs text-gray-400 uppercase tracking-wider font-medium">
+              <div className="w-full flex justify-between text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">
                 <span>Alumno {currentIndex + 1} de {students.length}</span>
                 <span>{Math.round(((currentIndex + 1) / students.length) * 100)}%</span>
               </div>
 
               {/* Student Info */}
               <div className="flex flex-col items-center gap-3">
-                <div className="h-20 w-20 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-2xl shadow-inner">
+                <div className="h-20 w-20 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-2xl shadow-inner">
                   {currentStudent.firstName[0]}{currentStudent.lastName[0]}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                     {currentStudent.lastName}, {currentStudent.firstName}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Legajo: {currentStudent.externalId || 'Sin legajo'}
                   </p>
                 </div>
@@ -276,7 +276,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                       "flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-95",
                       currentStatus === 'present'
                         ? "border-green-500 bg-green-50 text-green-700 shadow-sm"
-                        : currentStatus ? "border-gray-200 bg-white text-gray-400" : "border-green-200 bg-green-50/20 text-green-600 hover:bg-green-50"
+                        : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-green-200 bg-green-50/20 text-green-600 hover:bg-green-50 dark:border-green-800 dark:bg-green-900/10 dark:text-green-400 dark:hover:bg-green-900/20"
                     )}
                   >
                     <Check className="w-8 h-8" />
@@ -289,7 +289,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                       "flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-95",
                       currentStatus === 'absent'
                         ? "border-red-500 bg-red-50 text-red-700 shadow-sm"
-                        : currentStatus ? "border-gray-200 bg-white text-gray-400" : "border-red-200 bg-red-50/20 text-red-600 hover:bg-red-50"
+                        : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-red-200 bg-red-50/20 text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-red-900/10 dark:text-red-400 dark:hover:bg-red-900/20"
                     )}
                   >
                     <XCircle className="w-8 h-8" />
@@ -303,7 +303,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                     "w-full flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all active:scale-95",
                     currentStatus === 'late'
                       ? "border-yellow-500 bg-yellow-50 text-yellow-700 shadow-sm"
-                      : currentStatus ? "border-gray-200 bg-white text-gray-400" : "border-yellow-200 bg-yellow-50/20 text-yellow-600 hover:bg-yellow-50"
+                      : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-yellow-200 bg-yellow-50/20 text-yellow-600 hover:bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/10 dark:text-yellow-400 dark:hover:bg-yellow-900/20"
                   )}
                 >
                   <Clock className="w-5 h-5" />
@@ -312,11 +312,11 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
               </div>
 
               {/* Navigation Hints */}
-              <div className="flex items-center justify-between w-full text-gray-300 pt-2">
+              <div className="flex items-center justify-between w-full text-gray-300 dark:text-gray-600 pt-2">
                 <button 
                   onClick={() => currentIndex > 0 && setCurrentIndex(prev => prev - 1)}
                   disabled={currentIndex === 0}
-                  className="p-2 hover:text-gray-500 disabled:opacity-30"
+                  className="p-2 hover:text-gray-500 dark:hover:text-gray-400 disabled:opacity-30"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -326,7 +326,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                       key={idx} 
                       className={cn(
                         "w-1.5 h-1.5 rounded-full transition-all",
-                        idx === currentIndex ? "bg-indigo-500 w-3" : "bg-gray-200"
+                        idx === currentIndex ? "bg-indigo-500 w-3" : "bg-gray-200 dark:bg-gray-700"
                       )} 
                     />
                   ))}
@@ -334,7 +334,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                 <button 
                   onClick={() => currentIndex < students.length - 1 && setCurrentIndex(prev => prev + 1)}
                   disabled={currentIndex === students.length - 1}
-                  className="p-2 hover:text-gray-500 disabled:opacity-30"
+                  className="p-2 hover:text-gray-500 dark:hover:text-gray-400 disabled:opacity-30"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
@@ -344,10 +344,10 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 flex justify-end gap-3 flex-shrink-0 bg-white">
+        <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 flex-shrink-0 bg-white dark:bg-gray-900 transition-colors">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             Cancelar
           </button>
