@@ -38,6 +38,10 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
     date: '',
   });
   const [updating, setUpdating] = useState(false);
+  
+  // Synchronized scroll state for mobile sliders
+  const scrollRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const isScrolling = useRef(false);
 
   // Infinite scroll logic
   useEffect(() => {
@@ -344,69 +348,94 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
           return (
             <div key={student._id.toString()} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-colors">
               {/* Student Header */}
-              <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h4 className="font-semibold text-gray-900 dark:text-white">
+              <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-white truncate">
                   {student.lastName}, {student.firstName}
                 </h4>
+                
+                {/* Statistics in Header */}
+                <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-green-700 dark:text-green-400 font-semibold">{presentCount}</span>
+                    <span className="text-gray-300 dark:text-gray-600">/</span>
+                    <span className="text-red-700 dark:text-red-400 font-semibold">{absentCount}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    <span>{presentPercentage}%</span>
+                    <span className="text-gray-300 dark:text-gray-600">/</span>
+                    <span>{absentPercentage}%</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Attendance Table */}
-              <div className="p-3">
-                <div className="space-y-1">
-                  {dates.slice(0, 10).map((date) => {
-                    const status = studentRecords[date];
-                    return (
-                      <div 
-                        key={date} 
-                        className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0"
-                        onContextMenu={(e) => handleContextMenu(e, student._id.toString(), date, status)}
-                        onTouchStart={(e) => {
-                          const touch = e.touches[0];
-                          const timer = setTimeout(() => {
-                            handleContextMenu(
-                              { preventDefault: () => {}, clientX: touch.clientX, clientY: touch.clientY } as any,
-                              student._id.toString(),
-                              date,
-                              status
-                            );
-                          }, 500);
-                          e.currentTarget.addEventListener('touchend', () => clearTimeout(timer), { once: true });
-                        }}
-                      >
-                        {/* Date and Icon - Left */}
-                        <div className="flex items-center gap-3">
-                          <AttendanceIcon status={status} size="sm" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
+              {/* Attendance Slider - Horizontal */}
+              <div className="relative">
+                {/* Scroll container */}
+                <div 
+                  ref={(el) => {
+                    if (el) scrollRefs.current.set(student._id.toString(), el);
+                  }}
+                  className="overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+                  style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                  }}
+                  onScroll={(e) => {
+                    if (isScrolling.current) return;
+                    isScrolling.current = true;
+                    const scrollLeft = e.currentTarget.scrollLeft;
+                    scrollRefs.current.forEach((ref, id) => {
+                      if (id !== student._id.toString() && ref) {
+                        ref.scrollLeft = scrollLeft;
+                      }
+                    });
+                    requestAnimationFrame(() => {
+                      isScrolling.current = false;
+                    });
+                  }}
+                >
+                  <div className="flex gap-2 p-3 min-w-min">
+                    {dates.map((date) => {
+                      const status = studentRecords[date];
+                      return (
+                        <div
+                          key={date}
+                          className="flex flex-col items-center gap-2 min-w-[70px] snap-start"
+                          onContextMenu={(e) => handleContextMenu(e, student._id.toString(), date, status)}
+                          onTouchStart={(e) => {
+                            const touch = e.touches[0];
+                            const timer = setTimeout(() => {
+                              handleContextMenu(
+                                { preventDefault: () => {}, clientX: touch.clientX, clientY: touch.clientY } as any,
+                                student._id.toString(),
+                                date,
+                                status
+                              );
+                            }, 500);
+                            e.currentTarget.addEventListener('touchend', () => clearTimeout(timer), { once: true });
+                          }}
+                        >
+                          {/* Date */}
+                          <div className="text-xs font-medium text-gray-600 dark:text-gray-400 text-center">
                             {(() => {
                               const [year, month, day] = date.split('-').map(Number);
                               return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`;
                             })()}
-                          </span>
-                        </div>
-
-                        {/* Statistics - Right */}
-                        <div className="flex flex-col items-end gap-0.5">
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <span className="text-green-700 dark:text-green-400 font-semibold">{presentCount}</span>
-                            <span className="text-gray-300 dark:text-gray-600">/</span>
-                            <span className="text-red-700 dark:text-red-400 font-semibold">{absentCount}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                            <span>{presentPercentage}%</span>
-                            <span className="text-gray-300 dark:text-gray-600">/</span>
-                            <span>{absentPercentage}%</span>
+                          
+                          {/* Attendance Icon */}
+                          <div className="flex items-center justify-center">
+                            <AttendanceIcon status={status} size="md" />
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-
-                {dates.length > 10 && (
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center">
-                    +{dates.length - 10} clases más
-                  </p>
-                )}
+                
+                {/* Scroll indicators - subtle gradient shadows */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none" />
               </div>
             </div>
           );
