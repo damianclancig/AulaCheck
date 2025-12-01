@@ -184,10 +184,10 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+        <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Tomar Asistencia</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Tomar Asistencia</h2>
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
               {sortedStudents.length} alumnos registrados
             </p>
           </div>
@@ -200,7 +200,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         </div>
 
         {/* Date Picker */}
-        <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 transition-colors">
+        <div className="p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 transition-colors">
           <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Fecha de la clase
           </label>
@@ -301,7 +301,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
 
         {/* MOBILE CAROUSEL VIEW */}
         <div 
-          className="md:hidden flex-1 flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-800 transition-colors"
+          className="md:hidden flex-1 flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-800 transition-colors"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -309,7 +309,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
           {currentStudent && (
             <div 
               className={cn(
-                "w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center text-center space-y-6 transition-all duration-500",
+                "w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 flex flex-col items-center text-center space-y-4 transition-all duration-500",
                 isTransitioning ? "opacity-0 scale-95 translate-x-8" : "opacity-100 scale-100 translate-x-0"
               )} 
               key={currentIndex}
@@ -322,61 +322,58 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
               </div>
 
               {/* Student Info */}
-              <div className="flex flex-col items-center gap-3">
-                <div className="h-20 w-20 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-2xl shadow-inner">
-                  {currentStudent.firstName[0]}{currentStudent.lastName[0]}
-                </div>
+              <div className="flex flex-col items-center gap-2 py-2">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-3xl font-black text-gray-900 dark:text-white leading-tight tracking-tight">
                     {currentStudent.lastName}, {currentStudent.firstName}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
                     Legajo: {currentStudent.externalId || 'Sin legajo'}
                   </p>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="w-full space-y-3">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="w-full space-y-2">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => handleStatusChange(currentStudent._id.toString(), 'present', true)}
                     className={cn(
-                      "flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-95",
+                      "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-95",
                       currentStatus === 'present'
                         ? "border-green-500 bg-green-50 text-green-700 shadow-sm"
                         : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-green-200 bg-green-50/20 text-green-600 hover:bg-green-50 dark:border-green-800 dark:bg-green-900/10 dark:text-green-400 dark:hover:bg-green-900/20"
                     )}
                   >
-                    <Check className="w-8 h-8" />
-                    <span className="font-bold">Presente</span>
+                    <Check className="w-6 h-6" />
+                    <span className="font-bold text-sm">Presente</span>
                   </button>
 
                   <button
                     onClick={() => handleStatusChange(currentStudent._id.toString(), 'absent', true)}
                     className={cn(
-                      "flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all active:scale-95",
+                      "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-95",
                       currentStatus === 'absent'
                         ? "border-red-500 bg-red-50 text-red-700 shadow-sm"
                         : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-red-200 bg-red-50/20 text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-red-900/10 dark:text-red-400 dark:hover:bg-red-900/20"
                     )}
                   >
-                    <XCircle className="w-8 h-8" />
-                    <span className="font-bold">Ausente</span>
+                    <XCircle className="w-6 h-6" />
+                    <span className="font-bold text-sm">Ausente</span>
                   </button>
                 </div>
 
                 <button
                   onClick={() => handleStatusChange(currentStudent._id.toString(), 'late', true)}
                   className={cn(
-                    "w-full flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all active:scale-95",
+                    "w-full flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all active:scale-95",
                     currentStatus === 'late'
                       ? "border-yellow-500 bg-yellow-50 text-yellow-700 shadow-sm"
                       : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-yellow-200 bg-yellow-50/20 text-yellow-600 hover:bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/10 dark:text-yellow-400 dark:hover:bg-yellow-900/20"
                   )}
                 >
-                  <Clock className="w-5 h-5" />
-                  <span className="font-medium">Llegada Tarde</span>
+                  <Clock className="w-4 h-4" />
+                  <span className="font-medium text-sm">Llegada Tarde</span>
                 </button>
               </div>
 
@@ -413,7 +410,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0 bg-white dark:bg-gray-900 transition-colors">
+        <div className="p-4 md:p-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0 bg-white dark:bg-gray-900 transition-colors">
           <div className="text-sm">
             {!allStudentsMarked && (
               <p className="text-orange-600 dark:text-orange-400 font-medium flex items-center gap-1.5">
