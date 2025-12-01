@@ -14,6 +14,7 @@ import { GradeModal } from '@/components/grades/GradeModal';
 import { EditCourseModal } from '@/components/courses/EditCourseModal';
 import { InviteStudentsModal } from '@/components/courses/InviteStudentsModal';
 import { JoinRequestsModal } from '@/components/students/JoinRequestsModal';
+import { ExportModal, ExportOptions } from '@/components/courses/ExportModal';
 import { 
   Loader2, 
   ArrowLeft, 
@@ -62,7 +63,7 @@ export default function CourseDetailPage() {
     dates: string[];
     records: Record<string, Record<string, 'present' | 'absent' | 'late'>>;
   }>(
-    courseId && viewMode === 'sheet' ? `/api/courses/${courseId}/attendance-records` : null,
+    courseId ? `/api/courses/${courseId}/attendance-records` : null,
     fetcher
   );
 
@@ -70,6 +71,7 @@ export default function CourseDetailPage() {
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [isGradeModalOpen, setIsGradeModalOpen] = useState(false);
   const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isJoinRequestsModalOpen, setIsJoinRequestsModalOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
@@ -135,37 +137,38 @@ export default function CourseDetailPage() {
     }
   };
 
-  const handleExport = (type: 'attendance' | 'grades' | 'full') => {
-    // Redirigir directamente al endpoint de descarga
-    // Necesitamos pasar el token, pero para descarga directa es complicado con headers
-    // Una opción es abrir en nueva pestaña y manejar auth por cookie (no tenemos cookies)
-    // O hacer fetch blob y descargar. Haremos fetch blob.
-    
-    const downloadReport = async () => {
-      try {
-        const token = await auth.currentUser?.getIdToken();
-        const res = await fetch(`/api/courses/${courseId}/report?type=${type}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        
-        if (!res.ok) throw new Error('Error descargando reporte');
-        
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${course.name}_${type}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } catch (error) {
-        console.error('Error exporting:', error);
-        alert('Error al exportar reporte');
-      }
-    };
+  const handleExport = async (options: ExportOptions) => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      
+      // Construir query params
+      const params = new URLSearchParams();
+      if (options.dni) params.append('dni', 'true');
+      if (options.email) params.append('email', 'true');
+      if (options.phone) params.append('phone', 'true');
+      if (options.grades) params.append('grades', 'true');
+      if (options.attendanceStats) params.append('attendanceStats', 'true');
+      if (options.attendanceDetails) params.append('attendanceDetails', 'true');
 
-    downloadReport();
+      const res = await fetch(`/api/courses/${courseId}/report?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (!res.ok) throw new Error('Error descargando reporte');
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${course.name}_reporte.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error exporting:', error);
+      alert('Error al exportar reporte');
+    }
   };
 
   return (
@@ -214,7 +217,7 @@ export default function CourseDetailPage() {
             <GraduationCap className="w-4 h-4" /> Calificar
           </button>
           <button
-            onClick={() => handleExport('full')}
+            onClick={() => setIsExportModalOpen(true)}
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
           >
             <Download className="w-4 h-4" /> Exportar
@@ -347,8 +350,10 @@ export default function CourseDetailPage() {
           isOpen={isAttendanceModalOpen}
           onClose={() => setIsAttendanceModalOpen(false)}
           students={students}
+          existingDates={attendanceData?.dates || []}
           onAttendanceSaved={() => {
             mutateStudents();
+            mutate(`/api/courses/${courseId}/attendance-records`);
           }}
         />
       )}
@@ -374,6 +379,16 @@ export default function CourseDetailPage() {
           onCourseUpdated={() => {
             mutateCourse();
           }}
+        />
+      )}
+
+      {/* ExportModal */}
+      {course && (
+        <ExportModal
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          onExport={handleExport}
+          courseName={course.name}
         />
       )}
 

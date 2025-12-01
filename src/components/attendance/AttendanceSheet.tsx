@@ -68,8 +68,9 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
   }, [contextMenu.visible]);
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return `${date.getDate()}/${date.getMonth() + 1}`;
+    // Parsear la fecha directamente del string YYYY-MM-DD sin conversión UTC
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return `${day}/${month}`;
   };
 
   // Sort students alphabetically by last name, then first name
@@ -254,12 +255,16 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                 <th
                   key={date}
                   className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-                  title={new Date(date).toLocaleDateString('es-AR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
+                  title={(() => {
+                    const [year, month, day] = date.split('-').map(Number);
+                    const dateObj = new Date(year, month - 1, day);
+                    return dateObj.toLocaleDateString('es-AR', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    });
+                  })()}
                 >
                   {formatDate(date)}
                 </th>
@@ -372,7 +377,10 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                         <div className="flex items-center gap-3">
                           <AttendanceIcon status={status} size="sm" />
                           <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {new Date(date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}
+                            {(() => {
+                              const [year, month, day] = date.split('-').map(Number);
+                              return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`;
+                            })()}
                           </span>
                         </div>
 

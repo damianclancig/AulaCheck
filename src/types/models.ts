@@ -25,7 +25,7 @@ export interface Course {
   ownerId: string; // Firebase UID
   institutionName: string;
   schoolId?: ObjectId; // Deprecated/Future use
-  startDate: Date;
+  startDate: string; // Formato YYYY-MM-DD
   description?: string;
   joinCode?: string; // Unique 8-character code for self-registration
   allowJoinRequests: boolean; // Whether self-registration is enabled
@@ -73,7 +73,7 @@ export interface Grade {
   courseId: ObjectId;
   studentId: ObjectId;
   assessment: string; // nombre de la evaluación
-  date: Date;
+  date: string; // Formato YYYY-MM-DD
   score: number;
   weight: number; // peso para promedio ponderado
   createdAt: Date;

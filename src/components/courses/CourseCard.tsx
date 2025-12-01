@@ -9,11 +9,18 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course }: CourseCardProps) {
-  const startDate = new Date(course.startDate).toLocaleDateString('es-AR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  // Parsear fecha directamente del string YYYY-MM-DD sin conversión UTC
+  const formatStartDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString('es-AR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
+  const startDate = formatStartDate(course.startDate);
 
   const attendancePercent = (course.meta.avgAttendance * 100).toFixed(0);
 

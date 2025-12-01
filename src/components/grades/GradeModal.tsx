@@ -17,9 +17,18 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
   const params = useParams();
   const courseId = params.id as string;
   
+  // Función para obtener fecha local en formato YYYY-MM-DD sin conversión UTC
+  const getLocalDateString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [loading, setLoading] = useState(false);
   const [assessment, setAssessment] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(getLocalDateString());
   const [weight, setWeight] = useState(1);
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [score, setScore] = useState<string>('');

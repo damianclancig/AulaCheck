@@ -17,11 +17,25 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
 
   if (!isOpen) return null;
 
+  // Función para convertir fecha a formato local YYYY-MM-DD
+  const formatDateForInput = (dateString: string) => {
+    // Si ya está en formato YYYY-MM-DD, usarlo directamente
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+    // Si es otro formato, parsearlo y convertir a fecha local
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const initialData: CourseFormData = {
     institutionName: course.institutionName || '',
     name: course.name,
     description: course.description || '',
-    startDate: new Date(course.startDate).toISOString().split('T')[0],
+    startDate: formatDateForInput(course.startDate),
   };
 
   const handleSubmit = async (data: CourseFormData) => {

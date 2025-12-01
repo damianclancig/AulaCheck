@@ -30,10 +30,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Get all attendance records for this course
     const attendanceRecords = await attendanceCollection
       .find({ courseId })
-      .sort({ date: -1 })
+      .sort({ date: 1 })
       .toArray();
 
-    // Extract unique dates (sorted descending)
+    // Extract unique dates (sorted ascending)
     const datesSet = new Set<string>();
     attendanceRecords.forEach(record => {
       if (record.date) {
