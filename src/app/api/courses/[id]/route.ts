@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const updateData: any = {};
     if (name) updateData.name = name;
     if (institutionName) updateData.institutionName = institutionName;
-    if (startDate) updateData.startDate = new Date(startDate);
+    if (startDate) updateData.startDate = startDate; // Guardar como string YYYY-MM-DD
     if (description !== undefined) updateData.description = description;
 
     const coursesCollection = await getCoursesCollection();

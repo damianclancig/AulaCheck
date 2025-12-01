@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       name,
       ownerId: user.uid,
       institutionName,
-      startDate: new Date(startDate),
+      startDate: startDate, // Guardar como string YYYY-MM-DD
       description: description || undefined,
       allowJoinRequests: false, // Disabled by default
       createdAt: new Date(),

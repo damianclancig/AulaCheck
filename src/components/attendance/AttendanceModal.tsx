@@ -11,17 +11,27 @@ interface AttendanceModalProps {
   isOpen: boolean;
   onClose: () => void;
   students: Student[];
+  existingDates?: string[];
   onAttendanceSaved: () => void;
 }
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
-export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }: AttendanceModalProps) {
+export function AttendanceModal({ isOpen, onClose, students, existingDates = [], onAttendanceSaved }: AttendanceModalProps) {
   const params = useParams();
   const courseId = params.id as string;
   
+  // Función para obtener fecha local en formato YYYY-MM-DD sin conversión UTC
+  const getLocalDateString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(getLocalDateString());
   const [attendanceMap, setAttendanceMap] = useState<Record<string, AttendanceStatus>>({});
   
   // Carousel State
@@ -33,6 +43,12 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
   // Min swipe distance (in px)
   const minSwipeDistance = 50;
 
+  // Ordenar estudiantes por apellido y nombre
+  const sortedStudents = [...students].sort((a, b) => {
+    const lastNameCompare = a.lastName.localeCompare(b.lastName);
+    return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
+  });
+
   // Inicializar sin selección por defecto
   useEffect(() => {
     if (isOpen && students.length > 0) {
@@ -43,21 +59,50 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
 
   if (!isOpen) return null;
 
+  // Verificar si la fecha seleccionada ya tiene asistencia
+  const isDuplicateDate = existingDates.includes(date);
+
+  // Check if all students have attendance marked
+  const allStudentsMarked = sortedStudents.length > 0 && sortedStudents.every(student => 
+    attendanceMap[student._id.toString()] !== undefined
+  );
+
+  // Find next unmarked student index
+  const findNextUnmarkedStudent = (fromIndex: number): number => {
+    for (let i = fromIndex; i < sortedStudents.length; i++) {
+      if (!attendanceMap[sortedStudents[i]._id.toString()]) {
+        return i;
+      }
+    }
+    // If no unmarked student found after current, search from beginning
+    for (let i = 0; i < fromIndex; i++) {
+      if (!attendanceMap[sortedStudents[i]._id.toString()]) {
+        return i;
+      }
+    }
+    return -1; // All marked
+  };
+
   const handleStatusChange = (studentId: string, status: AttendanceStatus, autoAdvance = false) => {
     setAttendanceMap(prev => ({
       ...prev,
       [studentId]: status
     }));
 
-    if (autoAdvance && currentIndex < students.length - 1) {
-      // Trigger transition animation
-      setIsTransitioning(true);
+    if (autoAdvance) {
+      // Find next unmarked student
+      const nextUnmarkedIndex = findNextUnmarkedStudent(currentIndex + 1);
       
-      // Delay before advancing to next student
-      setTimeout(() => {
-        setCurrentIndex(prev => prev + 1);
-        setIsTransitioning(false);
-      }, 600);
+      if (nextUnmarkedIndex !== -1) {
+        // Trigger transition animation
+        setIsTransitioning(true);
+        
+        // Delay before advancing to next unmarked student
+        setTimeout(() => {
+          setCurrentIndex(nextUnmarkedIndex);
+          setIsTransitioning(false);
+        }, 600);
+      }
     }
   };
 
@@ -132,7 +177,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
     }
   };
 
-  const currentStudent = students[currentIndex];
+  const currentStudent = sortedStudents[currentIndex];
   const currentStatus = currentStudent ? attendanceMap[currentStudent._id.toString()] : undefined;
 
   return (
@@ -143,7 +188,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Tomar Asistencia</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {students.length} alumnos registrados
+              {sortedStudents.length} alumnos registrados
             </p>
           </div>
           <button 
@@ -155,7 +200,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
         </div>
 
         {/* Date Picker */}
-        <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 flex-shrink-0 transition-colors">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 transition-colors">
           <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Fecha de la clase
           </label>
@@ -164,24 +209,48 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
             id="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900"
+            className="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900 [color-scheme:light] dark:[color-scheme:dark]"
           />
+          {isDuplicateDate && (
+            <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg flex items-start gap-2">
+              <svg className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-orange-800 dark:text-orange-300">
+                  Ya existe asistencia para esta fecha
+                </p>
+                <p className="text-xs text-orange-700 dark:text-orange-400 mt-1">
+                  Si continúas, se sobrescribirá la asistencia existente para este día.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* DESKTOP LIST VIEW */}
         <div className="hidden md:block overflow-y-auto p-6 space-y-4 flex-1">
-          {students.map((student) => {
+          {sortedStudents.map((student) => {
             const status = attendanceMap[student._id.toString()];
             
             return (
-              <div key={student._id.toString()} className="flex items-center justify-between p-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
+              <div key={student._id.toString()} className={cn(
+                "flex items-center justify-between p-3 bg-white dark:bg-gray-900 border rounded-lg hover:border-gray-200 dark:hover:border-gray-700 transition-all",
+                status ? "border-gray-100 dark:border-gray-800" : "border-orange-200 dark:border-orange-800 bg-orange-50/20 dark:bg-orange-900/10"
+              )}>
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-medium text-sm">
+                  <div className={cn(
+                    "h-10 w-10 rounded-full flex items-center justify-center font-medium text-sm",
+                    status ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" : "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
+                  )}>
                     {student.firstName[0]}{student.lastName[0]}
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">{student.lastName}, {student.firstName}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Legajo: {student.externalId || '-'}</p>
+                    {!status && (
+                      <p className="text-xs text-orange-600 dark:text-orange-400 font-medium mt-0.5">⚠ Falta marcar asistencia</p>
+                    )}
                   </div>
                 </div>
 
@@ -248,8 +317,8 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
               
               {/* Progress Indicator */}
               <div className="w-full flex justify-between text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">
-                <span>Alumno {currentIndex + 1} de {students.length}</span>
-                <span>{Math.round(((currentIndex + 1) / students.length) * 100)}%</span>
+                <span>Alumno {currentIndex + 1} de {sortedStudents.length}</span>
+                <span>{Math.round(((currentIndex + 1) / sortedStudents.length) * 100)}%</span>
               </div>
 
               {/* Student Info */}
@@ -321,7 +390,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <div className="flex gap-1">
-                  {students.map((_, idx) => (
+                  {sortedStudents.map((_, idx) => (
                     <div 
                       key={idx} 
                       className={cn(
@@ -333,7 +402,7 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
                 </div>
                 <button 
                   onClick={() => currentIndex < students.length - 1 && setCurrentIndex(prev => prev + 1)}
-                  disabled={currentIndex === students.length - 1}
+                  disabled={currentIndex === sortedStudents.length - 1}
                   className="p-2 hover:text-gray-500 dark:hover:text-gray-400 disabled:opacity-30"
                 >
                   <ChevronRight className="w-6 h-6" />
@@ -344,21 +413,37 @@ export function AttendanceModal({ isOpen, onClose, students, onAttendanceSaved }
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 flex-shrink-0 bg-white dark:bg-gray-900 transition-colors">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
-          >
+        <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0 bg-white dark:bg-gray-900 transition-colors">
+          <div className="text-sm">
+            {!allStudentsMarked && (
+              <p className="text-orange-600 dark:text-orange-400 font-medium flex items-center gap-1.5">
+                <span className="inline-block w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+                Falta marcar {sortedStudents.filter(s => !attendanceMap[s._id.toString()]).length} alumno{sortedStudents.filter(s => !attendanceMap[s._id.toString()]).length !== 1 ? 's' : ''}
+              </p>
+            )}
+            {allStudentsMarked && (
+              <p className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1.5">
+                <Check className="w-4 h-4" />
+                Todos los alumnos marcados
+              </p>
+            )}
+          </div>
+          <div className="flex gap-3 w-full sm:w-auto">
+            <button
+              onClick={onClose}
+              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || !allStudentsMarked}
+              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 transition-all"
+            >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             Guardar Asistencia
           </button>
+          </div>
         </div>
       </div>
     </div>

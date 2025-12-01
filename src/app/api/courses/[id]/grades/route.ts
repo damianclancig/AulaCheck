@@ -100,7 +100,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       courseId,
       studentId: new ObjectId(studentId),
       assessment,
-      date: new Date(date),
+      date: date, // Guardar como string YYYY-MM-DD
       score: parseFloat(score),
       weight: parseFloat(weight),
       createdAt: new Date(),
