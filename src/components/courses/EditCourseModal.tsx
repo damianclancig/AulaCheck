@@ -36,6 +36,7 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
     name: course.name,
     description: course.description || '',
     startDate: formatDateForInput(course.startDate),
+    annualClassCount: course.annualClassCount,
   };
 
   const handleSubmit = async (data: CourseFormData) => {
@@ -74,7 +75,7 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Editar Curso</h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >

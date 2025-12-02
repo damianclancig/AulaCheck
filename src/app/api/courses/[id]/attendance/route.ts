@@ -72,37 +72,87 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { date, records } = body;
+    const { date, records, suspensionReason, suspensionNote } = body;
 
     // Validación
-    if (!date || !records || !Array.isArray(records)) {
+    if (!date || !Array.isArray(records)) {
       return NextResponse.json(
         { error: 'date and records array are required' },
         { status: 400 }
       );
     }
 
+    // Si no hay suspensión, debe haber registros
+    if (!suspensionReason && records.length === 0) {
+      return NextResponse.json(
+        { error: 'records array cannot be empty for normal classes' },
+        { status: 400 }
+      );
+    }
+
+    // Validar que si suspensionReason es 'other', se proporcione suspensionNote
+    if (suspensionReason === 'other' && !suspensionNote) {
+      return NextResponse.json(
+        { error: 'suspensionNote is required when suspensionReason is "other"' },
+        { status: 400 }
+      );
+    }
+
     const attendanceCollection = await getAttendanceCollection();
 
-    // Procesar cada registro (upsert)
-    const operations = records.map((record: { studentId: string; status: 'present' | 'absent' | 'late' }) => ({
-      updateOne: {
-        filter: {
-          courseId,
-          studentId: new ObjectId(record.studentId),
-          date,
-        },
-        update: {
-          $set: {
-            status: record.status,
-            createdAt: new Date(),
-          },
-        },
-        upsert: true,
-      },
-    }));
+    // Si estamos sobrescribiendo, eliminar registros marcadores de suspensión previos
+    // (registros sin studentId que solo marcan la fecha)
+    await attendanceCollection.deleteMany({
+      courseId,
+      date,
+      studentId: { $exists: false }
+    });
 
-    await attendanceCollection.bulkWrite(operations);
+    // Procesar cada registro (upsert)
+    const operations = records.map((record: { studentId: string; status: 'present' | 'absent' | 'late' }) => {
+      const updateData: any = {
+        status: record.status,
+        createdAt: new Date(),
+      };
+
+      // Agregar campos de suspensión si están presentes
+      if (suspensionReason) {
+        updateData.suspensionReason = suspensionReason;
+      }
+      if (suspensionNote) {
+        updateData.suspensionNote = suspensionNote;
+      }
+
+      return {
+        updateOne: {
+          filter: {
+            courseId,
+            studentId: new ObjectId(record.studentId),
+            date,
+          },
+          update: {
+            $set: updateData,
+          },
+          upsert: true,
+        },
+      };
+    });
+
+    // Solo ejecutar bulkWrite si hay operaciones (no vacío)
+    if (operations.length > 0) {
+      await attendanceCollection.bulkWrite(operations);
+    } else if (suspensionReason && suspensionReason !== 'none') {
+      // Si hay suspensión pero no hay registros, crear un registro marcador
+      // Este registro no tiene studentId, solo sirve para marcar la fecha como ocupada
+      await attendanceCollection.insertOne({
+        courseId,
+        date,
+        suspensionReason,
+        suspensionNote: suspensionNote || undefined,
+        createdAt: new Date(),
+        // No incluimos studentId ni status porque es un marcador de suspensión
+      } as any);
+    }
 
     // Recalcular promedio de asistencia del curso
     const avgAttendance = await calculateCourseAttendance(courseId);

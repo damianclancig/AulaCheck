@@ -26,6 +26,7 @@ export interface Course {
   institutionName: string;
   schoolId?: ObjectId; // Deprecated/Future use
   startDate: string; // Formato YYYY-MM-DD
+  annualClassCount?: number; // Cantidad total de clases durante el año
   description?: string;
   joinCode?: string; // Unique 8-character code for self-registration
   allowJoinRequests: boolean; // Whether self-registration is enabled
@@ -57,13 +58,16 @@ export interface Enrollment {
   status: 'active' | 'inactive';
 }
 
+
 // Attendance (registro por fecha)
 export interface Attendance {
   _id: ObjectId;
   courseId: ObjectId;
-  studentId: ObjectId;
+  studentId?: ObjectId; // Opcional: no presente en registros de suspensión sin alumnos
   date: string; // YYYY-MM-DD
-  status: 'present' | 'absent' | 'late';
+  status?: 'present' | 'absent' | 'late'; // Opcional: no presente en registros de suspensión sin alumnos
+  suspensionReason?: 'none' | 'class_suspension' | 'teacher_leave' | 'other'; // Motivo de suspensión
+  suspensionNote?: string; // Nota personalizada cuando suspensionReason es 'other'
   createdAt: Date;
 }
 
