@@ -104,9 +104,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       // Mapear registros
       allRecords.forEach(record => {
         if (!record.studentId) return;
+        if (!record.date) return;
+        const date = record.date as any;
         const sId = record.studentId.toString();
         if (!attendanceRecords[sId]) attendanceRecords[sId] = {};
-        attendanceRecords[sId][record.date] = record.status;
+        attendanceRecords[sId][date] = record.status as string;
       });
     }
 
