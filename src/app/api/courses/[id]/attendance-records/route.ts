@@ -46,14 +46,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const records: Record<string, Record<string, string>> = {};
 
     attendanceRecords.forEach(record => {
+      // Saltar registros marcadores de suspensión (sin studentId)
+      if (!record.studentId || !record.status) {
+        return;
+      }
+
       const studentId = record.studentId.toString();
       const date = record.date;
-      const status = record.status;
-      
+      const status = record.status as string;
+
       if (!records[studentId]) {
         records[studentId] = {};
       }
-      
+
       records[studentId][date] = status;
     });
 

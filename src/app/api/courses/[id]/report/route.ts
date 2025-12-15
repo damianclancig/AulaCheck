@@ -32,7 +32,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const { searchParams } = new URL(request.url);
-    
+
     // Parsear opciones
     const includeDni = searchParams.get('dni') === 'true';
     const includeEmail = searchParams.get('email') === 'true';
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Si no se selecciona nada, incluir todo por defecto (fallback)
     const isDefault = !includeDni && !includeEmail && !includePhone && !includeGrades && !includeAttendanceStats && !includeAttendanceDetails;
-    
+
     const showDni = includeDni || isDefault;
     const showEmail = includeEmail || isDefault;
     const showPhone = includePhone || isDefault;
@@ -103,9 +103,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
       // Mapear registros
       allRecords.forEach(record => {
+        if (!record.studentId) return;
+        if (!record.date) return;
+        const date = record.date as any;
         const sId = record.studentId.toString();
         if (!attendanceRecords[sId]) attendanceRecords[sId] = {};
-        attendanceRecords[sId][record.date] = record.status;
+        attendanceRecords[sId][date] = record.status as string;
       });
     }
 
@@ -114,7 +117,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     let csv = `Institución: AulaCheck,Curso: ${course.name},Fecha: ${today}\n\n`;
 
     const headers: string[] = ['Apellido', 'Nombre']; // Siempre incluidos
-    
+
     if (showDni) headers.push('Legajo/DNI');
     if (showEmail) headers.push('Email');
     if (showPhone) headers.push('Teléfono');
@@ -149,7 +152,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const attendance = attendanceMap.get(student._id.toString()) || 0;
         const attendancePercent = attendance * 100;
         const absencePercent = 100 - attendancePercent;
-        
+
         row.push(attendancePercent.toFixed(2));
         row.push(absencePercent.toFixed(2));
       }

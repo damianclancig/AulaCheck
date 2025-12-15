@@ -6,6 +6,7 @@ export interface CourseFormData {
   name: string;
   description: string;
   startDate: string;
+  annualClassCount?: number;
 }
 
 interface CourseFormProps {
@@ -16,12 +17,12 @@ interface CourseFormProps {
   loading?: boolean;
 }
 
-export function CourseForm({ 
-  initialData, 
-  onSubmit, 
-  onCancel, 
+export function CourseForm({
+  initialData,
+  onSubmit,
+  onCancel,
   submitLabel,
-  loading = false 
+  loading = false
 }: CourseFormProps) {
   // Función para obtener fecha local en formato YYYY-MM-DD sin conversión UTC
   const getLocalDateString = () => {
@@ -37,6 +38,7 @@ export function CourseForm({
     name: '',
     description: '',
     startDate: getLocalDateString(),
+    annualClassCount: undefined,
   });
 
   useEffect(() => {
@@ -93,6 +95,21 @@ export function CourseForm({
           value={formData.startDate}
           onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="annualClassCount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Cantidad de Clases Anual (Opcional)
+        </label>
+        <input
+          type="number"
+          id="annualClassCount"
+          min="1"
+          value={formData.annualClassCount || ''}
+          onChange={(e) => setFormData({ ...formData, annualClassCount: e.target.value ? parseInt(e.target.value) : undefined })}
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
+          placeholder="Ej: 120"
         />
       </div>
 
