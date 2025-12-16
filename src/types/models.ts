@@ -56,6 +56,9 @@ export interface Enrollment {
   studentId: ObjectId;
   enrollDate: Date;
   status: 'active' | 'inactive';
+  withdrawalReason?: 'course_change' | 'school_change' | 'other';
+  withdrawalDate?: Date;
+  withdrawalNote?: string;
 }
 
 
@@ -109,7 +112,8 @@ export interface CourseWithMetrics extends Course {
 
 export interface StudentWithMetrics extends Student {
   attendancePercentage?: number;
-  gradeAverage?: number;
+  gradeAverage?: number | null;
+  enrollmentStatus?: 'active' | 'inactive';
 }
 
 export interface EnrollmentWithStudent extends Enrollment {

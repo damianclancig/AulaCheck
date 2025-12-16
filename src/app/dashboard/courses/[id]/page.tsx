@@ -15,12 +15,12 @@ import { EditCourseModal } from '@/components/courses/EditCourseModal';
 import { InviteStudentsModal } from '@/components/courses/InviteStudentsModal';
 import { JoinRequestsModal } from '@/components/students/JoinRequestsModal';
 import { ExportModal, ExportOptions } from '@/components/courses/ExportModal';
-import { 
-  Loader2, 
-  ArrowLeft, 
-  UserPlus, 
-  CalendarCheck, 
-  GraduationCap, 
+import {
+  Loader2,
+  ArrowLeft,
+  UserPlus,
+  CalendarCheck,
+  GraduationCap,
   Download,
   Edit,
   Link2,
@@ -28,16 +28,18 @@ import {
   List,
   Table
 } from 'lucide-react';
+import { WithdrawalModal } from '@/components/students/WithdrawalModal';
+import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import Link from 'next/link';
 
 const fetcher = async (url: string) => {
   const token = await auth.currentUser?.getIdToken();
   if (!token) throw new Error('No autenticado');
-  
+
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  
+
   if (!res.ok) throw new Error('Error al cargar datos');
   return res.json();
 };
@@ -52,16 +54,21 @@ export default function CourseDetailPage() {
     fetcher
   );
 
-  const { data: students, mutate: mutateStudents } = useSWR<(Student & { attendancePercentage: number; gradeAverage: number | null })[]>(
+  const { data: students, mutate: mutateStudents } = useSWR<(Student & {
+    attendancePercentage: number;
+    gradeAverage: number | null;
+    enrollmentStatus?: 'active' | 'inactive';
+  })[]>(
     courseId ? `/api/courses/${courseId}/students` : null,
     fetcher
   );
 
   const [viewMode, setViewMode] = useState<'list' | 'sheet'>('list');
-  
-  const { data: attendanceData } = useSWR<{
+
+  const { data: attendanceData, mutate: mutateAttendance } = useSWR<{
     dates: string[];
     records: Record<string, Record<string, 'present' | 'absent' | 'late'>>;
+    suspensions: Record<string, { reason: string; note?: string }>;
   }>(
     courseId ? `/api/courses/${courseId}/attendance-records` : null,
     fetcher
@@ -77,6 +84,8 @@ export default function CourseDetailPage() {
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [isDeletingStudent, setIsDeletingStudent] = useState(false);
 
   // Fetch pending join requests count
   useEffect(() => {
@@ -121,26 +130,38 @@ export default function CourseDetailPage() {
     );
   }
 
-  const handleDeleteStudent = async (studentId: string) => {
-    if (!confirm('¿Estás seguro de dar de baja a este alumno?')) return;
+  const confirmDeleteStudent = (student: Student) => {
+    setStudentToDelete(student);
+  };
+
+  const handleExecuteWithdrawal = async (reason: string, note?: string) => {
+    if (!studentToDelete) return;
+    setIsDeletingStudent(true);
 
     try {
       const token = await auth.currentUser?.getIdToken();
-      await fetch(`/api/courses/${courseId}/students/${studentId}`, {
+      await fetch(`/api/courses/${courseId}/students/${studentToDelete._id.toString()}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason, note })
       });
       mutateStudents();
+      setStudentToDelete(null);
     } catch (error) {
-      console.error('Error deleting student:', error);
+      console.error('Error withrawing student:', error);
       alert('Error al dar de baja al alumno');
+    } finally {
+      setIsDeletingStudent(false);
     }
   };
 
   const handleExport = async (options: ExportOptions) => {
     try {
       const token = await auth.currentUser?.getIdToken();
-      
+
       // Construir query params
       const params = new URLSearchParams();
       if (options.dni) params.append('dni', 'true');
@@ -153,9 +174,9 @@ export default function CourseDetailPage() {
       const res = await fetch(`/api/courses/${courseId}/report?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (!res.ok) throw new Error('Error descargando reporte');
-      
+
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -176,13 +197,13 @@ export default function CourseDetailPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4 flex-1">
-          <Link 
-            href="/dashboard" 
+          <Link
+            href="/dashboard"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500 dark:text-gray-400 flex-shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          
+
           <div className="flex-1">
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
               {course.institutionName}
@@ -274,43 +295,41 @@ export default function CourseDetailPage() {
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 transition-colors">
         <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
           <h3 className="font-semibold text-gray-900 dark:text-white">Listado de Alumnos</h3>
-          
+
           {/* View Mode Toggle */}
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'list'
+                ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
             >
               <List className="w-4 h-4" />
               <span className="hidden sm:inline">Lista</span>
             </button>
             <button
               onClick={() => setViewMode('sheet')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'sheet'
-                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'sheet'
+                ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
             >
               <Table className="w-4 h-4" />
               <span className="hidden sm:inline">Planilla</span>
             </button>
           </div>
         </div>
-        
+
         <div className="p-6">
           {!students ? (
             <div className="p-8 text-center">
               <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
             </div>
           ) : viewMode === 'list' ? (
-            <StudentList 
-              students={students} 
-              onDeleteStudent={handleDeleteStudent}
+            <StudentList
+              students={students}
+              onDeleteStudent={confirmDeleteStudent}
               onEditStudent={(student) => {
                 setSelectedStudent(student);
                 setIsEditStudentModalOpen(true);
@@ -322,6 +341,7 @@ export default function CourseDetailPage() {
                 students={students}
                 dates={attendanceData.dates}
                 records={attendanceData.records}
+                suspensions={attendanceData.suspensions}
                 onUpdate={() => {
                   mutateStudents();
                   // Trigger re-fetch of attendance data by mutating the SWR cache
@@ -337,39 +357,40 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* AddStudentModal */}
       <AddStudentModal
         isOpen={isAddStudentModalOpen}
         onClose={() => setIsAddStudentModalOpen(false)}
         onStudentAdded={() => mutateStudents()}
       />
 
-      {/* AttendanceModal */}
-      {students && (
-        <AttendanceModal
-          isOpen={isAttendanceModalOpen}
-          onClose={() => setIsAttendanceModalOpen(false)}
-          students={students}
-          existingDates={attendanceData?.dates || []}
-          onAttendanceSaved={() => {
-            mutateStudents();
-            mutate(`/api/courses/${courseId}/attendance-records`);
-          }}
-        />
-      )}
+      {/* Filter active students for attendance and grades */}
+      {(() => {
+        const activeStudents = students?.filter(s => s.enrollmentStatus !== 'inactive') || [];
 
-      {/* GradeModal */}
-      {students && (
-        <GradeModal
-          isOpen={isGradeModalOpen}
-          onClose={() => setIsGradeModalOpen(false)}
-          students={students}
-          onGradeSaved={() => {
-            mutateStudents();
-          }}
-        />
-      )}
+        return (
+          <>
+            <AttendanceModal
+              isOpen={isAttendanceModalOpen}
+              onClose={() => setIsAttendanceModalOpen(false)}
+              students={activeStudents}
+              existingDates={attendanceData?.dates || []}
+              onAttendanceSaved={() => {
+                mutateStudents(); // Update metrics
+                mutateAttendance(); // Update attendance data
+              }}
+            />
 
+            <GradeModal
+              isOpen={isGradeModalOpen}
+              onClose={() => setIsGradeModalOpen(false)}
+              students={activeStudents}
+              onGradeSaved={() => {
+                mutateStudents(); // Update metrics (averages)
+              }}
+            />
+          </>
+        );
+      })()}
       {/* EditCourseModal */}
       {course && (
         <EditCourseModal
@@ -428,6 +449,14 @@ export default function CourseDetailPage() {
           setIsEditStudentModalOpen(false);
           setSelectedStudent(null);
         }}
+      />
+
+      <WithdrawalModal
+        isOpen={!!studentToDelete}
+        onClose={() => setStudentToDelete(null)}
+        onConfirm={handleExecuteWithdrawal}
+        studentName={`${studentToDelete?.lastName}, ${studentToDelete?.firstName}`}
+        isLoading={isDeletingStudent}
       />
     </div>
   );
