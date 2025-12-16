@@ -13,6 +13,7 @@ interface AttendanceSheetProps {
   students: Student[];
   dates: string[];
   records: Record<string, Record<string, AttendanceStatus>>;
+  suspensions?: Record<string, { reason: string; note?: string }>;
   onUpdate?: () => void;
 }
 
@@ -25,7 +26,7 @@ interface ContextMenuState {
   currentStatus?: AttendanceStatus;
 }
 
-export function AttendanceSheet({ students, dates, records, onUpdate }: AttendanceSheetProps) {
+export function AttendanceSheet({ students, dates, records, suspensions, onUpdate }: AttendanceSheetProps) {
   const params = useParams();
   const courseId = params.id as string;
   const [visibleStudents, setVisibleStudents] = useState(20);
@@ -38,7 +39,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
     date: '',
   });
   const [updating, setUpdating] = useState(false);
-  
+
   // Synchronized scroll state for mobile sliders
   const scrollRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const isScrolling = useRef(false);
@@ -87,33 +88,33 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
 
   const handleContextMenu = (e: React.MouseEvent, studentId: string, date: string, currentStatus?: AttendanceStatus) => {
     e.preventDefault();
-    
+
     // Dimensiones estimadas del menú contextual
     const menuWidth = 160;
     const menuHeight = currentStatus ? 200 : 150; // Más alto si tiene la opción de eliminar
-    
+
     // Obtener dimensiones de la ventana
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-    
+
     // Calcular posición X (horizontal)
     let x = e.clientX;
     if (x + menuWidth > windowWidth) {
       // Si se sale por la derecha, mostrar a la izquierda del cursor
       x = e.clientX - menuWidth;
     }
-    
+
     // Calcular posición Y (vertical)
     let y = e.clientY;
     if (y + menuHeight > windowHeight) {
       // Si se sale por abajo, posicionar para que el borde inferior quede cerca del cursor
       y = e.clientY - menuHeight + 20; // El borde inferior queda ~20px arriba del cursor
     }
-    
+
     // Asegurar que no se salga por los bordes superior e izquierdo
     x = Math.max(10, x);
     y = Math.max(10, y);
-    
+
     setContextMenu({
       visible: true,
       x,
@@ -130,7 +131,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
 
     try {
       const token = await auth.currentUser?.getIdToken();
-      
+
       if (newStatus === null) {
         // Delete attendance record
         const response = await fetch(
@@ -189,7 +190,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
           <span>•</span>
           <span>{dates.length} clases registradas</span>
         </div>
-        
+
         {/* Help text */}
         <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 transition-colors">
           <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
@@ -255,24 +256,44 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
               <th className="sticky left-0 z-20 bg-gray-50 dark:bg-gray-800 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
                 Alumno
               </th>
-              {dates.map((date) => (
-                <th
-                  key={date}
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-                  title={(() => {
-                    const [year, month, day] = date.split('-').map(Number);
-                    const dateObj = new Date(year, month - 1, day);
-                    return dateObj.toLocaleDateString('es-AR', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    });
-                  })()}
-                >
-                  {formatDate(date)}
-                </th>
-              ))}
+              {dates.map((date) => {
+                const suspension = suspensions?.[date];
+                return (
+                  <th
+                    key={date}
+                    className={`px-4 py-3 text-center text-xs font-medium uppercase tracking-wider whitespace-nowrap group relative ${suspension
+                        ? 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-500 dark:text-gray-400'
+                      }`}
+                    title={(() => {
+                      const [year, month, day] = date.split('-').map(Number);
+                      const dateObj = new Date(year, month - 1, day);
+                      const dateStr = dateObj.toLocaleDateString('es-AR', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      });
+
+                      if (suspension) {
+                        const reasonText = suspension.reason === 'class_suspension' ? 'Suspensión de clases' :
+                          suspension.reason === 'teacher_leave' ? 'Licencia docente' :
+                            'Otro motivo';
+                        return `${dateStr}\n${reasonText}${suspension.note ? `: ${suspension.note}` : ''}`;
+                      }
+
+                      return dateStr;
+                    })()}
+                  >
+                    <div className="flex flex-col items-center gap-1">
+                      <span>{formatDate(date)}</span>
+                      {suspension && (
+                        <Info className="w-3 h-3" />
+                      )}
+                    </div>
+                  </th>
+                );
+              })}
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-l border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
                 Estadística
               </th>
@@ -295,14 +316,26 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                   </td>
                   {dates.map((date) => {
                     const status = studentRecords[date];
+                    const isSuspended = !!suspensions?.[date];
+
                     return (
-                      <td 
-                        key={date} 
-                        className="px-4 py-4 text-center cursor-context-menu"
-                        onContextMenu={(e) => handleContextMenu(e, student._id.toString(), date, status)}
+                      <td
+                        key={date}
+                        className={`px-4 py-4 text-center ${isSuspended ? 'bg-gray-50/50 dark:bg-gray-800/50 cursor-default' : 'cursor-context-menu'}`}
+                        onContextMenu={(e) => {
+                          if (!isSuspended) {
+                            handleContextMenu(e, student._id.toString(), date, status);
+                          } else {
+                            e.preventDefault();
+                          }
+                        }}
                       >
                         <div className="flex justify-center">
-                          <AttendanceIcon status={status} size="md" />
+                          {isSuspended ? (
+                            <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600" title="Clase suspendida" />
+                          ) : (
+                            <AttendanceIcon status={status} size="md" />
+                          )}
                         </div>
                       </td>
                     );
@@ -326,7 +359,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
             })}
           </tbody>
         </table>
-        
+
         {/* Infinite scroll trigger */}
         {visibleStudents < students.length && (
           <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
@@ -352,7 +385,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                 <h4 className="font-semibold text-gray-900 dark:text-white truncate">
                   {student.lastName}, {student.firstName}
                 </h4>
-                
+
                 {/* Statistics in Header */}
                 <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
                   <div className="flex items-center gap-1.5 text-xs">
@@ -371,7 +404,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
               {/* Attendance Slider - Horizontal */}
               <div className="relative">
                 {/* Scroll container */}
-                <div 
+                <div
                   ref={(el) => {
                     if (el) scrollRefs.current.set(student._id.toString(), el);
                   }}
@@ -397,16 +430,26 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                   <div className="flex gap-2 p-3 min-w-min">
                     {dates.map((date) => {
                       const status = studentRecords[date];
+                      const suspension = suspensions?.[date];
+
                       return (
                         <div
                           key={date}
-                          className="flex flex-col items-center gap-2 min-w-[70px] snap-start"
-                          onContextMenu={(e) => handleContextMenu(e, student._id.toString(), date, status)}
+                          className={`flex flex-col items-center gap-2 min-w-[70px] snap-start ${suspension ? 'opacity-70' : ''
+                            }`}
+                          onContextMenu={(e) => {
+                            if (!suspension) {
+                              handleContextMenu(e, student._id.toString(), date, status);
+                            } else {
+                              e.preventDefault();
+                            }
+                          }}
                           onTouchStart={(e) => {
+                            if (suspension) return;
                             const touch = e.touches[0];
                             const timer = setTimeout(() => {
                               handleContextMenu(
-                                { preventDefault: () => {}, clientX: touch.clientX, clientY: touch.clientY } as any,
+                                { preventDefault: () => { }, clientX: touch.clientX, clientY: touch.clientY } as any,
                                 student._id.toString(),
                                 date,
                                 status
@@ -416,23 +459,31 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
                           }}
                         >
                           {/* Date */}
-                          <div className="text-xs font-medium text-gray-600 dark:text-gray-400 text-center">
+                          <div className={`text-xs font-medium text-center flex flex-col items-center ${suspension
+                              ? 'text-blue-600 dark:text-blue-400'
+                              : 'text-gray-600 dark:text-gray-400'
+                            }`}>
                             {(() => {
                               const [year, month, day] = date.split('-').map(Number);
                               return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`;
                             })()}
+                            {suspension && <Info className="w-3 h-3 mt-0.5" />}
                           </div>
-                          
+
                           {/* Attendance Icon */}
                           <div className="flex items-center justify-center">
-                            <AttendanceIcon status={status} size="md" />
+                            {suspension ? (
+                              <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600" />
+                            ) : (
+                              <AttendanceIcon status={status} size="md" />
+                            )}
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 </div>
-                
+
                 {/* Scroll indicators - subtle gradient shadows */}
                 <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none" />
                 <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none" />
@@ -440,7 +491,7 @@ export function AttendanceSheet({ students, dates, records, onUpdate }: Attendan
             </div>
           );
         })}
-        
+
         {/* Infinite scroll trigger */}
         {visibleStudents < students.length && (
           <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">

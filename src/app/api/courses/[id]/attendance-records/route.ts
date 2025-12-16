@@ -44,10 +44,21 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Build records map: { studentId: { date: status } }
     const records: Record<string, Record<string, string>> = {};
+    const suspensions: Record<string, { reason: string; note?: string }> = {};
 
     attendanceRecords.forEach(record => {
-      // Saltar registros marcadores de suspensión (sin studentId)
-      if (!record.studentId || !record.status) {
+      // Si no tiene studentId, es un marcador de suspensión
+      if (!record.studentId) {
+        if (record.date && record.suspensionReason) {
+          suspensions[record.date] = {
+            reason: record.suspensionReason,
+            note: record.suspensionNote
+          };
+        }
+        return;
+      }
+
+      if (!record.status) {
         return;
       }
 
@@ -64,7 +75,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({
       dates,
-      records
+      records,
+      suspensions
     });
 
   } catch (error) {
