@@ -11,7 +11,7 @@ interface RouteParams {
   }>;
 }
 
-// DELETE /api/courses/[id]/students/[studentId] - Dar de baja alumno del curso
+// DELETE /api/courses/[id]/students/[studentId] - Dar de baja alumno del curso (Baja lógica)
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const user = await authenticateRequest(request);
@@ -28,10 +28,21 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Intentar leer datos adicionales del body (motivo)
+    let body = {};
+    try {
+      body = await request.json();
+    } catch (e) {
+      // Body vacío es aceptable si no se envía razón (compatibilidad), 
+      // pero nuestro frontend nuevo siempre enviará uno.
+    }
+
+    const { reason, note } = body as { reason?: string, note?: string };
+
     const enrollmentsCollection = await getEnrollmentsCollection();
     const coursesCollection = await getCoursesCollection();
 
-    // Buscar enrollment
+    // Buscar enrollment activo
     const enrollment = await enrollmentsCollection.findOne({
       courseId,
       studentId: studentObjectId,
@@ -42,10 +53,18 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
     }
 
-    // Marcar como inactivo
+    // Marcar como inactivo con motivo
+    const updateData: any = {
+      status: 'inactive',
+      withdrawalDate: new Date(),
+    };
+
+    if (reason) updateData.withdrawalReason = reason;
+    if (note) updateData.withdrawalNote = note;
+
     await enrollmentsCollection.updateOne(
       { _id: enrollment._id },
-      { $set: { status: 'inactive' } }
+      { $set: updateData }
     );
 
     // Decrementar contador

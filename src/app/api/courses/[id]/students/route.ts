@@ -35,9 +35,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const enrollmentsCollection = await getEnrollmentsCollection();
     const studentsCollection = await getStudentsCollection();
 
-    // Obtener enrollments activos
+    // Obtener enrollments (activos e inactivos)
     const enrollments = await enrollmentsCollection
-      .find({ courseId, status: 'active' })
+      .find({ courseId })
       .toArray();
 
     if (enrollments.length === 0) {
@@ -55,11 +55,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const gradesMap = await calculateAllStudentsAverages(courseId);
 
     // Combinar datos
-    const studentsWithMetrics = students.map(student => ({
-      ...student,
-      attendancePercentage: attendanceMap.get(student._id.toString()) || 0,
-      gradeAverage: gradesMap.get(student._id.toString()) || null,
-    }));
+    const studentsWithMetrics = students.map(student => {
+      const enrollment = enrollments.find(e => e.studentId.toString() === student._id.toString());
+      return {
+        ...student,
+        attendancePercentage: attendanceMap.get(student._id.toString()) || 0,
+        gradeAverage: gradesMap.get(student._id.toString()) || null,
+        enrollmentStatus: enrollment?.status || 'active', // Default to active if missing (shouldn't happen)
+      };
+    });
 
     return NextResponse.json(studentsWithMetrics);
   } catch (error) {

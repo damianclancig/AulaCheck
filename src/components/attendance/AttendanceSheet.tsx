@@ -10,7 +10,7 @@ import { auth } from '@/lib/firebase/client';
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
 interface AttendanceSheetProps {
-  students: Student[];
+  students: (Student & { enrollmentStatus?: 'active' | 'inactive' })[];
   dates: string[];
   records: Record<string, Record<string, AttendanceStatus>>;
   suspensions?: Record<string, { reason: string; note?: string }>;
@@ -25,6 +25,21 @@ interface ContextMenuState {
   date: string;
   currentStatus?: AttendanceStatus;
 }
+
+// Función para obtener fecha local en formato YYYY-MM-DD sin conversión UTC
+const getLocalDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const isFutureDate = (dateStr: string) => {
+  const today = getLocalDateString();
+  return dateStr > today;
+};
+
 
 export function AttendanceSheet({ students, dates, records, suspensions, onUpdate }: AttendanceSheetProps) {
   const params = useParams();
@@ -258,11 +273,14 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
               </th>
               {dates.map((date) => {
                 const suspension = suspensions?.[date];
+                const isFuture = isFutureDate(date);
                 return (
                   <th
                     key={date}
                     className={`px-4 py-3 text-center text-xs font-medium uppercase tracking-wider whitespace-nowrap group relative ${suspension
-                        ? 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400'
+                      ? 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400'
+                      : isFuture
+                        ? 'text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-gray-800/50'
                         : 'text-gray-500 dark:text-gray-400'
                       }`}
                     title={(() => {
@@ -282,11 +300,15 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                         return `${dateStr}\n${reasonText}${suspension.note ? `: ${suspension.note}` : ''}`;
                       }
 
+                      if (isFuture) {
+                        return `${dateStr}\nClase futura`;
+                      }
+
                       return dateStr;
                     })()}
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <span>{formatDate(date)}</span>
+                      <span className={isFuture ? 'italic' : ''}>{formatDate(date)}</span>
                       {suspension && (
                         <Info className="w-3 h-3" />
                       )}
@@ -317,13 +339,19 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                   {dates.map((date) => {
                     const status = studentRecords[date];
                     const isSuspended = !!suspensions?.[date];
+                    const isFuture = isFutureDate(date);
+
+                    const isInactive = student.enrollmentStatus === 'inactive';
+                    const hasRecord = !!status;
+                    // Disable if: Suspended OR Future OR (Inactive AND No Record)
+                    const isDisabled = isSuspended || isFuture || (isInactive && !hasRecord);
 
                     return (
                       <td
                         key={date}
-                        className={`px-4 py-4 text-center ${isSuspended ? 'bg-gray-50/50 dark:bg-gray-800/50 cursor-default' : 'cursor-context-menu'}`}
+                        className={`px-4 py-4 text-center ${isDisabled ? 'bg-gray-50/50 dark:bg-gray-800/50 cursor-default' : 'cursor-context-menu'}`}
                         onContextMenu={(e) => {
-                          if (!isSuspended) {
+                          if (!isDisabled) {
                             handleContextMenu(e, student._id.toString(), date, status);
                           } else {
                             e.preventDefault();
@@ -333,6 +361,10 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                         <div className="flex justify-center">
                           {isSuspended ? (
                             <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600" title="Clase suspendida" />
+                          ) : isFuture && !status ? (
+                            <div className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-700" title="Clase futura" />
+                          ) : isInactive && !status ? (
+                            <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full" title="Alumno inactivo" />
                           ) : (
                             <AttendanceIcon status={status} size="md" />
                           )}
@@ -430,22 +462,27 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                   <div className="flex gap-2 p-3 min-w-min">
                     {dates.map((date) => {
                       const status = studentRecords[date];
-                      const suspension = suspensions?.[date];
+                      const isSuspended = !!suspensions?.[date];
+                      const isFuture = isFutureDate(date);
+
+                      const isInactive = student.enrollmentStatus === 'inactive';
+                      const hasRecord = !!status;
+                      const isDisabled = isSuspended || isFuture || (isInactive && !hasRecord);
 
                       return (
                         <div
                           key={date}
-                          className={`flex flex-col items-center gap-2 min-w-[70px] snap-start ${suspension ? 'opacity-70' : ''
+                          className={`flex flex-col items-center gap-2 min-w-[70px] snap-start ${isDisabled ? 'opacity-70' : ''
                             }`}
                           onContextMenu={(e) => {
-                            if (!suspension) {
+                            if (!isDisabled) {
                               handleContextMenu(e, student._id.toString(), date, status);
                             } else {
                               e.preventDefault();
                             }
                           }}
                           onTouchStart={(e) => {
-                            if (suspension) return;
+                            if (isDisabled) return;
                             const touch = e.touches[0];
                             const timer = setTimeout(() => {
                               handleContextMenu(
@@ -459,21 +496,27 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                           }}
                         >
                           {/* Date */}
-                          <div className={`text-xs font-medium text-center flex flex-col items-center ${suspension
-                              ? 'text-blue-600 dark:text-blue-400'
+                          <div className={`text-xs font-medium text-center flex flex-col items-center ${isSuspended
+                            ? 'text-blue-600 dark:text-blue-400'
+                            : isFuture
+                              ? 'text-gray-400 dark:text-gray-500 italic'
                               : 'text-gray-600 dark:text-gray-400'
                             }`}>
                             {(() => {
                               const [year, month, day] = date.split('-').map(Number);
                               return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`;
                             })()}
-                            {suspension && <Info className="w-3 h-3 mt-0.5" />}
+                            {isSuspended && <Info className="w-3 h-3 mt-0.5" />}
                           </div>
 
                           {/* Attendance Icon */}
                           <div className="flex items-center justify-center">
-                            {suspension ? (
+                            {isSuspended ? (
                               <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600" />
+                            ) : isFuture && !status ? (
+                              <div className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-700" />
+                            ) : isInactive && !status ? (
+                              <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
                             ) : (
                               <AttendanceIcon status={status} size="md" />
                             )}
