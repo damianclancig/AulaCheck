@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { PhoneInput } from '@/components/common/PhoneInput';
 import { isValidEmail } from '@/lib/utils/contactUtils';
@@ -31,7 +31,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
     lastName: string | null;
     email: string | null;
   }>({ firstName: null, lastName: null, email: null });
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -61,9 +61,6 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
     setError(null);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error('No autenticado');
-
       // Validate required fields
       const newErrors = {
         firstName: !formData.firstName.trim() ? 'Este campo es obligatorio' : null,
@@ -73,6 +70,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
 
       if (newErrors.firstName || newErrors.lastName || newErrors.email) {
         setFieldErrors(newErrors);
+        setLoading(false);
         return;
       }
 
@@ -87,7 +85,6 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(submissionData),
       });
@@ -112,7 +109,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Editar Alumno</h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
@@ -145,9 +142,8 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
                     setFieldErrors(prev => ({ ...prev, firstName: 'Este campo es obligatorio' }));
                   }
                 }}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${
-                  fieldErrors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${fieldErrors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
+                  }`}
               />
               {fieldErrors.firstName && (
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.firstName}</p>
@@ -170,9 +166,8 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
                     setFieldErrors(prev => ({ ...prev, lastName: 'Este campo es obligatorio' }));
                   }
                 }}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${
-                  fieldErrors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${fieldErrors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
+                  }`}
               />
               {fieldErrors.lastName && (
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.lastName}</p>
@@ -210,9 +205,8 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
                   setFieldErrors(prev => ({ ...prev, email: 'El formato del email no es válido' }));
                 }
               }}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${
-                fieldErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${fieldErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
+                }`}
             />
             {fieldErrors.email && (
               <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/components/auth/AuthProvider';
+import { useSession } from 'next-auth/react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -12,17 +12,17 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (status === 'unauthenticated') {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [status, router]);
 
-  if (loading) {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
@@ -30,14 +30,16 @@ export default function DashboardLayout({
     );
   }
 
-  if (!user) {
+  if (!session) {
     return null; // Redirecting...
   }
+
+  const user = session.user;
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden transition-colors duration-200">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
+
       <div className="flex-1 flex flex-col overflow-hidden w-full">
         <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 flex items-center justify-between px-4 sm:px-8 flex-shrink-0 transition-colors duration-200">
           <div className="flex items-center gap-4">
@@ -52,15 +54,15 @@ export default function DashboardLayout({
             </button>
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 truncate">
               {/* El título podría ser dinámico según la página */}
-              Bienvenido, {user.displayName?.split(' ')[0]}
+              Bienvenido, {user.name?.split(' ')[0]}
             </h1>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            {user.photoURL && (
+            {user.image && (
               <img
-                src={user.photoURL}
-                alt={user.displayName || 'User'}
+                src={user.image}
+                alt={user.name || 'User'}
                 className="h-8 w-8 rounded-full border border-gray-200 dark:border-gray-700"
               />
             )}

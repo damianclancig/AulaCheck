@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
-import { authenticateRequest, requireAuth } from '@/lib/auth/middleware';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { verifyStudentAccess } from '@/lib/auth/ownership';
 import { getStudentsCollection } from '@/lib/mongodb/collections';
 
@@ -13,16 +14,17 @@ interface RouteParams {
 // PUT /api/students/[id] - Editar datos del alumno
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const user = await authenticateRequest(request);
-    if (!requireAuth(user)) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const studentId = new ObjectId(id);
+    const userId = session.user.id;
 
     // Verificar que el usuario tiene acceso al alumno
-    const hasAccess = await verifyStudentAccess(studentId, user.uid);
+    const hasAccess = await verifyStudentAccess(studentId, userId);
     if (!hasAccess) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
