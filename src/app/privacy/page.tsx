@@ -1,20 +1,26 @@
 'use client';
 
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { ArrowLeft, ShieldCheck, Lock, EyeOff, UserCircle } from 'lucide-react';
 
 export default function PrivacyPage() {
+    const { status } = useSession();
+    const isAuthenticated = status === 'authenticated';
+    const returnHref = isAuthenticated ? '/dashboard' : '/';
+    const returnText = isAuthenticated ? 'Volver al Dashboard' : 'Volver al inicio';
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-200">
             <div className="max-w-3xl mx-auto px-4 py-12 md:py-20">
                 {/* Header */}
                 <div className="mb-12">
                     <Link
-                        href="/"
+                        href={returnHref}
                         className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:underline mb-8 transition-all"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
-                        Volver al inicio
+                        {returnText}
                     </Link>
                     <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
                         Política de Privacidad
@@ -92,10 +98,10 @@ export default function PrivacyPage() {
                             Puedes solicitar la eliminación completa de tu cuenta y todos tus datos asociados en cualquier momento contactando con el administrador del sistema.
                         </p>
                         <Link
-                            href="/login"
+                            href={returnHref}
                             className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg shadow-indigo-200 dark:shadow-none transition-all inline-block"
                         >
-                            Regresar al Login
+                            {returnText}
                         </Link>
                     </section>
                 </div>

@@ -96,12 +96,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </nav>
         </div>
 
-        <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-gray-800 p-4">
+        <div className="flex-shrink-0 flex flex-col border-t border-gray-200 dark:border-gray-800 p-4 space-y-2">
+          <Link
+            href="/privacy"
+            onClick={() => onClose()}
+            className="flex items-center px-2 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 rounded-md transition-colors"
+          >
+            <Settings className="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+            Privacidad
+          </Link>
+
           <button
             onClick={() => handleSignOut()}
             className="flex-shrink-0 w-full group block"
           >
-            <div className="flex items-center">
+            <div className="flex items-center px-2 py-2">
               <LogOut className="inline-block h-5 w-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400" />
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">

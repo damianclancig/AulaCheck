@@ -36,7 +36,7 @@ export default function Home() {
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
             Simplifica tu vida docente. Lleva el control de asistencias, calificaciones y alumnos en un solo lugar, accesible desde cualquier dispositivo.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link
               href="/dashboard"
@@ -89,7 +89,14 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-white py-8 text-center text-gray-500 text-sm">
-        <p>&copy; {new Date().getFullYear()} AulaCheck. Todos los derechos reservados.</p>
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p>&copy; {new Date().getFullYear()} AulaCheck. Todos los derechos reservados.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
+              Política de Privacidad
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );

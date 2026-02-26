@@ -61,7 +61,10 @@ export default function LoginPage() {
           </button>
 
           <p className="mt-8 text-xs text-gray-400">
-            Al continuar, aceptas nuestros términos y condiciones.
+            Al continuar, aceptas nuestra{' '}
+            <a href="/privacy" className="text-indigo-600 hover:underline">
+              política de privacidad
+            </a>.
           </p>
         </div>
 
