@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
-import { authenticateRequest, requireAuth } from '@/lib/auth/middleware';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { verifyCourseOwnership } from '@/lib/auth/ownership';
 import { getJoinRequestsCollection, getStudentsCollection, getEnrollmentsCollection } from '@/lib/mongodb/collections';
 
@@ -13,15 +14,16 @@ interface RouteParams {
 // GET /api/courses/[id]/join-requests - List pending join requests
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const user = await authenticateRequest(request);
-    if (!requireAuth(user)) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const courseId = new ObjectId(id);
+    const userId = session.user.id;
 
-    const isOwner = await verifyCourseOwnership(courseId, user.uid);
+    const isOwner = await verifyCourseOwnership(courseId, userId);
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -42,15 +44,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST /api/courses/[id]/join-requests - Process join request (approve/reject)
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const user = await authenticateRequest(request);
-    if (!requireAuth(user)) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const courseId = new ObjectId(id);
+    const userId = session.user.id;
 
-    const isOwner = await verifyCourseOwnership(courseId, user.uid);
+    const isOwner = await verifyCourseOwnership(courseId, userId);
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -63,9 +66,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const joinRequestsCollection = await getJoinRequestsCollection();
-    const request_doc = await joinRequestsCollection.findOne({ 
+    const request_doc = await joinRequestsCollection.findOne({
       _id: new ObjectId(requestId),
-      courseId 
+      courseId
     });
 
     if (!request_doc) {
@@ -98,12 +101,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Mark request as approved
       await joinRequestsCollection.updateOne(
         { _id: new ObjectId(requestId) },
-        { 
-          $set: { 
+        {
+          $set: {
             status: 'approved',
             processedAt: new Date(),
-            processedBy: user.uid 
-          } 
+            processedBy: userId
+          }
         }
       );
 
@@ -112,12 +115,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Mark request as rejected
       await joinRequestsCollection.updateOne(
         { _id: new ObjectId(requestId) },
-        { 
-          $set: { 
+        {
+          $set: {
             status: 'rejected',
             processedAt: new Date(),
-            processedBy: user.uid 
-          } 
+            processedBy: userId
+          }
         }
       );
 

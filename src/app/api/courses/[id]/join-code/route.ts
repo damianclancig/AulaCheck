@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
-import { authenticateRequest, requireAuth } from '@/lib/auth/middleware';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { verifyCourseOwnership } from '@/lib/auth/ownership';
 import { getCoursesCollection } from '@/lib/mongodb/collections';
 
@@ -23,25 +24,26 @@ function generateJoinCode(): string {
 // POST /api/courses/[id]/join-code - Generate or regenerate join code
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const user = await authenticateRequest(request);
-    if (!requireAuth(user)) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const courseId = new ObjectId(id);
+    const userId = session.user.id;
 
-    const isOwner = await verifyCourseOwnership(courseId, user.uid);
+    const isOwner = await verifyCourseOwnership(courseId, userId);
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const coursesCollection = await getCoursesCollection();
-    
+
     // Generate unique code
     let joinCode: string;
     let isUnique = false;
-    
+
     while (!isUnique) {
       joinCode = generateJoinCode();
       const existing = await coursesCollection.findOne({ joinCode });
@@ -53,11 +55,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Update course with new join code and enable join requests
     await coursesCollection.updateOne(
       { _id: courseId },
-      { 
-        $set: { 
+      {
+        $set: {
           joinCode: joinCode!,
-          allowJoinRequests: true 
-        } 
+          allowJoinRequests: true
+        }
       }
     );
 
@@ -71,21 +73,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/courses/[id]/join-code - Disable join requests
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const user = await authenticateRequest(request);
-    if (!requireAuth(user)) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const courseId = new ObjectId(id);
+    const userId = session.user.id;
 
-    const isOwner = await verifyCourseOwnership(courseId, user.uid);
+    const isOwner = await verifyCourseOwnership(courseId, userId);
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const coursesCollection = await getCoursesCollection();
-    
+
     // Disable join requests (keep code for history)
     await coursesCollection.updateOne(
       { _id: courseId },

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Loader2, Check, XCircle, User } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { JoinRequest } from '@/types/models';
 
 interface JoinRequestsModalProps {
@@ -26,10 +26,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
-      const response = await fetch(`/api/courses/${courseId}/join-requests`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(`/api/courses/${courseId}/join-requests`);
 
       if (!response.ok) throw new Error('Error al cargar solicitudes');
 
@@ -45,12 +42,10 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
   const handleProcess = async (requestId: string, action: 'approve' | 'reject') => {
     setProcessing(requestId);
     try {
-      const token = await auth.currentUser?.getIdToken();
       const response = await fetch(`/api/courses/${courseId}/join-requests`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ requestId, action }),
       });
@@ -80,7 +75,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
               Solicitudes Pendientes ({requests.length})
             </h2>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >

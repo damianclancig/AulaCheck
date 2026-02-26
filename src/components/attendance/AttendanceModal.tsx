@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { X, Loader2, Check, XCircle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -114,9 +114,6 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error('No autenticado');
-
       // Si hay suspensión, no enviamos registros de asistencia
       const records = suspensionReason === 'none'
         ? Object.entries(attendanceMap).map(([studentId, status]) => ({
@@ -129,7 +126,6 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           date,

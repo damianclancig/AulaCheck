@@ -2,15 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Users, 
-  Settings, 
-  LogOut, 
-  GraduationCap 
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  Settings,
+  LogOut,
+  GraduationCap
 } from 'lucide-react';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -27,12 +27,16 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { signOut } = useAuth();
+  const { data: session } = useSession();
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/login' });
+  };
 
   return (
     <>
       {/* Mobile overlay */}
-      <div 
+      <div
         className={cn(
           "fixed inset-0 z-40 bg-gray-600 bg-opacity-75 transition-opacity lg:hidden",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -51,7 +55,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <span className="text-xl font-bold text-gray-900 dark:text-white">AulaCheck</span>
           </div>
           {/* Close button for mobile */}
-          <button 
+          <button
             onClick={onClose}
             className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
@@ -61,7 +65,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </svg>
           </button>
         </div>
-        
+
         <div className="flex-1 flex flex-col overflow-y-auto pt-5 pb-4">
           <nav className="mt-5 flex-1 px-4 space-y-1">
             {navigation.map((item) => {
@@ -94,7 +98,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         <div className="flex-shrink-0 flex border-t border-gray-200 dark:border-gray-800 p-4">
           <button
-            onClick={() => signOut()}
+            onClick={() => handleSignOut()}
             className="flex-shrink-0 w-full group block"
           >
             <div className="flex items-center">

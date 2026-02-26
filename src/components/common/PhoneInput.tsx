@@ -22,6 +22,10 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
     } else if (value) {
       // Fallback for other formats
       setInputValue(value);
+    } else {
+      // Reset input if value is empty
+      setInputValue('');
+      setTouched(false);
     }
   }, [value]);
 
@@ -30,7 +34,7 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
     // Allow digits, spaces, and hyphens
     if (/^[\d\s-]*$/.test(newVal)) {
       setInputValue(newVal);
-      
+
       // Prepare for storage
       const digits = newVal.replace(/\D/g, '');
       if (digits.length > 0) {
@@ -45,13 +49,13 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
   // Basic validation: check total digits (usually 10 for Argentina: 2+8, 3+7, 4+6)
   const digits = inputValue.replace(/\D/g, '');
   const isValid = !touched || digits.length === 0 || (digits.length >= 10);
-  
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         Teléfono / WhatsApp (Opcional)
       </label>
-      
+
       <div className="flex gap-2">
         {/* Prefix */}
         <div className="w-24 flex-shrink-0">
@@ -69,9 +73,8 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
             value={inputValue}
             onChange={handleChange}
             onBlur={() => setTouched(true)}
-            className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-900 ${
-              !isValid ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
-            }`}
+            className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-900 ${!isValid ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+              }`}
           />
         </div>
       </div>

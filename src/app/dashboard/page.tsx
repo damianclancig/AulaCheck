@@ -1,26 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import { Course } from '@/types/models';
 import { CourseCard } from '@/components/courses/CourseCard';
 import { CreateCourseModal } from '@/components/courses/CreateCourseModal';
 import { Plus, Loader2, BookOpen } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
 
 const fetcher = async (url: string) => {
-  const token = await auth.currentUser?.getIdToken();
-  if (!token) throw new Error('No autenticado');
-  
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  
+  const res = await fetch(url);
+
   if (!res.ok) throw new Error('Error al cargar datos');
   return res.json();
 };
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: courses, error, isLoading, mutate } = useSWR<Course[]>('/api/courses', fetcher);
 

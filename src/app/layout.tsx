@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import SessionProviderWrapper from "@/components/auth/SessionProviderWrapper";
 
 export const metadata: Metadata = {
   title: "AulaCheck",
@@ -30,11 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
+        <SessionProviderWrapper>
           <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
             {children}
           </ThemeProvider>
-        </AuthProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

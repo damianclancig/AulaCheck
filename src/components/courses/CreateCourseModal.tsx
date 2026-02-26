@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { CourseForm, CourseFormData } from './CourseForm';
 
 interface CreateCourseModalProps {
@@ -20,14 +20,10 @@ export function CreateCourseModal({ isOpen, onClose, onCourseCreated }: CreateCo
     setError(null);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error('No autenticado');
-
       const response = await fetch('/api/courses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });
@@ -51,7 +47,7 @@ export function CreateCourseModal({ isOpen, onClose, onCourseCreated }: CreateCo
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Nuevo Curso</h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Copy, Check, RefreshCw, Link2, AlertCircle } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { QRCodeSVG } from 'qrcode.react';
 
 interface InviteStudentsModalProps {
@@ -14,13 +14,13 @@ interface InviteStudentsModalProps {
   allowJoinRequests: boolean;
 }
 
-export function InviteStudentsModal({ 
-  isOpen, 
-  onClose, 
-  courseId, 
+export function InviteStudentsModal({
+  isOpen,
+  onClose,
+  courseId,
   courseName,
   currentJoinCode,
-  allowJoinRequests 
+  allowJoinRequests
 }: InviteStudentsModalProps) {
   const [loading, setLoading] = useState(false);
   const [joinCode, setJoinCode] = useState(currentJoinCode || '');
@@ -34,10 +34,8 @@ export function InviteStudentsModal({
   const handleGenerateCode = async () => {
     setLoading(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
       const response = await fetch(`/api/courses/${courseId}/join-code`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error('Error al generar código');
@@ -58,10 +56,8 @@ export function InviteStudentsModal({
 
     setLoading(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
       const response = await fetch(`/api/courses/${courseId}/join-code`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error('Error al desactivar');
@@ -90,7 +86,7 @@ export function InviteStudentsModal({
             <Link2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Invitar Alumnos</h2>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
@@ -149,8 +145,8 @@ export function InviteStudentsModal({
                   📱 Escanea el QR en clase
                 </p>
                 <div className="flex justify-center bg-white p-4 rounded-lg">
-                  <QRCodeSVG 
-                    value={joinUrl} 
+                  <QRCodeSVG
+                    value={joinUrl}
                     size={200}
                     level="H"
                     includeMargin={true}

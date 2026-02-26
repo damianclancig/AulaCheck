@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { Course } from '@/types/models';
 import { CourseForm, CourseFormData } from './CourseForm';
 
@@ -44,14 +44,10 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
     setError(null);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error('No autenticado');
-
       const response = await fetch(`/api/courses/${course._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });

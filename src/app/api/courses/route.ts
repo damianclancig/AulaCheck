@@ -1,24 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
-import { authenticateRequest, requireAuth } from '@/lib/auth/middleware';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { getCoursesCollection } from '@/lib/mongodb/collections';
 import { Course } from '@/types/models';
 
 // GET /api/courses - Lista cursos del docente autenticado
 export async function GET(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request);
+    const session = await getServerSession(authOptions);
 
-    if (!requireAuth(user)) {
+    if (!session || !session.user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
+    const userId = session.user.id;
+
     const coursesCollection = await getCoursesCollection();
     const courses = await coursesCollection
-      .find({ ownerId: user.uid })
+      .find({ ownerId: userId })
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -35,14 +38,16 @@ export async function GET(request: NextRequest) {
 // POST /api/courses - Crear nuevo curso
 export async function POST(request: NextRequest) {
   try {
-    const user = await authenticateRequest(request);
+    const session = await getServerSession(authOptions);
 
-    if (!requireAuth(user)) {
+    if (!session || !session.user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
+
+    const userId = session.user.id;
 
     const body = await request.json();
     const { name, startDate, description, institutionName, annualClassCount } = body;
@@ -59,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     const newCourse: Omit<Course, '_id'> = {
       name,
-      ownerId: user.uid,
+      ownerId: userId,
       institutionName,
       startDate: startDate, // Guardar como string YYYY-MM-DD
       annualClassCount: annualClassCount || undefined,

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
 import { useParams, useRouter } from 'next/navigation';
 import { Course, Student } from '@/types/models';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { StudentList } from '@/components/students/StudentList';
 import { AttendanceSheet } from '@/components/attendance/AttendanceSheet';
 import { AddStudentModal } from '@/components/students/AddStudentModal';
@@ -33,18 +33,14 @@ import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import Link from 'next/link';
 
 const fetcher = async (url: string) => {
-  const token = await auth.currentUser?.getIdToken();
-  if (!token) throw new Error('No autenticado');
-
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await fetch(url);
 
   if (!res.ok) throw new Error('Error al cargar datos');
   return res.json();
 };
 
 export default function CourseDetailPage() {
+  const { data: session } = useSession();
   const params = useParams();
   const courseId = params.id as string;
   const router = useRouter();
@@ -92,10 +88,7 @@ export default function CourseDetailPage() {
     const fetchPendingCount = async () => {
       if (!courseId) return;
       try {
-        const token = await auth.currentUser?.getIdToken();
-        const response = await fetch(`/api/courses/${courseId}/join-requests`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(`/api/courses/${courseId}/join-requests`);
         if (response.ok) {
           const data = await response.json();
           setPendingRequestsCount(data.length);
@@ -139,11 +132,9 @@ export default function CourseDetailPage() {
     setIsDeletingStudent(true);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
       await fetch(`/api/courses/${courseId}/students/${studentToDelete._id.toString()}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ reason, note })
@@ -160,8 +151,6 @@ export default function CourseDetailPage() {
 
   const handleExport = async (options: ExportOptions) => {
     try {
-      const token = await auth.currentUser?.getIdToken();
-
       // Construir query params
       const params = new URLSearchParams();
       if (options.dni) params.append('dni', 'true');
@@ -171,9 +160,7 @@ export default function CourseDetailPage() {
       if (options.attendanceStats) params.append('attendanceStats', 'true');
       if (options.attendanceDetails) params.append('attendanceDetails', 'true');
 
-      const res = await fetch(`/api/courses/${courseId}/report?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(`/api/courses/${courseId}/report?${params.toString()}`);
 
       if (!res.ok) throw new Error('Error descargando reporte');
 

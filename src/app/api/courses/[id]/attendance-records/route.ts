@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
-import { authenticateRequest, requireAuth } from '@/lib/auth/middleware';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import { verifyCourseOwnership } from '@/lib/auth/ownership';
 import { getAttendanceCollection } from '@/lib/mongodb/collections';
 
@@ -12,15 +13,16 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const user = await authenticateRequest(request);
-    if (!requireAuth(user)) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const courseId = new ObjectId(id);
+    const userId = session.user.id;
 
-    const isOwner = await verifyCourseOwnership(courseId, user.uid);
+    const isOwner = await verifyCourseOwnership(courseId, userId);
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

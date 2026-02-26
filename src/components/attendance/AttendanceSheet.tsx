@@ -5,7 +5,7 @@ import { AttendanceIcon } from './AttendanceIcon';
 import { useEffect, useRef, useState } from 'react';
 import { Check, XCircle, Clock, X as XIcon, Info } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
@@ -42,6 +42,7 @@ const isFutureDate = (dateStr: string) => {
 
 
 export function AttendanceSheet({ students, dates, records, suspensions, onUpdate }: AttendanceSheetProps) {
+  const { data: session } = useSession();
   const params = useParams();
   const courseId = params.id as string;
   const [visibleStudents, setVisibleStudents] = useState(20);
@@ -145,15 +146,12 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
     setUpdating(true);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
-
       if (newStatus === null) {
         // Delete attendance record
         const response = await fetch(
           `/api/courses/${courseId}/attendance/${contextMenu.studentId}?date=${contextMenu.date}`,
           {
             method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
           }
         );
 
@@ -164,7 +162,6 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             date: contextMenu.date,

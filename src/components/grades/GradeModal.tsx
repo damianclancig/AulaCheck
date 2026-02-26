@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import { auth } from '@/lib/firebase/client';
+import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
 
@@ -16,7 +16,7 @@ interface GradeModalProps {
 export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeModalProps) {
   const params = useParams();
   const courseId = params.id as string;
-  
+
   // Función para obtener fecha local en formato YYYY-MM-DD sin conversión UTC
   const getLocalDateString = () => {
     const now = new Date();
@@ -44,14 +44,10 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
 
     setLoading(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error('No autenticado');
-
       const response = await fetch(`/api/courses/${courseId}/grades`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           studentId: selectedStudentId,
@@ -84,7 +80,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Nueva Calificación</h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
