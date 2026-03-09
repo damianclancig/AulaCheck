@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sun, CloudSun, Moon } from 'lucide-react';
 
 export interface CourseFormData {
   institutionName: string;
@@ -7,6 +7,7 @@ export interface CourseFormData {
   description: string;
   startDate: string;
   annualClassCount?: number;
+  shift?: 'Mañana' | 'Tarde' | 'Noche' | '';
 }
 
 interface CourseFormProps {
@@ -39,6 +40,7 @@ export function CourseForm({
     description: '',
     startDate: getLocalDateString(),
     annualClassCount: undefined,
+    shift: '',
   });
 
   useEffect(() => {
@@ -85,6 +87,34 @@ export function CourseForm({
       </div>
 
       <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          Turno (Opcional)
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { id: 'Mañana', icon: Sun, label: 'Mañana', color: 'amber' },
+            { id: 'Tarde', icon: CloudSun, label: 'Tarde', color: 'orange' },
+            { id: 'Noche', icon: Moon, label: 'Noche', color: 'indigo' },
+          ].map((shift) => (
+            <button
+              key={shift.id}
+              type="button"
+              onClick={() => setFormData({ ...formData, shift: formData.shift === shift.id ? '' : shift.id as any })}
+              className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all gap-1 ${formData.shift === shift.id
+                  ? shift.color === 'amber' ? 'bg-amber-50 border-amber-500 text-amber-700 dark:bg-amber-900/20 dark:border-amber-500 dark:text-amber-400'
+                    : shift.color === 'orange' ? 'bg-orange-50 border-orange-500 text-orange-700 dark:bg-orange-900/20 dark:border-orange-500 dark:text-orange-400'
+                      : 'bg-indigo-50 border-indigo-500 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-500 dark:text-indigo-400'
+                  : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-200 dark:hover:border-gray-600'
+                }`}
+            >
+              <shift.icon className={`w-6 h-6 ${formData.shift === shift.id ? '' : 'opacity-50'}`} />
+              <span className="text-xs font-medium">{shift.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
         <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Fecha de Inicio *
         </label>
@@ -112,6 +142,8 @@ export function CourseForm({
           placeholder="Ej: 120"
         />
       </div>
+
+
 
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

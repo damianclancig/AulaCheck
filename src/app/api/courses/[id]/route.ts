@@ -75,13 +75,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { name, startDate, description, institutionName, annualClassCount } = body;
+    const { name, startDate, description, institutionName, annualClassCount, shift } = body;
 
     const updateData: any = {};
     if (name) updateData.name = name;
     if (institutionName) updateData.institutionName = institutionName;
     if (startDate) updateData.startDate = startDate; // Guardar como string YYYY-MM-DD
     if (annualClassCount !== undefined) updateData.annualClassCount = annualClassCount;
+    if (shift !== undefined) updateData.shift = shift;
     if (description !== undefined) updateData.description = description;
 
     const coursesCollection = await getCoursesCollection();

@@ -30,7 +30,7 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                 <span className="font-semibold text-gray-700 dark:text-gray-300">Institución:</span> {course.institutionName}
               </p>
               <div>
@@ -38,13 +38,21 @@ export function CourseCard({ course }: CourseCardProps) {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
                   {course.name}
                 </h3>
+                {course.shift && (
+                  <p className={`text-xs font-semibold mt-0.5 ${course.shift === 'Mañana' ? 'text-amber-600 dark:text-amber-400'
+                      : course.shift === 'Tarde' ? 'text-orange-600 dark:text-orange-400'
+                        : 'text-indigo-600 dark:text-indigo-400'
+                    }`}>
+                    Turno: {course.shift}
+                  </p>
+                )}
               </div>
             </div>
             <div className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 ml-2">
               {course.meta.studentCount} alumnos
             </div>
           </div>
-          
+
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 h-10">
             {course.description || 'Sin descripción'}
           </p>
@@ -54,14 +62,14 @@ export function CourseCard({ course }: CourseCardProps) {
               <Calendar className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
               <span>Inicio: {startDate}</span>
             </div>
-            
+
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
               <BarChart3 className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
               <span>Asistencia prom: <span className="font-medium text-gray-900 dark:text-gray-200">{attendancePercent}%</span></span>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-900/10 transition-colors">
           <span className="text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Ver detalles</span>
           <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transform group-hover:translate-x-1 transition-all" />

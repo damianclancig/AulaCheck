@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const userId = session.user.id;
 
     const body = await request.json();
-    const { name, startDate, description, institutionName, annualClassCount } = body;
+    const { name, startDate, description, institutionName, annualClassCount, shift } = body;
 
     // Validación
     if (!name || !startDate || !institutionName) {
@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
       institutionName,
       startDate: startDate, // Guardar como string YYYY-MM-DD
       annualClassCount: annualClassCount || undefined,
+      shift: shift || undefined,
       description: description || undefined,
       allowJoinRequests: false, // Disabled by default
       createdAt: new Date(),

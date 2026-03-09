@@ -205,6 +205,14 @@ export default function CourseDetailPage() {
                 <Edit className="w-6 h-6" />
               </button>
             </div>
+            {course.shift && (
+              <p className={`text-sm font-semibold mt-1 ${course.shift === 'Mañana' ? 'text-amber-600 dark:text-amber-400'
+                  : course.shift === 'Tarde' ? 'text-orange-600 dark:text-orange-400'
+                    : 'text-indigo-600 dark:text-indigo-400'
+                }`}>
+                Turno: {course.shift}
+              </p>
+            )}
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
               {course.description || 'Sin descripción'} • {students?.length || 0} alumnos
             </p>

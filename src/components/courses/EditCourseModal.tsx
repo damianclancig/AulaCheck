@@ -37,6 +37,7 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
     description: course.description || '',
     startDate: formatDateForInput(course.startDate),
     annualClassCount: course.annualClassCount,
+    shift: course.shift || '',
   };
 
   const handleSubmit = async (data: CourseFormData) => {
