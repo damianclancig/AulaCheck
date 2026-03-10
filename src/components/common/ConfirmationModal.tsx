@@ -14,6 +14,7 @@ interface ConfirmationModalProps {
     cancelText?: string;
     variant?: 'danger' | 'warning' | 'info';
     isLoading?: boolean;
+    hideCancel?: boolean;
 }
 
 export function ConfirmationModal({
@@ -26,6 +27,7 @@ export function ConfirmationModal({
     cancelText = 'Cancelar',
     variant = 'info',
     isLoading = false,
+    hideCancel = false,
 }: ConfirmationModalProps) {
     if (!isOpen) return null;
 
@@ -109,14 +111,16 @@ export function ConfirmationModal({
                         {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         {confirmText}
                     </button>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        disabled={isLoading}
-                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
-                    >
-                        {cancelText}
-                    </button>
+                    {!hideCancel && (
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isLoading}
+                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
+                        >
+                            {cancelText}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

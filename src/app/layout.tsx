@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import SessionProviderWrapper from "@/components/auth/SessionProviderWrapper";
+import { ModalProvider } from "@/providers/ModalProvider";
 
 export const metadata: Metadata = {
   title: "AulaCheck",
@@ -32,7 +33,9 @@ export default function RootLayout({
       >
         <SessionProviderWrapper>
           <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-            {children}
+            <ModalProvider>
+              {children}
+            </ModalProvider>
           </ThemeProvider>
         </SessionProviderWrapper>
       </body>

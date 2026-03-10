@@ -5,6 +5,7 @@ import { X, Loader2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
+import { useModal } from '@/hooks/useModal';
 
 interface GradeModalProps {
   isOpen: boolean;
@@ -32,13 +33,18 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
   const [weight, setWeight] = useState(1);
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [score, setScore] = useState<string>('');
+  const { showAlert } = useModal();
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedStudentId) {
-      alert('Selecciona un alumno');
+      await showAlert({
+        title: 'Atención',
+        description: 'Debes seleccionar un alumno para calificar.',
+        variant: 'warning'
+      });
       return;
     }
 
@@ -66,10 +72,18 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
       // Reset score but keep assessment details for easier entry of next student
       setScore('');
       setSelectedStudentId('');
-      alert('Calificación guardada correctamente');
+      await showAlert({
+        title: 'Éxito',
+        description: 'Calificación guardada correctamente.',
+        variant: 'info'
+      });
     } catch (error) {
       console.error('Error saving grade:', error);
-      alert('Error al guardar la calificación');
+      await showAlert({
+        title: 'Error',
+        description: 'Hubo un problema al guardar la calificación.',
+        variant: 'danger'
+      });
     } finally {
       setLoading(false);
     }

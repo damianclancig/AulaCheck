@@ -30,6 +30,7 @@ export interface Course {
   shift?: 'Mañana' | 'Tarde' | 'Noche'; // Turno del curso
   description?: string;
   joinCode?: string; // Unique 8-character code for self-registration
+  joinCodeExpiresAt?: Date; // Fecha límite de validez del código
   allowJoinRequests: boolean; // Whether self-registration is enabled
   createdAt: Date;
   meta: {

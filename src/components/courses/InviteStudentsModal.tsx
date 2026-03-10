@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Copy, Check, RefreshCw, Link2, AlertCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useModal } from '@/hooks/useModal';
 
 interface InviteStudentsModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function InviteStudentsModal({
   const [joinCode, setJoinCode] = useState(currentJoinCode || '');
   const [isEnabled, setIsEnabled] = useState(allowJoinRequests);
   const [copied, setCopied] = useState(false);
+  const { showAlert, showConfirm } = useModal();
 
   if (!isOpen) return null;
 
@@ -45,14 +47,26 @@ export function InviteStudentsModal({
       setIsEnabled(true);
     } catch (error) {
       console.error(error);
-      alert('Error al generar el código de invitación');
+      await showAlert({
+        title: 'Error',
+        description: 'No se pudo generar el código de invitación.',
+        variant: 'danger'
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleDisable = async () => {
-    if (!confirm('¿Desactivar el link de invitación? Los alumnos ya no podrán usarlo.')) return;
+    const isConfirmed = await showConfirm({
+      title: 'Desactivar link',
+      description: '¿Estás seguro de desactivar el link de invitación? Los alumnos ya no podrán usar este código y el QR desaparecerá.',
+      confirmText: 'Desactivar',
+      cancelText: 'Cancelar',
+      variant: 'warning'
+    });
+
+    if (!isConfirmed) return;
 
     setLoading(true);
     try {
@@ -63,10 +77,18 @@ export function InviteStudentsModal({
       if (!response.ok) throw new Error('Error al desactivar');
 
       setIsEnabled(false);
-      alert('Link de invitación desactivado');
+      await showAlert({
+        title: 'Link Desactivado',
+        description: 'El link de invitación ha sido desactivado exitosamente.',
+        variant: 'info'
+      });
     } catch (error) {
       console.error(error);
-      alert('Error al desactivar el link');
+      await showAlert({
+        title: 'Error',
+        description: 'Ocurrió un error al intentar desactivar el link.',
+        variant: 'danger'
+      });
     } finally {
       setLoading(false);
     }
@@ -119,43 +141,47 @@ export function InviteStudentsModal({
             </div>
           ) : (
             <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Link de Invitación {isEnabled ? '(Activo)' : '(Desactivado)'}
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={joinUrl}
-                    readOnly
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm"
-                  />
-                  <button
-                    onClick={handleCopy}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
-                  >
-                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    {copied ? 'Copiado' : 'Copiar'}
-                  </button>
+              {isEnabled && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Link de Invitación (Activo)
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={joinUrl}
+                      readOnly
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm"
+                    />
+                    <button
+                      onClick={handleCopy}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+                    >
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copied ? 'Copiado' : 'Copiar'}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg p-6 border-2 border-indigo-200 dark:border-indigo-800 transition-colors">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
-                  📱 Escanea el QR en clase
-                </p>
-                <div className="flex justify-center bg-white p-4 rounded-lg">
-                  <QRCodeSVG
-                    value={joinUrl}
-                    size={200}
-                    level="H"
-                    includeMargin={true}
-                  />
+              {isEnabled && (
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg p-6 border-2 border-indigo-200 dark:border-indigo-800 transition-colors">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
+                    📱 Escanea el QR en clase
+                  </p>
+                  <div className="flex justify-center bg-white p-4 rounded-lg">
+                    <QRCodeSVG
+                      value={joinUrl}
+                      size={200}
+                      level="H"
+                      includeMargin={true}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">
+                    Los alumnos pueden escanear este código con su celular. Recuerda que la vigencia del link es de 2 horas.
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">
-                  Los alumnos pueden escanear este código con su celular
-                </p>
-              </div>
+              )}
 
               <div className="flex gap-3">
                 <button

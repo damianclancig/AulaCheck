@@ -25,54 +25,54 @@ export function CourseCard({ course }: CourseCardProps) {
   const attendancePercent = (course.meta.avgAttendance * 100).toFixed(0);
 
   return (
-    <Link href={`/dashboard/courses/${course._id}`}>
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all duration-200 overflow-hidden group">
-        <div className="p-6">
-          <div className="flex justify-between items-start mb-4">
+    <Link href={`/dashboard/courses/${course._id}`} className="block h-full">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-800 hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 overflow-hidden group h-full flex flex-col">
+        <div className="p-8 flex-1">
+          <div className="flex justify-between items-start mb-6">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Institución:</span> {course.institutionName}
+              <p className="text-base text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
+                <span className="font-semibold text-gray-700 dark:text-gray-200">Institución:</span> {course.institutionName}
               </p>
-              <div>
-                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Curso:</span>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest opacity-80">Curso</span>
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2 leading-tight">
                   {course.name}
                 </h3>
                 {course.shift && (
-                  <p className={`text-xs font-semibold mt-0.5 ${course.shift === 'Mañana' ? 'text-amber-600 dark:text-amber-400'
-                      : course.shift === 'Tarde' ? 'text-orange-600 dark:text-orange-400'
-                        : 'text-indigo-600 dark:text-indigo-400'
+                  <p className={`text-sm font-bold mt-1.5 ${course.shift === 'Mañana' ? 'text-amber-600 dark:text-amber-400'
+                    : course.shift === 'Tarde' ? 'text-orange-600 dark:text-orange-400'
+                      : 'text-indigo-600 dark:text-indigo-400'
                     }`}>
                     Turno: {course.shift}
                   </p>
                 )}
               </div>
             </div>
-            <div className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 ml-2">
-              {course.meta.studentCount} alumnos
+            <div className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-bold px-3 py-1 rounded-lg shrink-0 ml-3 border border-indigo-100 dark:border-indigo-800">
+              {course.meta.studentCount} Alumnos
             </div>
           </div>
 
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 h-10">
-            {course.description || 'Sin descripción'}
+          <p className="text-base text-gray-600 dark:text-gray-400 mb-8 line-clamp-2 leading-relaxed">
+            {course.description || 'Sin descripción detallada del curso.'}
           </p>
 
-          <div className="space-y-3">
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <Calendar className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
-              <span>Inicio: {startDate}</span>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
+              <Calendar className="w-5 h-5 mr-3 text-indigo-500/70" />
+              <span>Inicio: <span className="text-gray-900 dark:text-gray-100">{startDate}</span></span>
             </div>
 
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <BarChart3 className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
-              <span>Asistencia prom: <span className="font-medium text-gray-900 dark:text-gray-200">{attendancePercent}%</span></span>
+            <div className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
+              <BarChart3 className="w-5 h-5 mr-3 text-indigo-500/70" />
+              <span>Asistencia: <span className="text-gray-900 dark:text-gray-100">{attendancePercent}% Promedio</span></span>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800/50 px-6 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-900/10 transition-colors">
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Ver detalles</span>
-          <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transform group-hover:translate-x-1 transition-all" />
+        <div className="bg-gray-50/50 dark:bg-gray-800/30 px-8 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center group-hover:bg-indigo-50/80 dark:group-hover:bg-indigo-900/20 transition-all">
+          <span className="text-sm font-bold text-indigo-600/80 dark:text-indigo-400/80 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Ver Gestión Completa</span>
+          <ArrowRight className="w-5 h-5 text-indigo-400 transform group-hover:translate-x-1.5 transition-transform" />
         </div>
       </div>
     </Link>

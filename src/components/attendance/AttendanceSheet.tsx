@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Check, XCircle, Clock, X as XIcon, Info } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useModal } from '@/hooks/useModal';
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
@@ -55,6 +56,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
     date: '',
   });
   const [updating, setUpdating] = useState(false);
+  const { showAlert } = useModal();
 
   // Synchronized scroll state for mobile sliders
   const scrollRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -178,7 +180,11 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
       }
     } catch (error) {
       console.error('Error updating attendance:', error);
-      alert('Error al actualizar la asistencia');
+      await showAlert({
+        title: 'Error',
+        description: 'Ocurrió un error al actualizar la asistencia.',
+        variant: 'danger'
+      });
     } finally {
       setUpdating(false);
     }

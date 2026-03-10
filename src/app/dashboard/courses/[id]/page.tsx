@@ -31,6 +31,7 @@ import {
 import { WithdrawalModal } from '@/components/students/WithdrawalModal';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 import Link from 'next/link';
+import { useModal } from '@/hooks/useModal';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -82,6 +83,7 @@ export default function CourseDetailPage() {
   const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [isDeletingStudent, setIsDeletingStudent] = useState(false);
+  const { showAlert } = useModal();
 
   // Fetch pending join requests count
   useEffect(() => {
@@ -143,7 +145,11 @@ export default function CourseDetailPage() {
       setStudentToDelete(null);
     } catch (error) {
       console.error('Error withrawing student:', error);
-      alert('Error al dar de baja al alumno');
+      await showAlert({
+        title: 'Error',
+        description: 'No se pudo dar de baja al alumno.',
+        variant: 'danger'
+      });
     } finally {
       setIsDeletingStudent(false);
     }
@@ -175,7 +181,11 @@ export default function CourseDetailPage() {
       document.body.removeChild(a);
     } catch (error) {
       console.error('Error exporting:', error);
-      alert('Error al exportar reporte');
+      await showAlert({
+        title: 'Error',
+        description: 'No se procesar ni exportar el reporte.',
+        variant: 'danger'
+      });
     }
   };
 

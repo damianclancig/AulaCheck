@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useModal } from '@/hooks/useModal';
 
 interface AttendanceModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
   const [attendanceMap, setAttendanceMap] = useState<Record<string, AttendanceStatus>>({});
   const [suspensionReason, setSuspensionReason] = useState<'none' | 'class_suspension' | 'teacher_leave' | 'other'>('none');
   const [suspensionNote, setSuspensionNote] = useState('');
+  const { showAlert } = useModal();
 
   // Carousel State
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -143,7 +145,11 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
       onClose();
     } catch (error) {
       console.error('Error saving attendance:', error);
-      alert('Error al guardar la asistencia');
+      await showAlert({
+        title: 'Error',
+        description: 'No se pudo guardar la asistencia.',
+        variant: 'danger'
+      });
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Loader2, Check, XCircle, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { JoinRequest } from '@/types/models';
+import { useModal } from '@/hooks/useModal';
 
 interface JoinRequestsModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
   const [loading, setLoading] = useState(false);
   const [requests, setRequests] = useState<JoinRequest[]>([]);
   const [processing, setProcessing] = useState<string | null>(null);
+  const { showAlert } = useModal();
 
   useEffect(() => {
     if (isOpen) {
@@ -57,7 +59,11 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
       onRequestProcessed();
     } catch (error) {
       console.error(error);
-      alert('Error al procesar la solicitud');
+      await showAlert({
+        title: 'Error',
+        description: 'Ocurrió un error al procesar la solicitud.',
+        variant: 'danger'
+      });
     } finally {
       setProcessing(null);
     }

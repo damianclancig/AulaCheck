@@ -53,7 +53,7 @@ export default function DashboardPage() {
       </div>
 
       {courses && courses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {courses.map((course) => (
             <CourseCard key={course._id.toString()} course={course} />
           ))}

@@ -16,7 +16,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const coursesCollection = await getCoursesCollection();
     const course = await coursesCollection.findOne({ 
       joinCode: code,
-      allowJoinRequests: true 
+      allowJoinRequests: true,
+      $or: [
+        { joinCodeExpiresAt: { $gt: new Date() } },
+        { joinCodeExpiresAt: { $exists: false } }
+      ]
     });
 
     if (!course) {
@@ -57,7 +61,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const coursesCollection = await getCoursesCollection();
     const course = await coursesCollection.findOne({ 
       joinCode: code,
-      allowJoinRequests: true 
+      allowJoinRequests: true,
+      $or: [
+        { joinCodeExpiresAt: { $gt: new Date() } },
+        { joinCodeExpiresAt: { $exists: false } }
+      ]
     });
 
     if (!course) {

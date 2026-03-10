@@ -52,12 +52,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // Calculate expiration date (2 hours from now)
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 2);
+
     // Update course with new join code and enable join requests
     await coursesCollection.updateOne(
       { _id: courseId },
       {
         $set: {
           joinCode: joinCode!,
+          joinCodeExpiresAt: expiresAt,
           allowJoinRequests: true
         }
       }
@@ -89,10 +94,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const coursesCollection = await getCoursesCollection();
 
-    // Disable join requests (keep code for history)
+    // Disable join requests and remove expiration
     await coursesCollection.updateOne(
       { _id: courseId },
-      { $set: { allowJoinRequests: false } }
+      { 
+        $set: { allowJoinRequests: false },
+        $unset: { joinCodeExpiresAt: "" }
+      }
     );
 
     return NextResponse.json({ success: true });
