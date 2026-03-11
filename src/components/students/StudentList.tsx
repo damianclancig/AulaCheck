@@ -119,8 +119,8 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
       clientY = (e as React.MouseEvent).clientY;
     }
 
-    const menuWidth = 200;
-    const menuHeight = 120; // 3 items approx
+    const menuWidth = 220;
+    const menuHeight = 280; // Estimated height for title + 5 items + separators
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -134,6 +134,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
       y = clientY - menuHeight;
     }
 
+    // Ensure it doesn't go off the left or top edge
     x = Math.max(10, x);
     y = Math.max(10, y);
 
