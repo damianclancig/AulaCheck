@@ -53,7 +53,7 @@ export default function DashboardPage() {
       </div>
 
       {courses && courses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {[...courses]
             .sort((a, b) => {
               // Primero ordenar por institución

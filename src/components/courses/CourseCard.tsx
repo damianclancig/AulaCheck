@@ -37,8 +37,8 @@ export function CourseCard({ course }: CourseCardProps) {
           </h2>
         </div>
 
-        <div className="p-8 flex-1">
-          <div className="flex justify-between items-start mb-6">
+        <div className="p-5 flex-1">
+          <div className="flex justify-between items-start mb-3">
             <div>
               <div className="space-y-1">
                 <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Curso</span>
@@ -61,12 +61,12 @@ export function CourseCard({ course }: CourseCardProps) {
           </div>
 
           {course.description && (
-            <p className="text-base text-gray-600 dark:text-gray-400 mb-8 line-clamp-2 leading-relaxed">
+            <p className="text-base text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 leading-relaxed">
               {course.description}
             </p>
           )}
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-2.5">
             <div className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
               <Calendar className="w-5 h-5 mr-3 text-indigo-500/70" />
               <span>Inicio: <span className="text-gray-900 dark:text-gray-100">{startDate}</span></span>
@@ -79,7 +79,7 @@ export function CourseCard({ course }: CourseCardProps) {
           </div>
         </div>
 
-        <div className="bg-gray-50/50 dark:bg-gray-800/30 px-8 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center group-hover:bg-indigo-50/80 dark:group-hover:bg-indigo-900/20 transition-all">
+        <div className="bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center group-hover:bg-indigo-50/80 dark:group-hover:bg-indigo-900/20 transition-all">
           <span className="text-sm font-bold text-indigo-600/80 dark:text-indigo-400/80 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Ver Gestión Completa</span>
           <ArrowRight className="w-5 h-5 text-indigo-400 transform group-hover:translate-x-1.5 transition-transform" />
         </div>
