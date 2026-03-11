@@ -54,7 +54,9 @@ export default function DashboardPage() {
 
       {courses && courses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {courses.map((course) => (
+          {[...courses]
+            .sort((a, b) => a.institutionName.localeCompare(b.institutionName))
+            .map((course) => (
             <CourseCard key={course._id.toString()} course={course} />
           ))}
         </div>
