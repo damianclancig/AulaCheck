@@ -19,6 +19,11 @@ import { ModalProvider } from "@/providers/ModalProvider";
 export const metadata: Metadata = {
   title: "AulaCheck",
   description: "Gestión inteligente de asistencias y calificaciones",
+  icons: {
+    icon: "/assets/icon.webp",
+    apple: "/assets/icon.webp",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

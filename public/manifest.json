@@ -1,0 +1,21 @@
+{
+  "name": "AulaCheck",
+  "short_name": "AulaCheck",
+  "description": "Gestión inteligente de asistencias y calificaciones para docentes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/assets/icon.webp",
+      "sizes": "192x192",
+      "type": "image/webp"
+    },
+    {
+      "src": "/assets/icon.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}

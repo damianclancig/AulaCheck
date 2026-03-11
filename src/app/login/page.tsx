@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { GraduationCap, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import logoPic from '../../../public/assets/logo.webp';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -26,11 +28,10 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
         <div className="p-8 text-center">
-          <div className="mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
-            <GraduationCap className="w-8 h-8 text-indigo-600" />
+          <div className="mx-auto flex items-center justify-center mb-6">
+            <Image src={logoPic} alt="AulaCheck Logo" className="h-24 w-auto object-contain" priority />
           </div>
-
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">AulaCheck</h1>
+          <h1 className="sr-only">AulaCheck</h1>
           <p className="text-gray-500 mb-8">
             Gestión inteligente de asistencias y calificaciones para docentes.
           </p>

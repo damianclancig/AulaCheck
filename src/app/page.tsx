@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { GraduationCap, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import logoPic from '../../public/assets/logo.webp';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <GraduationCap className="h-8 w-8 text-indigo-600" />
-          <span className="text-xl font-bold text-gray-900">AulaCheck</span>
+        <div className="flex items-center -ml-2">
+          <Image src={logoPic} alt="AulaCheck Logo" className="h-12 w-auto object-contain" priority />
         </div>
         <div className="flex gap-4">
           <Link

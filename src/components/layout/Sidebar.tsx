@@ -7,11 +7,12 @@ import {
   BookOpen,
   Users,
   Settings,
-  LogOut,
-  GraduationCap
+  LogOut
 } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import logoPic from '../../../public/assets/logo.webp';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -50,9 +51,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center">
-            <GraduationCap className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">AulaCheck</span>
+          <div className="flex items-center py-2">
+            <Image src={logoPic} alt="AulaCheck Logo" className="h-10 w-auto object-contain" priority />
           </div>
           {/* Close button for mobile */}
           <button
