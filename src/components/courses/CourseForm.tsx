@@ -35,7 +35,7 @@ export function CourseForm({
     return `${year}-${month}-${day}`;
   };
 
-  const [formData, setFormData] = useState<CourseFormData>({
+  const [formData, setFormData] = useState<CourseFormData>(initialData || {
     institutionName: '',
     name: '',
     description: '',
@@ -44,11 +44,15 @@ export function CourseForm({
     shift: '',
   });
 
-  useEffect(() => {
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
+
+  // Ajustar estado si initialData cambia externamente
+  if (initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
     if (initialData) {
       setFormData(initialData);
     }
-  }, [initialData]);
+  }
 
   const { institutions } = useInstitutions();
 

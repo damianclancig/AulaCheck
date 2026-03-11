@@ -46,17 +46,14 @@ export function ContactPopover({
     };
   }, [isOpen, onClose, triggerRef]);
 
-  // Calculate position
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  
   useEffect(() => {
-    if (isOpen && triggerRef.current) {
+    if (isOpen && triggerRef.current && popoverRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
       
       // Dimensiones estimadas del popover
-      const popoverHeight = 250; // Altura aproximada del popover
+      const popoverHeight = popoverRef.current.offsetHeight || 250;
       const popoverWidth = 280;
       
       // Calcular posición horizontal (centrado si es posible)
@@ -77,10 +74,8 @@ export function ContactPopover({
         top = rect.top + scrollY - popoverHeight - 8;
       }
 
-      setPosition({
-        top: top,
-        left: left,
-      });
+      popoverRef.current.style.top = `${top}px`;
+      popoverRef.current.style.left = `${left}px`;
     }
   }, [isOpen, triggerRef]);
 
@@ -104,7 +99,6 @@ export function ContactPopover({
     <div 
       ref={popoverRef}
       className="absolute z-50 w-72 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 animate-in fade-in zoom-in-95 duration-200 transition-colors"
-      style={{ top: position.top, left: position.left }}
     >
       <div className="p-4 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2">

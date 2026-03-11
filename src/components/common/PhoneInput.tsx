@@ -12,22 +12,20 @@ interface PhoneInputProps {
 export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [touched, setTouched] = useState(false);
+  const [prevValue, setPrevValue] = useState(value);
 
-  // Parse initial value
-  useEffect(() => {
+  // Ajustar estado durante el render si la prop cambia (evita renders en cascada)
+  if (value !== prevValue) {
+    setPrevValue(value);
     if (value && value.startsWith('+549')) {
-      // Remove +549 and format nicely if possible, or just show digits
-      const raw = value.substring(4);
-      setInputValue(raw);
+      setInputValue(value.substring(4));
     } else if (value) {
-      // Fallback for other formats
       setInputValue(value);
     } else {
-      // Reset input if value is empty
       setInputValue('');
       setTouched(false);
     }
-  }, [value]);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
