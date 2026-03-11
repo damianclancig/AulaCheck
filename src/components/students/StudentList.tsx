@@ -1,7 +1,7 @@
 'use client';
 
 import { Student } from '@/types/models';
-import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X, AlertTriangle, RefreshCw, Loader2 } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -88,6 +88,8 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
     y: 0,
     studentId: '',
   });
+  const [loadingFlags, setLoadingFlags] = useState<Record<string, Record<string, boolean | undefined>>>({});
+  const [optimisticFlags, setOptimisticFlags] = useState<Record<string, Record<string, boolean | undefined>>>({});
 
   // Close context menu on click outside
   useEffect(() => {
@@ -151,12 +153,30 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
   const handleToggleFlag = async (flag: 'requiresAttention' | 'isRepeating') => {
     if (!currentStudentContextMenu) return;
 
-    setContextMenu(prev => ({ ...prev, visible: false }));
+    const studentId = currentStudentContextMenu._id.toString();
+    const oldValue = currentStudentContextMenu[flag];
+    const newValue = !oldValue;
     
-    const newValue = !currentStudentContextMenu[flag];
+    // Configurar actualización optimista
+    setOptimisticFlags(prev => ({
+      ...prev,
+      [studentId]: {
+        ...(prev[studentId] || {}),
+        [flag]: newValue
+      }
+    }));
+
+    // Configurar estado de carga
+    setLoadingFlags(prev => ({
+      ...prev,
+      [studentId]: {
+        ...(prev[studentId] || {}),
+        [flag]: true
+      }
+    }));
     
     try {
-      const response = await fetch(`/api/students/${currentStudentContextMenu._id}`, {
+      const response = await fetch(`/api/students/${studentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -175,6 +195,23 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
       router.refresh();
     } catch (error) {
       console.error('Error updating flag:', error);
+      // Revertir cambio optimista en caso de error
+      setOptimisticFlags(prev => ({
+        ...prev,
+        [studentId]: {
+          ...(prev[studentId] || {}),
+          [flag]: oldValue
+        }
+      }));
+    } finally {
+      // Quitar estado de carga
+      setLoadingFlags(prev => ({
+        ...prev,
+        [studentId]: {
+          ...(prev[studentId] || {}),
+          [flag]: false
+        }
+      }));
     }
   };
 
@@ -209,8 +246,18 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
       return sortDirection === 'asc' ? comparison : -comparison;
     });
 
-    return filtered;
-  }, [students, searchQuery, sortField, sortDirection]);
+    return filtered.map(student => {
+      const studentId = student._id.toString();
+      const studentOptimisticFlags = optimisticFlags[studentId];
+      
+      if (!studentOptimisticFlags) return student;
+      
+      return {
+        ...student,
+        ...studentOptimisticFlags
+      };
+    });
+  }, [students, searchQuery, sortField, sortDirection, optimisticFlags]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -342,7 +389,8 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
           </div>
           <button
             onClick={() => handleToggleFlag('requiresAttention')}
-            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors"
+            disabled={loadingFlags[contextMenu.studentId]?.requiresAttention}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center gap-3">
               <AlertTriangle className={`w-4 h-4 ${currentStudentContextMenu.requiresAttention ? 'text-fuchsia-600 dark:text-fuchsia-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-fuchsia-500'}`} />
@@ -350,12 +398,17 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                 {t('requiresAttention')}
               </span>
             </div>
-            {currentStudentContextMenu.requiresAttention && <Check className="w-4 h-4 text-fuchsia-600 dark:text-fuchsia-400" />}
+            {loadingFlags[contextMenu.studentId]?.requiresAttention ? (
+              <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
+            ) : (
+              currentStudentContextMenu.requiresAttention && <Check className="w-4 h-4 text-fuchsia-600 dark:text-fuchsia-400" />
+            )}
           </button>
           
           <button
             onClick={() => handleToggleFlag('isRepeating')}
-            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors"
+            disabled={loadingFlags[contextMenu.studentId]?.isRepeating}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center gap-3">
               <RefreshCw className={`w-4 h-4 ${currentStudentContextMenu.isRepeating ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-amber-500'}`} />
@@ -363,7 +416,11 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                 {t('isRepeating')}
               </span>
             </div>
-            {currentStudentContextMenu.isRepeating && <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />}
+            {loadingFlags[contextMenu.studentId]?.isRepeating ? (
+              <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
+            ) : (
+              currentStudentContextMenu.isRepeating && <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            )}
           </button>
 
           <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
@@ -480,6 +537,9 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                                 <span className={student.requiresAttention ? "bg-fuchsia-200 dark:bg-fuchsia-900/40 text-fuchsia-900 dark:text-fuchsia-100 px-1.5 py-0.5 rounded-sm" : ""}>
                                   {student.lastName}, {student.firstName}
                                 </span>
+                                {Object.values(loadingFlags[student._id.toString()] || {}).some(Boolean) && (
+                                  <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
+                                )}
                                 <div className="flex items-center gap-1.5 ml-1">
                                   {student.isRepeating && (
                                     <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title={t('isRepeating')}>
@@ -601,6 +661,9 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                         <span className={student.requiresAttention ? "bg-fuchsia-200 dark:bg-fuchsia-900/40 text-fuchsia-900 dark:text-fuchsia-100 px-1.5 py-0.5 rounded-sm" : ""}>
                           {student.lastName}, {student.firstName}
                         </span>
+                        {Object.values(loadingFlags[student._id.toString()] || {}).some(Boolean) && (
+                          <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
+                        )}
                         <div className="flex items-center gap-1.5 ml-1">
                           {student.isRepeating && (
                             <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title={t('isRepeating')}>
