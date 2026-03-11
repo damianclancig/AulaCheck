@@ -20,8 +20,12 @@ export const metadata: Metadata = {
   title: "AulaCheck",
   description: "Gestión inteligente de asistencias y calificaciones",
   icons: {
-    icon: "/assets/icon.webp",
-    apple: "/assets/icon.webp",
+    icon: [
+      { url: "/assets/icon.webp", type: "image/webp" },
+    ],
+    apple: [
+      { url: "/assets/icon.webp", type: "image/webp" },
+    ],
   },
   manifest: "/manifest.json",
 };
