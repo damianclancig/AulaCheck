@@ -205,6 +205,7 @@
       },
       "actions": {
         "edit": "Editar",
+        "addComment": "Adicionar comentário",
         "withdrawal": "Dar baixa",
         "withdrawalDetails": "Ver detalhes da baixa"
       },
@@ -234,6 +235,14 @@
     "editModal": {
       "title": "Editar Aluno",
       "saveChanges": "Salvar Alterações"
+    },
+    "addCommentModal": {
+      "title": "Adicionar Comentário",
+      "commentLabel": "Comentário",
+      "commentPlaceholder": "Insira um comentário sobre o aluno...",
+      "addButton": "Adicionar",
+      "success": "Comentário adicionado com sucesso",
+      "error": "Erro ao adicionar comentário"
     },
     "withdrawModal": {
       "title": "Dar baixa no aluno",

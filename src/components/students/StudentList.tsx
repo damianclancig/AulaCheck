@@ -1,11 +1,12 @@
 'use client';
 
 import { Student } from '@/types/models';
-import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X, AlertTriangle, RefreshCw, Loader2 } from 'lucide-react';
+import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X, AlertTriangle, RefreshCw, Loader2, MessageSquare } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ContactPopover } from './ContactPopover';
+import { AddCommentModal } from './AddCommentModal';
 
 interface ContextMenuState {
   visible: boolean;
@@ -75,6 +76,7 @@ function ContactTrigger({ student, showText = false }: { student: Student; showT
 
 export function StudentList({ students, onDeleteStudent, onEditStudent, onStudentUpdated }: StudentListProps) {
   const t = useTranslations('students.list');
+  const tComments = useTranslations('students.addCommentModal');
   const tCommon = useTranslations('common');
   
   const router = useRouter();
@@ -82,6 +84,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [isAddCommentModalOpen, setIsAddCommentModalOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({
     visible: false,
     x: 0,
@@ -210,6 +213,53 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
         [studentId]: {
           ...(prev[studentId] || {}),
           [flag]: false
+        }
+      }));
+    }
+  };
+
+  const handleAddComment = async (comment: string) => {
+    if (!currentStudentContextMenu) return;
+
+    const studentId = currentStudentContextMenu._id.toString();
+    const oldNotes = currentStudentContextMenu.notes || '';
+    const newNotes = oldNotes ? `${oldNotes}\n\n${comment}` : comment;
+
+    setLoadingFlags(prev => ({
+      ...prev,
+      [studentId]: {
+        ...(prev[studentId] || {}),
+        comment: true
+      }
+    }));
+
+    try {
+      const response = await fetch(`/api/students/${studentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          notes: newNotes,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Error al actualizar el alumno');
+
+      if (onStudentUpdated) {
+        onStudentUpdated();
+      }
+
+      router.refresh();
+      setIsAddCommentModalOpen(false);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    } finally {
+      setLoadingFlags(prev => ({
+        ...prev,
+        [studentId]: {
+          ...(prev[studentId] || {}),
+          comment: false
         }
       }));
     }
@@ -420,6 +470,27 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
               <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
             ) : (
               currentStudentContextMenu.isRepeating && <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            )}
+          </button>
+
+          <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+
+          <button
+            onClick={() => {
+              setIsAddCommentModalOpen(true);
+              setContextMenu({ ...contextMenu, visible: false });
+            }}
+            disabled={loadingFlags[contextMenu.studentId]?.comment}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="flex items-center gap-3">
+              <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-indigo-500" />
+              <span className="text-gray-700 dark:text-gray-300">
+                {t('actions.addComment')}
+              </span>
+            </div>
+            {loadingFlags[contextMenu.studentId]?.comment && (
+              <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
             )}
           </button>
 
@@ -719,6 +790,14 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
           })
         )}
       </div>
+
+      <AddCommentModal
+        isOpen={isAddCommentModalOpen}
+        onClose={() => setIsAddCommentModalOpen(false)}
+        onConfirm={handleAddComment}
+        studentName={currentStudentContextMenu ? `${currentStudentContextMenu.firstName} ${currentStudentContextMenu.lastName}` : ''}
+        isLoading={loadingFlags[contextMenu.studentId]?.comment}
+      />
     </div>
   );
 }

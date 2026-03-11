@@ -205,6 +205,7 @@
       },
       "actions": {
         "edit": "Edit",
+        "addComment": "Add comment",
         "withdrawal": "Withdraw",
         "withdrawalDetails": "View withdrawal details"
       },
@@ -234,6 +235,14 @@
     "editModal": {
       "title": "Edit Student",
       "saveChanges": "Save Changes"
+    },
+    "addCommentModal": {
+      "title": "Add Comment",
+      "commentLabel": "Comment",
+      "commentPlaceholder": "Enter a comment about the student...",
+      "addButton": "Add",
+      "success": "Comment added successfully",
+      "error": "Error adding comment"
     },
     "withdrawModal": {
       "title": "Withdraw student",

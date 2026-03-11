@@ -204,8 +204,9 @@
         "search": "No se encontraron alumnos con ese criterio",
         "noStudents": "No hay alumnos inscritos"
       },
-      "actions": {
+        "actions": {
         "edit": "Editar",
+        "addComment": "Añadir comentario",
         "withdrawal": "Dar de baja",
         "withdrawalDetails": "Ver detalles baja"
       },
@@ -239,6 +240,14 @@
       "saveChanges": "Guardar Cambios",
       "success": "Alumno actualizado correctamente",
       "error": "Error al actualizar alumno"
+    },
+    "addCommentModal": {
+      "title": "Añadir comentario",
+      "commentLabel": "Comentario",
+      "commentPlaceholder": "Ingrese un comentario sobre el alumno...",
+      "addButton": "Agregar",
+      "success": "Comentario agregado correctamente",
+      "error": "Error al agregar el comentario"
     },
     "withdrawModal": {
       "title": "Dar de baja al alumno",
