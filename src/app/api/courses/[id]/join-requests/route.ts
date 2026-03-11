@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { verifyCourseOwnership } from '@/lib/auth/ownership';
-import { getJoinRequestsCollection, getStudentsCollection, getEnrollmentsCollection } from '@/lib/mongodb/collections';
+import { getJoinRequestsCollection, getStudentsCollection, getEnrollmentsCollection, getCoursesCollection } from '@/lib/mongodb/collections';
 
 interface RouteParams {
   params: Promise<{
@@ -108,6 +108,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             processedBy: userId
           }
         }
+      );
+
+      // Actualizar contador de alumnos en el curso
+      const coursesCollection = await getCoursesCollection();
+      await coursesCollection.updateOne(
+        { _id: courseId },
+        { $inc: { 'meta.studentCount': 1 } }
       );
 
       return NextResponse.json({ success: true, message: 'Alumno agregado correctamente' });

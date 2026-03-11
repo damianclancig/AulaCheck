@@ -60,9 +60,11 @@ export function CourseCard({ course }: CourseCardProps) {
             </div>
           </div>
 
-          <p className="text-base text-gray-600 dark:text-gray-400 mb-8 line-clamp-2 leading-relaxed">
-            {course.description || 'Sin descripción detallada del curso.'}
-          </p>
+          {course.description && (
+            <p className="text-base text-gray-600 dark:text-gray-400 mb-8 line-clamp-2 leading-relaxed">
+              {course.description}
+            </p>
+          )}
 
           <div className="grid grid-cols-1 gap-4">
             <div className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">

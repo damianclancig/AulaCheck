@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Sun, CloudSun, Moon } from 'lucide-react';
+import { useInstitutions } from '@/hooks/useInstitutions';
 
 export interface CourseFormData {
   institutionName: string;
@@ -49,6 +50,8 @@ export function CourseForm({
     }
   }, [initialData]);
 
+  const { institutions } = useInstitutions();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(formData);
@@ -63,12 +66,18 @@ export function CourseForm({
         <input
           type="text"
           id="institutionName"
+          list="institutions-list"
           required
           value={formData.institutionName}
           onChange={(e) => setFormData({ ...formData, institutionName: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
           placeholder="Ej: Universidad Nacional"
         />
+        <datalist id="institutions-list">
+          {institutions.map((inst, index) => (
+            <option key={`inst-${index}`} value={inst} />
+          ))}
+        </datalist>
       </div>
 
       <div>

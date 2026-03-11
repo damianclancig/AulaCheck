@@ -55,7 +55,18 @@ export default function DashboardPage() {
       {courses && courses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {[...courses]
-            .sort((a, b) => a.institutionName.localeCompare(b.institutionName))
+            .sort((a, b) => {
+              // Primero ordenar por institución
+              const instCompare = a.institutionName.localeCompare(b.institutionName);
+              if (instCompare !== 0) return instCompare;
+
+              // Si es la misma institución, ordenar por turno
+              const shiftOrder = { 'Mañana': 1, 'Tarde': 2, 'Noche': 3, '': 4 };
+              const orderA = shiftOrder[a.shift as keyof typeof shiftOrder] || 4;
+              const orderB = shiftOrder[b.shift as keyof typeof shiftOrder] || 4;
+              
+              return orderA - orderB;
+            })
             .map((course) => (
             <CourseCard key={course._id.toString()} course={course} />
           ))}
