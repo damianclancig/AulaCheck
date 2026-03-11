@@ -41,6 +41,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
     externalId: '',
     requiresAttention: false,
     isRepeating: false,
+    notes: '',
   });
 
   // Pre-fill form when student changes
@@ -54,6 +55,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
         externalId: student.externalId || '',
         requiresAttention: student.requiresAttention || false,
         isRepeating: student.isRepeating || false,
+        notes: student.notes || '',
       });
     }
   }, [student]);
@@ -227,6 +229,20 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
             }}
             error={fieldErrors.phone || undefined}
           />
+
+          <div>
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Observaciones / Notas (Opcional)
+            </label>
+            <textarea
+              id="notes"
+              rows={3}
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              placeholder="Ingrese detalles adicionales, conducta, notas médicas, etc."
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 resize-none"
+            />
+          </div>
 
           <div className="pt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">

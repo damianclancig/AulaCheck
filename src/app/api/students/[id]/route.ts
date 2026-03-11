@@ -30,7 +30,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { firstName, lastName, email, phone, externalId, requiresAttention, isRepeating } = body;
+    const { firstName, lastName, email, phone, externalId, requiresAttention, isRepeating, notes } = body;
 
     const updateData: any = {};
     if (firstName) updateData.firstName = firstName;
@@ -40,6 +40,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (externalId !== undefined) updateData.externalId = externalId;
     if (requiresAttention !== undefined) updateData.requiresAttention = requiresAttention;
     if (isRepeating !== undefined) updateData.isRepeating = isRepeating;
+    if (notes !== undefined) updateData.notes = notes;
 
     const studentsCollection = await getStudentsCollection();
     await studentsCollection.updateOne(

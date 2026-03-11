@@ -50,6 +50,7 @@ export interface Student {
   externalId?: string; // legajo/DNI
   requiresAttention?: boolean; // ¿Requiere atención especial / se porta mal?
   isRepeating?: boolean; // ¿Es recursante?
+  notes?: string; // Observaciones o notas
   createdAt: Date;
 }
 
@@ -101,6 +102,7 @@ export interface JoinRequest {
   externalId?: string;
   requiresAttention?: boolean;
   isRepeating?: boolean;
+  notes?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: Date;
   processedAt?: Date;

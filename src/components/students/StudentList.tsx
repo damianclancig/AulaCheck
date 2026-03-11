@@ -442,37 +442,44 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                         }
                       }}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
-                            <span className={`font-medium text-sm ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
-                              {student.firstName[0]}{student.lastName[0]}
-                            </span>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                              <span className={student.requiresAttention ? "bg-fuchsia-200 dark:bg-fuchsia-900/40 text-fuchsia-900 dark:text-fuchsia-100 px-1.5 py-0.5 rounded-sm" : ""}>
-                                {student.lastName}, {student.firstName}
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center">
+                            <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
+                              <span className={`font-medium text-xs ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
+                                {student.firstName[0]}{student.lastName[0]}
                               </span>
-                              <div className="flex items-center gap-1.5 ml-1">
-                                {student.isRepeating && (
-                                  <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title="Recursante">
-                                    <span className="font-black text-sm">R</span>
-                                  </div>
+                            </div>
+                            <div className="ml-3">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                <span className={student.requiresAttention ? "bg-fuchsia-200 dark:bg-fuchsia-900/40 text-fuchsia-900 dark:text-fuchsia-100 px-1.5 py-0.5 rounded-sm" : ""}>
+                                  {student.lastName}, {student.firstName}
+                                </span>
+                                <div className="flex items-center gap-1.5 ml-1">
+                                  {student.isRepeating && (
+                                    <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title="Recursante">
+                                      <span className="font-black text-sm">R</span>
+                                    </div>
+                                  )}
+                                </div>
+                                {isInactive && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                    Baja
+                                  </span>
                                 )}
                               </div>
-                              {isInactive && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                  Baja
-                                </span>
+                              {student.externalId && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  Legajo: {student.externalId}
+                                </div>
                               )}
                             </div>
-                            {student.externalId && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                                Legajo: {student.externalId}
-                              </div>
-                            )}
                           </div>
+                          {student.notes && (
+                            <div className="text-sm text-gray-500 dark:text-gray-400 italic whitespace-pre-line line-clamp-2 max-w-md" title={student.notes}>
+                              {student.notes}
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -602,10 +609,10 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                   }
                 }}
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
-                    <div className={`flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
-                      <span className={`font-medium ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
+                    <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
+                      <span className={`font-medium text-sm ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}>
                         {student.firstName[0]}{student.lastName[0]}
                       </span>
                     </div>
@@ -676,6 +683,10 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                     )}
                   </div>
                 </div>
+
+                {student.notes && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 italic whitespace-pre-line line-clamp-3 mb-3">{student.notes}</p>
+                )}
 
                 {(student.email || student.phone) ? (
                   <div className="flex items-center justify-between mb-3">
