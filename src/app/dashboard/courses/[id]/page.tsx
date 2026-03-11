@@ -339,6 +339,7 @@ export default function CourseDetailPage() {
                 setSelectedStudent(student);
                 setIsEditStudentModalOpen(true);
               }}
+              onStudentUpdated={() => mutateStudents()}
             />
           ) : (
             attendanceData ? (

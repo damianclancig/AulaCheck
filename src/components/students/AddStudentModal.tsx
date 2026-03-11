@@ -41,6 +41,8 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
     email: '',
     phone: '',
     externalId: '',
+    requiresAttention: false,
+    isRepeating: false,
   });
 
   if (!isOpen) return null;
@@ -94,6 +96,8 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
         email: '',
         phone: '',
         externalId: '',
+        requiresAttention: false,
+        isRepeating: false,
       });
       setFieldErrors({ firstName: null, lastName: null, email: null });
 
@@ -232,6 +236,66 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
             value={formData.phone}
             onChange={(phone) => setFormData({ ...formData, phone })}
           />
+
+          <div className="pt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+              <div>
+                <label htmlFor="requiresAttention" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  ¿Requiere atención especial?
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Comportamiento o seguimiento
+                </p>
+              </div>
+              <button
+                type="button"
+                id="requiresAttention"
+                role="switch"
+                aria-checked={formData.requiresAttention}
+                onClick={() => setFormData({ ...formData, requiresAttention: !formData.requiresAttention })}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                  formData.requiresAttention ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                }`}
+              >
+                <span className="sr-only">Requiere atención especial</span>
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    formData.requiresAttention ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+              <div>
+                <label htmlFor="isRepeating" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  ¿Es recursante?
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Ya cursó anteriormente
+                </p>
+              </div>
+              <button
+                type="button"
+                id="isRepeating"
+                role="switch"
+                aria-checked={formData.isRepeating}
+                onClick={() => setFormData({ ...formData, isRepeating: !formData.isRepeating })}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                  formData.isRepeating ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                }`}
+              >
+                <span className="sr-only">Es recursante</span>
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    formData.isRepeating ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
 
           <div className="pt-4 flex justify-end gap-3">
             <button

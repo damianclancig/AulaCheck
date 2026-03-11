@@ -1,9 +1,17 @@
 'use client';
 
 import { Student } from '@/types/models';
-import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X } from 'lucide-react';
-import { useState, useMemo, useRef } from 'react';
+import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ContactPopover } from './ContactPopover';
+
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  studentId: string;
+}
 
 interface StudentListProps {
   students: (Student & {
@@ -13,6 +21,7 @@ interface StudentListProps {
   })[];
   onDeleteStudent: (student: Student) => void;
   onEditStudent: (student: Student) => void;
+  onStudentUpdated?: () => void;
 }
 
 type SortField = 'name' | 'attendance' | 'grade';
@@ -61,12 +70,115 @@ function ContactTrigger({ student }: { student: Student }) {
   );
 }
 
-export function StudentList({ students, onDeleteStudent, onEditStudent }: StudentListProps) {
+export function StudentList({ students, onDeleteStudent, onEditStudent, onStudentUpdated }: StudentListProps) {
+  const router = useRouter();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    studentId: '',
+  });
+
+  // Close context menu on click outside
+  useEffect(() => {
+    const handleClick = () => setContextMenu(prev => ({ ...prev, visible: false }));
+    const handleScroll = () => setContextMenu(prev => ({ ...prev, visible: false }));
+    
+    if (contextMenu.visible) {
+      document.addEventListener('click', handleClick);
+      window.addEventListener('scroll', handleScroll, true); // Use capture phase for scrolling in any scrollable parent
+      return () => {
+        document.removeEventListener('click', handleClick);
+        window.removeEventListener('scroll', handleScroll, true);
+      };
+    }
+  }, [contextMenu.visible]);
+
+  const handleContextMenu = (e: React.MouseEvent | React.TouchEvent, studentId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Prevent open on touch if we're not using right click
+    // For touch devices, we'll use long press later
+    
+    let clientX = 0;
+    let clientY = 0;
+
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = (e as React.MouseEvent).clientX;
+      clientY = (e as React.MouseEvent).clientY;
+    }
+
+    const menuWidth = 200;
+    const menuHeight = 120; // 3 items approx
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let x = clientX;
+    if (x + menuWidth > windowWidth) {
+      x = clientX - menuWidth;
+    }
+
+    let y = clientY;
+    if (y + menuHeight > windowHeight) {
+      y = clientY - menuHeight;
+    }
+
+    x = Math.max(10, x);
+    y = Math.max(10, y);
+
+    setContextMenu({
+      visible: true,
+      x,
+      y,
+      studentId,
+    });
+  };
+
+  const currentStudentContextMenu = students.find(s => s._id.toString() === contextMenu.studentId);
+
+  const handleToggleFlag = async (flag: 'requiresAttention' | 'isRepeating') => {
+    if (!currentStudentContextMenu) return;
+
+    setContextMenu(prev => ({ ...prev, visible: false }));
+    
+    // Optimistic update logic would normally go here if we had state for it
+    // but since students come from props, we just call the API and trigger refresh
+    const newValue = !currentStudentContextMenu[flag];
+    
+    try {
+      const response = await fetch(`/api/students/${currentStudentContextMenu._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          [flag]: newValue,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Error al actualizar el alumno');
+      
+      // Notificamos al componente padre que un estudiante se actualizó para que recargue (con SWR)
+      if (onStudentUpdated) {
+        onStudentUpdated();
+      }
+      
+      // Utilizamos router.refresh() de Next.js como respaldo si no hay prop de actualización
+      router.refresh();
+    } catch (error) {
+      console.error('Error updating flag:', error);
+      alert('Ocurrió un error al actualizar los datos del alumno.');
+    }
+  };
 
   // Filter and sort students
   const filteredAndSortedStudents = useMemo(() => {
@@ -223,6 +335,44 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
         </div>
       </div>
 
+      {/* Context Menu */}
+      {contextMenu.visible && currentStudentContextMenu && (
+        <div
+          className="fixed bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-[100] min-w-[220px] transition-colors"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-800 mb-1">
+            Indicadores
+          </div>
+          <button
+            onClick={() => handleToggleFlag('requiresAttention')}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <AlertTriangle className={`w-4 h-4 ${currentStudentContextMenu.requiresAttention ? 'text-fuchsia-600 dark:text-fuchsia-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-fuchsia-500'}`} />
+              <span className={currentStudentContextMenu.requiresAttention ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}>
+                Requiere atención
+              </span>
+            </div>
+            {currentStudentContextMenu.requiresAttention && <Check className="w-4 h-4 text-fuchsia-600 dark:text-fuchsia-400" />}
+          </button>
+          
+          <button
+            onClick={() => handleToggleFlag('isRepeating')}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <RefreshCw className={`w-4 h-4 ${currentStudentContextMenu.isRepeating ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-amber-500'}`} />
+              <span className={currentStudentContextMenu.isRepeating ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}>
+                Es recursante
+              </span>
+            </div>
+            {currentStudentContextMenu.isRepeating && <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />}
+          </button>
+        </div>
+      )}
+
       {/* Desktop Table View */}
       <div className="hidden md:block bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-colors">
         <div className="overflow-x-auto">
@@ -284,7 +434,15 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                           'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30';
 
                   return (
-                    <tr key={student._id.toString()} className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${isInactive ? 'opacity-60 bg-gray-50/50 dark:bg-gray-900/50' : ''}`}>
+                    <tr 
+                      key={student._id.toString()} 
+                      className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${isInactive ? 'opacity-60 bg-gray-50/50 dark:bg-gray-900/50' : 'cursor-context-menu'}`}
+                      onContextMenu={(e) => {
+                        if (!isInactive) {
+                          handleContextMenu(e, student._id.toString());
+                        }
+                      }}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
@@ -294,7 +452,16 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                              {student.lastName}, {student.firstName}
+                              <span className={student.requiresAttention ? "bg-fuchsia-200 dark:bg-fuchsia-900/40 text-fuchsia-900 dark:text-fuchsia-100 px-1.5 py-0.5 rounded-sm" : ""}>
+                                {student.lastName}, {student.firstName}
+                              </span>
+                              <div className="flex items-center gap-1.5 ml-1">
+                                {student.isRepeating && (
+                                  <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title="Recursante">
+                                    <span className="font-black text-sm">R</span>
+                                  </div>
+                                )}
+                              </div>
                               {isInactive && (
                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                                   Baja
@@ -302,7 +469,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                               )}
                             </div>
                             {student.externalId && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                              <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                                 Legajo: {student.externalId}
                               </div>
                             )}
@@ -400,7 +567,42 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                     'text-red-600 bg-red-50';
 
             return (
-              <div key={student._id.toString()} className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 transition-colors ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}>
+              <div 
+                key={student._id.toString()} 
+                className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
+                onContextMenu={(e) => {
+                  if (!isInactive) {
+                    handleContextMenu(e, student._id.toString());
+                  }
+                }}
+                onTouchStart={(e) => {
+                  if (isInactive) return;
+                  const touch = e.touches[0];
+                  // Guardar el timer id en el elemento para poder cancelarlo si se mueve el dedo
+                  const timerId = window.setTimeout(() => {
+                    handleContextMenu(
+                      { preventDefault: () => { }, stopPropagation: () => { }, touches: [{ clientX: touch.clientX, clientY: touch.clientY }] } as any,
+                      student._id.toString()
+                    );
+                  }, 600);
+                  
+                  e.currentTarget.setAttribute('data-longpress-timer', timerId.toString());
+                }}
+                onTouchMove={(e) => {
+                  const timerId = e.currentTarget.getAttribute('data-longpress-timer');
+                  if (timerId) {
+                    window.clearTimeout(parseInt(timerId, 10));
+                    e.currentTarget.removeAttribute('data-longpress-timer');
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  const timerId = e.currentTarget.getAttribute('data-longpress-timer');
+                  if (timerId) {
+                    window.clearTimeout(parseInt(timerId, 10));
+                    e.currentTarget.removeAttribute('data-longpress-timer');
+                  }
+                }}
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className={`flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
@@ -410,7 +612,16 @@ export function StudentList({ students, onDeleteStudent, onEditStudent }: Studen
                     </div>
                     <div>
                       <h3 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                        {student.lastName}, {student.firstName}
+                        <span className={student.requiresAttention ? "bg-fuchsia-200 dark:bg-fuchsia-900/40 text-fuchsia-900 dark:text-fuchsia-100 px-1.5 py-0.5 rounded-sm" : ""}>
+                          {student.lastName}, {student.firstName}
+                        </span>
+                        <div className="flex items-center gap-1.5 ml-1">
+                          {student.isRepeating && (
+                            <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title="Recursante">
+                              <span className="font-black text-sm">R</span>
+                            </div>
+                          )}
+                        </div>
                         {isInactive && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                             Baja

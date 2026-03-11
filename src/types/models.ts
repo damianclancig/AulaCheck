@@ -48,6 +48,8 @@ export interface Student {
   email?: string;
   phone?: string; // número de celular
   externalId?: string; // legajo/DNI
+  requiresAttention?: boolean; // ¿Requiere atención especial / se porta mal?
+  isRepeating?: boolean; // ¿Es recursante?
   createdAt: Date;
 }
 
@@ -97,6 +99,8 @@ export interface JoinRequest {
   email?: string;
   phone?: string;
   externalId?: string;
+  requiresAttention?: boolean;
+  isRepeating?: boolean;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: Date;
   processedAt?: Date;

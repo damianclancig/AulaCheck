@@ -92,7 +92,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { studentId, firstName, lastName, email, phone, externalId } = body;
+    const { studentId, firstName, lastName, email, phone, externalId, requiresAttention, isRepeating } = body;
 
     const studentsCollection = await getStudentsCollection();
     const enrollmentsCollection = await getEnrollmentsCollection();
@@ -124,6 +124,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         email: email || undefined,
         phone: phone || undefined,
         externalId: externalId || undefined,
+        requiresAttention: requiresAttention !== undefined ? requiresAttention : false,
+        isRepeating: isRepeating !== undefined ? isRepeating : false,
         createdAt: new Date(),
       };
 
