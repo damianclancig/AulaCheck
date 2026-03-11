@@ -33,6 +33,16 @@ export function isValidArgentinePhone(areaCode: string, number: string): boolean
 }
 
 /**
+ * Validate phone stored format (+549 + 10 digits)
+ */
+export function isValidStoredPhone(phone: string): boolean {
+  if (!phone) return true; // Optional
+  const digits = phone.replace(/\D/g, '');
+  // Argentina: 54 (country) + 9 (mobile) + 10 (area + number) = 13 digits
+  return digits.length >= 13;
+}
+
+/**
  * Format phone for storage (international format with mobile prefix)
  * Input: areaCode="11", number="4444-5555"
  * Output: "+5491144445555"

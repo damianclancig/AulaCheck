@@ -27,7 +27,7 @@ interface StudentListProps {
 type SortField = 'name' | 'attendance' | 'grade';
 type SortDirection = 'asc' | 'desc';
 
-function ContactTrigger({ student }: { student: Student }) {
+function ContactTrigger({ student, showText = false }: { student: Student; showText?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -35,11 +35,7 @@ function ContactTrigger({ student }: { student: Student }) {
   const hasPhone = !!student.phone;
 
   if (!hasEmail && !hasPhone) {
-    return (
-      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-300 dark:text-gray-600">
-        <Mail className="w-4 h-4" />
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -50,12 +46,15 @@ function ContactTrigger({ student }: { student: Student }) {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg transition-colors ${isOpen ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'
+        className={`flex items-center justify-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${isOpen ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'
           }`}
         title="Ver contacto"
       >
-        {hasEmail && <Mail className={`w-4 h-4 ${hasPhone ? 'mr-0.5' : ''}`} />}
-        {hasPhone && <Phone className="w-4 h-4" />}
+        <div className="flex items-center">
+          {hasEmail && <Mail className={`w-4 h-4 ${hasPhone ? 'mr-1' : ''}`} />}
+          {hasPhone && <Phone className="w-4 h-4" />}
+        </div>
+        {showText && <span className="text-sm font-medium">Ver contacto</span>}
       </button>
 
       <ContactPopover
@@ -478,7 +477,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className={`flex justify-center ${isInactive ? 'opacity-50 pointer-events-none' : ''}`}>
-                          <ContactTrigger student={student} />
+                          <ContactTrigger student={student} showText={true} />
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -678,14 +677,13 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <ContactTrigger student={student} />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {student.email || student.phone ? 'Ver contacto' : 'Sin contacto'}
-                    </span>
+                {(student.email || student.phone) ? (
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <ContactTrigger student={student} showText={true} />
+                    </div>
                   </div>
-                </div>
+                ) : null}
 
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
                   <div className="flex items-center gap-4">

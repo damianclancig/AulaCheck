@@ -5,7 +5,7 @@ import { X, Loader2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { PhoneInput } from '@/components/common/PhoneInput';
-import { isValidEmail } from '@/lib/utils/contactUtils';
+import { isValidEmail, isValidStoredPhone } from '@/lib/utils/contactUtils';
 
 interface EditStudentModalProps {
   isOpen: boolean;
@@ -30,7 +30,8 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
     firstName: string | null;
     lastName: string | null;
     email: string | null;
-  }>({ firstName: null, lastName: null, email: null });
+    phone: string | null;
+  }>({ firstName: null, lastName: null, email: null, phone: null });
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -69,10 +70,11 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
       const newErrors = {
         firstName: !formData.firstName.trim() ? 'Este campo es obligatorio' : null,
         lastName: !formData.lastName.trim() ? 'Este campo es obligatorio' : null,
-        email: formData.email && !isValidEmail(formData.email) ? 'El formato del email no es válido' : null
+        email: formData.email && !isValidEmail(formData.email) ? 'El formato del email no es válido' : null,
+        phone: formData.phone && !isValidStoredPhone(formData.phone) ? 'El número parece incompleto (mínimo 10 dígitos)' : null
       };
 
-      if (newErrors.firstName || newErrors.lastName || newErrors.email) {
+      if (newErrors.firstName || newErrors.lastName || newErrors.email || newErrors.phone) {
         setFieldErrors(newErrors);
         setLoading(false);
         return;
@@ -219,7 +221,11 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
 
           <PhoneInput
             value={formData.phone}
-            onChange={(phone) => setFormData({ ...formData, phone })}
+            onChange={(phone) => {
+              setFormData({ ...formData, phone });
+              if (fieldErrors.phone) setFieldErrors({ ...fieldErrors, phone: null });
+            }}
+            error={fieldErrors.phone || undefined}
           />
 
           <div className="pt-2 grid grid-cols-1 md:grid-cols-2 gap-4">

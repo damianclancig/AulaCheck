@@ -77,21 +77,20 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
         </div>
       </div>
 
-      {/* Help Text */}
-      <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-        <p>Ingresa el código de área y número (sin 0 ni 15)</p>
+      {/* Help Text or Error Message */}
+      <div className="mt-1">
+        {error ? (
+          <p className="text-sm text-red-600">{error}</p>
+        ) : !isValid ? (
+          <p className="text-sm text-red-600">
+            El número parece incompleto (mínimo 10 dígitos)
+          </p>
+        ) : (
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Ingresa el código de área y número (sin 0 ni 15)
+          </p>
+        )}
       </div>
-
-      {/* Error Message */}
-      {!isValid && (
-        <p className="mt-1 text-sm text-red-600">
-          El número parece incompleto (mínimo 10 dígitos)
-        </p>
-      )}
-
-      {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
-      )}
     </div>
   );
 }

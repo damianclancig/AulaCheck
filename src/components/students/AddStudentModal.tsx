@@ -5,7 +5,7 @@ import { X, Loader2, Search } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { PhoneInput } from '@/components/common/PhoneInput';
-import { isValidEmail } from '@/lib/utils/contactUtils';
+import { isValidEmail, isValidStoredPhone } from '@/lib/utils/contactUtils';
 
 interface AddStudentModalProps {
   isOpen: boolean;
@@ -33,7 +33,8 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
     firstName: string | null;
     lastName: string | null;
     email: string | null;
-  }>({ firstName: null, lastName: null, email: null });
+    phone: string | null;
+  }>({ firstName: null, lastName: null, email: null, phone: null });
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -57,10 +58,11 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
       const newErrors = {
         firstName: !formData.firstName.trim() ? 'Este campo es obligatorio' : null,
         lastName: !formData.lastName.trim() ? 'Este campo es obligatorio' : null,
-        email: formData.email && !isValidEmail(formData.email) ? 'El formato del email no es válido' : null
+        email: formData.email && !isValidEmail(formData.email) ? 'El formato del email no es válido' : null,
+        phone: formData.phone && !isValidStoredPhone(formData.phone) ? 'El número parece incompleto (mínimo 10 dígitos)' : null
       };
 
-      if (newErrors.firstName || newErrors.lastName || newErrors.email) {
+      if (newErrors.firstName || newErrors.lastName || newErrors.email || newErrors.phone) {
         setFieldErrors(newErrors);
         // If there are errors, stop submission
         setLoading(false);
@@ -99,7 +101,7 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
         requiresAttention: false,
         isRepeating: false,
       });
-      setFieldErrors({ firstName: null, lastName: null, email: null });
+      setFieldErrors({ firstName: null, lastName: null, email: null, phone: null });
 
       // Close modal only if not keeping open
       if (!keepOpen) {
@@ -234,7 +236,11 @@ export function AddStudentModal({ isOpen, onClose, onStudentAdded }: AddStudentM
 
           <PhoneInput
             value={formData.phone}
-            onChange={(phone) => setFormData({ ...formData, phone })}
+            onChange={(phone) => {
+              setFormData({ ...formData, phone });
+              if (fieldErrors.phone) setFieldErrors({ ...fieldErrors, phone: null });
+            }}
+            error={fieldErrors.phone || undefined}
           />
 
           <div className="pt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
