@@ -3,9 +3,11 @@
 import { Moon, Sun, Laptop } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useState, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
+  const t = useTranslations('theme');
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -25,11 +27,11 @@ export function ThemeToggle() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400"
-        title="Cambiar tema"
+        title={t('toggle')}
       >
         <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <Moon className="absolute top-2 left-2 h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-        <span className="sr-only">Cambiar tema</span>
+        <span className="sr-only">{t('toggle')}</span>
       </button>
 
       {isOpen && (
@@ -44,7 +46,7 @@ export function ThemeToggle() {
             }`}
           >
             <Sun className="h-4 w-4" />
-            <span>Claro</span>
+            <span>{t('light')}</span>
           </button>
           <button
             onClick={() => {
@@ -56,7 +58,7 @@ export function ThemeToggle() {
             }`}
           >
             <Moon className="h-4 w-4" />
-            <span>Oscuro</span>
+            <span>{t('dark')}</span>
           </button>
           <button
             onClick={() => {
@@ -68,7 +70,7 @@ export function ThemeToggle() {
             }`}
           >
             <Laptop className="h-4 w-4" />
-            <span>Sistema</span>
+            <span>{t('system')}</span>
           </button>
         </div>
       )}

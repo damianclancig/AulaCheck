@@ -4,6 +4,7 @@ import { Student } from '@/types/models';
 import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import { ContactPopover } from './ContactPopover';
 
 interface ContextMenuState {
@@ -27,7 +28,10 @@ interface StudentListProps {
 type SortField = 'name' | 'attendance' | 'grade';
 type SortDirection = 'asc' | 'desc';
 
+import { useTranslations } from 'next-intl';
+
 function ContactTrigger({ student, showText = false }: { student: Student; showText?: boolean }) {
+  const t = useTranslations('students.list');
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -48,13 +52,13 @@ function ContactTrigger({ student, showText = false }: { student: Student; showT
         }}
         className={`flex items-center justify-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${isOpen ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'
           }`}
-        title="Ver contacto"
+        title={t('contact')}
       >
         <div className="flex items-center">
           {hasEmail && <Mail className={`w-4 h-4 ${hasPhone ? 'mr-1' : ''}`} />}
           {hasPhone && <Phone className="w-4 h-4" />}
         </div>
-        {showText && <span className="text-sm font-medium">Ver contacto</span>}
+        {showText && <span className="text-sm font-medium">{t('contact')}</span>}
       </button>
 
       <ContactPopover
@@ -70,8 +74,10 @@ function ContactTrigger({ student, showText = false }: { student: Student; showT
 }
 
 export function StudentList({ students, onDeleteStudent, onEditStudent, onStudentUpdated }: StudentListProps) {
+  const t = useTranslations('students.list');
+  const tCommon = useTranslations('common');
+  
   const router = useRouter();
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -102,9 +108,6 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
     e.preventDefault();
     e.stopPropagation();
 
-    // Prevent open on touch if we're not using right click
-    // For touch devices, we'll use long press later
-    
     let clientX = 0;
     let clientY = 0;
 
@@ -149,8 +152,6 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
 
     setContextMenu(prev => ({ ...prev, visible: false }));
     
-    // Optimistic update logic would normally go here if we had state for it
-    // but since students come from props, we just call the API and trigger refresh
     const newValue = !currentStudentContextMenu[flag];
     
     try {
@@ -166,16 +167,13 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
 
       if (!response.ok) throw new Error('Error al actualizar el alumno');
       
-      // Notificamos al componente padre que un estudiante se actualizó para que recargue (con SWR)
       if (onStudentUpdated) {
         onStudentUpdated();
       }
       
-      // Utilizamos router.refresh() de Next.js como respaldo si no hay prop de actualización
       router.refresh();
     } catch (error) {
       console.error('Error updating flag:', error);
-      alert('Ocurrió un error al actualizar los datos del alumno.');
     }
   };
 
@@ -197,7 +195,6 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
       let comparison = 0;
 
       if (sortField === 'name') {
-        // Sort by lastName, then firstName
         const lastNameCompare = a.lastName.localeCompare(b.lastName);
         comparison = lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
       } else if (sortField === 'attendance') {
@@ -216,10 +213,8 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      // Toggle direction
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      // New field, default to asc
       setSortField(field);
       setSortDirection('asc');
     }
@@ -243,7 +238,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
-              placeholder="Buscar por nombre, apellido, email o legajo..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-900"
@@ -265,7 +260,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                 className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-center gap-2 text-sm font-medium transition-colors"
               >
                 <SlidersHorizontal className="w-4 h-4" />
-                Ordenar
+                {t('sort')}
               </button>
               {sortMenuOpen && (
                 <>
@@ -276,7 +271,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                   <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 dark:ring-gray-700 z-20">
                     <div className="py-1">
                       <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                        Ordenar por
+                        {t('sortBy')}
                       </div>
                       <button
                         onClick={() => {
@@ -285,7 +280,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                         }}
                         className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                       >
-                        <span>Alumno (A-Z)</span>
+                        <span>{t('studentAZ')}</span>
                         {sortField === 'name' && <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
                       </button>
                       <button
@@ -295,7 +290,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                         }}
                         className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                       >
-                        <span>Asistencia</span>
+                        <span>{t('attendance')}</span>
                         {sortField === 'attendance' && <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
                       </button>
                       <button
@@ -305,7 +300,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                         }}
                         className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                       >
-                        <span>Promedio</span>
+                        <span>{t('average')}</span>
                         {sortField === 'grade' && <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
                       </button>
                       <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
@@ -315,7 +310,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                         }}
                         className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                       >
-                        <span>Dirección</span>
+                        <span>{t('direction')}</span>
                         {sortDirection === 'asc' ? (
                           <ArrowUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                         ) : (
@@ -328,7 +323,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
               )}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
-              {filteredAndSortedStudents.length} de {students.length} alumnos
+              {t('count', { filtered: filteredAndSortedStudents.length, total: students.length })}
             </div>
           </div>
         </div>
@@ -342,7 +337,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-800 mb-1">
-            Indicadores
+            {t('indicators')}
           </div>
           <button
             onClick={() => handleToggleFlag('requiresAttention')}
@@ -351,7 +346,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
             <div className="flex items-center gap-3">
               <AlertTriangle className={`w-4 h-4 ${currentStudentContextMenu.requiresAttention ? 'text-fuchsia-600 dark:text-fuchsia-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-fuchsia-500'}`} />
               <span className={currentStudentContextMenu.requiresAttention ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}>
-                Requiere atención
+                {t('requiresAttention')}
               </span>
             </div>
             {currentStudentContextMenu.requiresAttention && <Check className="w-4 h-4 text-fuchsia-600 dark:text-fuchsia-400" />}
@@ -364,13 +359,42 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
             <div className="flex items-center gap-3">
               <RefreshCw className={`w-4 h-4 ${currentStudentContextMenu.isRepeating ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-amber-500'}`} />
               <span className={currentStudentContextMenu.isRepeating ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}>
-                Es recursante
+                {t('isRepeating')}
               </span>
             </div>
             {currentStudentContextMenu.isRepeating && <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />}
           </button>
+
+          <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+          
+          <button
+            onClick={() => {
+              onEditStudent(currentStudentContextMenu);
+              setContextMenu({ ...contextMenu, visible: false });
+            }}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 transition-colors"
+          >
+            <UserCog className="w-4 h-4 text-gray-500" />
+            <span className="text-gray-700 dark:text-gray-300">
+              {t('actions.edit')}
+            </span>
+          </button>
+
+          <button
+            onClick={() => {
+              onDeleteStudent(currentStudentContextMenu);
+              setContextMenu({ ...contextMenu, visible: false });
+            }}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+          >
+            <Trash2 className="w-4 h-4 text-red-500" />
+            <span className="text-red-600 dark:text-red-400">
+              {currentStudentContextMenu.enrollmentStatus === 'inactive' ? t('actions.withdrawalDetails') : t('actions.withdrawal')}
+            </span>
+          </button>
         </div>
       )}
+
 
       {/* Desktop Table View */}
       <div className="hidden md:block bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-colors">
@@ -384,7 +408,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                   onClick={() => handleSort('name')}
                 >
                   <div className="flex items-center gap-2">
-                    Alumno
+                    {t('headers.student')}
                     <SortIcon field="name" />
                   </div>
                 </th>
@@ -397,7 +421,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                   onClick={() => handleSort('attendance')}
                 >
                   <div className="flex items-center gap-2">
-                    Asistencia
+                    {t('headers.attendance')}
                     <SortIcon field="attendance" />
                   </div>
                 </th>
@@ -407,12 +431,9 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                   onClick={() => handleSort('grade')}
                 >
                   <div className="flex items-center gap-2">
-                    Promedio
+                    {t('headers.average')}
                     <SortIcon field="grade" />
                   </div>
-                </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Acciones</span>
                 </th>
               </tr>
             </thead>
@@ -420,7 +441,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
               {filteredAndSortedStudents.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                    {searchQuery ? 'No se encontraron alumnos con ese criterio' : 'No hay alumnos inscritos'}
+                    {searchQuery ? t('empty.search') : t('empty.noStudents')}
                   </td>
                 </tr>
               ) : (
@@ -435,7 +456,10 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                   return (
                     <tr 
                       key={student._id.toString()} 
-                      className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${isInactive ? 'opacity-60 bg-gray-50/50 dark:bg-gray-900/50' : 'cursor-context-menu'}`}
+                      className={cn(
+                        "hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors",
+                        isInactive ? "opacity-60 bg-gray-50/50 dark:bg-gray-900/50" : "cursor-context-menu"
+                      )}
                       onContextMenu={(e) => {
                         if (!isInactive) {
                           handleContextMenu(e, student._id.toString());
@@ -457,20 +481,20 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                                 </span>
                                 <div className="flex items-center gap-1.5 ml-1">
                                   {student.isRepeating && (
-                                    <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title="Recursante">
+                                    <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title={t('isRepeating')}>
                                       <span className="font-black text-sm">R</span>
                                     </div>
                                   )}
                                 </div>
                                 {isInactive && (
                                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                    Baja
+                                    {t('inactive')}
                                   </span>
                                 )}
                               </div>
                               {student.externalId && (
                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                  Legajo: {student.externalId}
+                                  {t('externalIdPlaceholder')}: {student.externalId}
                                 </div>
                               )}
                             </div>
@@ -503,51 +527,6 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                           ? student.gradeAverage.toFixed(2)
                           : '-'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="relative">
-                          <button
-                            onClick={() => setOpenMenuId(openMenuId === student._id.toString() ? null : student._id.toString())}
-                            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-                          >
-                            <MoreVertical className="w-5 h-5" />
-                          </button>
-                          {openMenuId === student._id.toString() && (
-                            <>
-                              <div
-                                className="fixed inset-0 z-10"
-                                onClick={() => setOpenMenuId(null)}
-                              />
-                              <div
-                                className={`absolute right-0 w-48 rounded-md shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 dark:ring-gray-700 z-20 ${index >= filteredAndSortedStudents.length - 2 ? 'bottom-full mb-2' : 'mt-2'
-                                  }`}
-                              >
-                                <div className="py-1">
-                                  <button
-                                    onClick={() => {
-                                      onEditStudent(student);
-                                      setOpenMenuId(null);
-                                    }}
-                                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                  >
-                                    <UserCog className="w-4 h-4 mr-3" />
-                                    Editar
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      onDeleteStudent(student);
-                                      setOpenMenuId(null);
-                                    }}
-                                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                  >
-                                    <Trash2 className="w-4 h-4 mr-3" />
-                                    {isInactive ? 'Ver detalles baja' : 'Dar de baja'}
-                                  </button>
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </td>
                     </tr>
                   );
                 })
@@ -561,7 +540,7 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
       <div className="md:hidden space-y-4">
         {filteredAndSortedStudents.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-8 text-center text-gray-500 dark:text-gray-400 transition-colors">
-            {searchQuery ? 'No se encontraron alumnos con ese criterio' : 'No hay alumnos inscritos'}
+            {searchQuery ? t('empty.search') : t('empty.noStudents')}
           </div>
         ) : (
           filteredAndSortedStudents.map((student, index) => {
@@ -623,64 +602,21 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                         </span>
                         <div className="flex items-center gap-1.5 ml-1">
                           {student.isRepeating && (
-                            <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title="Recursante">
+                            <div className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50" title={t('isRepeating')}>
                               <span className="font-black text-sm">R</span>
                             </div>
                           )}
                         </div>
                         {isInactive && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                            Baja
+                            {t('inactive')}
                           </span>
                         )}
                       </h3>
                       {student.externalId && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Legajo: {student.externalId}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('externalIdPlaceholder')}: {student.externalId}</p>
                       )}
                     </div>
-                  </div>
-                  <div className="relative">
-                    <button
-                      onClick={() => setOpenMenuId(openMenuId === student._id.toString() ? null : student._id.toString())}
-                      className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-                    >
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
-                    {openMenuId === student._id.toString() && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() => setOpenMenuId(null)}
-                        />
-                        <div
-                          className={`absolute right-0 w-48 rounded-md shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 dark:ring-gray-700 z-20 ${index >= filteredAndSortedStudents.length - 2 ? 'bottom-full mb-2' : 'mt-2'
-                            }`}
-                        >
-                          <div className="py-1">
-                            <button
-                              onClick={() => {
-                                onEditStudent(student);
-                                setOpenMenuId(null);
-                              }}
-                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                            >
-                              <UserCog className="w-4 h-4 mr-3" />
-                              Editar
-                            </button>
-                            <button
-                              onClick={() => {
-                                onDeleteStudent(student);
-                                setOpenMenuId(null);
-                              }}
-                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            >
-                              <Trash2 className="w-4 h-4 mr-3" />
-                              {isInactive ? 'Ver detalles baja' : 'Dar de baja'}
-                            </button>
-                          </div>
-                        </div>
-                      </>
-                    )}
                   </div>
                 </div>
 
@@ -699,13 +635,13 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
                   <div className="flex items-center gap-4">
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Asistencia</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('headers.attendance')}</p>
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${attendanceColor}`}>
                         {((student.attendancePercentage || 0) * 100).toFixed(0)}%
                       </span>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Promedio</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('headers.average')}</p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
                         {student.gradeAverage !== null && student.gradeAverage !== undefined
                           ? student.gradeAverage.toFixed(2)

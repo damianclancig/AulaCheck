@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Phone } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface PhoneInputProps {
   value: string; // Full phone in storage format: +5491144445555
@@ -12,6 +13,8 @@ interface PhoneInputProps {
 export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [touched, setTouched] = useState(false);
+  const t = useTranslations('common.phoneInput');
+
   const [prevValue, setPrevValue] = useState(value);
 
   // Ajustar estado durante el render si la prop cambia (evita renders en cascada)
@@ -51,7 +54,7 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Teléfono / WhatsApp (Opcional)
+        {t('label')}
       </label>
 
       <div className="flex gap-2">
@@ -67,7 +70,7 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
-            placeholder="11 1234 5678"
+            placeholder={t('placeholder')}
             value={inputValue}
             onChange={handleChange}
             onBlur={() => setTouched(true)}
@@ -83,11 +86,11 @@ export function PhoneInput({ value, onChange, error }: PhoneInputProps) {
           <p className="text-sm text-red-600">{error}</p>
         ) : !isValid ? (
           <p className="text-sm text-red-600">
-            El número parece incompleto (mínimo 10 dígitos)
+            {t('error')}
           </p>
         ) : (
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Ingresa el código de área y número (sin 0 ni 15)
+            {t('helpText')}
           </p>
         )}
       </div>

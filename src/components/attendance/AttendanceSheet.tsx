@@ -7,6 +7,7 @@ import { Check, XCircle, Clock, X as XIcon, Info } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useModal } from '@/hooks/useModal';
+import { useTranslations } from 'next-intl';
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
@@ -46,6 +47,8 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
   const { data: session } = useSession();
   const params = useParams();
   const courseId = params.id as string;
+  const t = useTranslations('attendance.sheet');
+  const tCommon = useTranslations('common');
   const [visibleStudents, setVisibleStudents] = useState(20);
   const observerRef = useRef<HTMLDivElement>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({
@@ -157,7 +160,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
           }
         );
 
-        if (!response.ok) throw new Error('Error al eliminar registro');
+        if (!response.ok) throw new Error(t('legends.delete'));
       } else {
         // Update attendance record
         const response = await fetch(`/api/courses/${courseId}/attendance`, {
@@ -171,7 +174,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
           }),
         });
 
-        if (!response.ok) throw new Error('Error al actualizar asistencia');
+        if (!response.ok) throw new Error(tCommon('error'));
       }
 
       // Refresh data
@@ -181,8 +184,8 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
     } catch (error) {
       console.error('Error updating attendance:', error);
       await showAlert({
-        title: 'Error',
-        description: 'Ocurrió un error al actualizar la asistencia.',
+        title: tCommon('error'),
+        description: tCommon('error'),
         variant: 'danger'
       });
     } finally {
@@ -193,8 +196,8 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
   if (dates.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-        <p>No hay registros de asistencia para este curso.</p>
-        <p className="text-sm mt-2">Comienza tomando asistencia para ver la planilla.</p>
+        <p>{t('noRecords')}</p>
+        <p className="text-sm mt-2">{t('howToStart')}</p>
       </div>
     );
   }
@@ -204,17 +207,15 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
       {/* Info header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <span>{students.length} alumnos</span>
-          <span>•</span>
-          <span>{dates.length} clases registradas</span>
+          <span>{t('stats', { students: students.length, dates: dates.length })}</span>
         </div>
 
         {/* Help text */}
         <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 transition-colors">
           <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
           <span>
-            <span className="hidden sm:inline">Click derecho sobre un ícono para editar. </span>
-            <span className="sm:hidden">Mantén presionado para editar. </span>
+            <span className="hidden sm:inline">{t('helpDesktop')}</span>
+            <span className="sm:hidden">{t('helpMobile')}</span>
           </span>
         </div>
       </div>
@@ -232,7 +233,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
             className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-colors"
           >
             <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="font-medium">Presente</span>
+            <span className="font-medium">{t('legends.present')}</span>
           </button>
           <button
             onClick={() => handleStatusChange('absent')}
@@ -240,7 +241,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
             className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-colors"
           >
             <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-            <span className="font-medium">Ausente</span>
+            <span className="font-medium">{t('legends.absent')}</span>
           </button>
           <button
             onClick={() => handleStatusChange('late')}
@@ -248,7 +249,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
             className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-colors"
           >
             <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
-            <span className="font-medium">Tarde</span>
+            <span className="font-medium">{t('legends.late')}</span>
           </button>
           {contextMenu.currentStatus && (
             <>
@@ -259,7 +260,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                 className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 disabled:opacity-50 text-gray-600 dark:text-gray-400 transition-colors"
               >
                 <XIcon className="w-4 h-4" />
-                <span className="font-medium">Eliminar registro</span>
+                <span className="font-medium">{t('legends.delete')}</span>
               </button>
             </>
           )}
@@ -272,7 +273,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
           <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
             <tr>
               <th className="sticky left-0 z-20 bg-gray-50 dark:bg-gray-800 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
-                Alumno
+                {tCommon('student')}
               </th>
               {dates.map((date) => {
                 const suspension = suspensions?.[date];
@@ -297,14 +298,11 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                       });
 
                       if (suspension) {
-                        const reasonText = suspension.reason === 'class_suspension' ? 'Suspensión de clases' :
-                          suspension.reason === 'teacher_leave' ? 'Licencia docente' :
-                            'Otro motivo';
-                        return `${dateStr}\n${reasonText}${suspension.note ? `: ${suspension.note}` : ''}`;
+                        return `${dateStr}\n${t('legends.suspended')}${suspension.note ? `: ${suspension.note}` : ''}`;
                       }
 
                       if (isFuture) {
-                        return `${dateStr}\nClase futura`;
+                        return `${dateStr}\n${t('legends.future')}`;
                       }
 
                       return dateStr;
@@ -320,7 +318,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                 );
               })}
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-l border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                Estadística
+                {t('columnHeader')}
               </th>
             </tr>
           </thead>
@@ -363,11 +361,11 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
                       >
                         <div className="flex justify-center">
                           {isSuspended ? (
-                            <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600" title="Clase suspendida" />
+                            <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600" title={t('legends.suspended')} />
                           ) : isFuture && !status ? (
-                            <div className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-700" title="Clase futura" />
+                            <div className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-700" title={t('legends.future')} />
                           ) : isInactive && !status ? (
-                            <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full" title="Alumno inactivo" />
+                            <div className="w-4 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full" title={t('legends.inactive')} />
                           ) : (
                             <AttendanceIcon status={status} size="md" />
                           )}
@@ -398,7 +396,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
         {/* Infinite scroll trigger */}
         {visibleStudents < students.length && (
           <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
-            Cargando más alumnos...
+            {t('loading')}
           </div>
         )}
       </div>
@@ -541,7 +539,7 @@ export function AttendanceSheet({ students, dates, records, suspensions, onUpdat
         {/* Infinite scroll trigger */}
         {visibleStudents < students.length && (
           <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
-            Cargando más alumnos...
+            {t('loading')}
           </div>
         )}
       </div>

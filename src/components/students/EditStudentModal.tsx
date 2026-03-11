@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { PhoneInput } from '@/components/common/PhoneInput';
 import { isValidEmail, isValidStoredPhone } from '@/lib/utils/contactUtils';
+import { useTranslations } from 'next-intl';
 
 interface EditStudentModalProps {
   isOpen: boolean;
@@ -24,6 +25,9 @@ const toTitleCase = (text: string): string => {
 };
 
 export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }: EditStudentModalProps) {
+  const t = useTranslations('students.editModal');
+  const tAdd = useTranslations('students.addModal');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{
@@ -70,10 +74,10 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
     try {
       // Validate required fields
       const newErrors = {
-        firstName: !formData.firstName.trim() ? 'Este campo es obligatorio' : null,
-        lastName: !formData.lastName.trim() ? 'Este campo es obligatorio' : null,
-        email: formData.email && !isValidEmail(formData.email) ? 'El formato del email no es válido' : null,
-        phone: formData.phone && !isValidStoredPhone(formData.phone) ? 'El número parece incompleto (mínimo 10 dígitos)' : null
+        firstName: !formData.firstName.trim() ? tAdd('errors.required') : null,
+        lastName: !formData.lastName.trim() ? tAdd('errors.required') : null,
+        email: formData.email && !isValidEmail(formData.email) ? tAdd('errors.email') : null,
+        phone: formData.phone && !isValidStoredPhone(formData.phone) ? tAdd('errors.phone') : null
       };
 
       if (newErrors.firstName || newErrors.lastName || newErrors.email || newErrors.phone) {
@@ -97,16 +101,16 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
         body: JSON.stringify(submissionData),
       });
 
-      if (!response.ok) {
+        if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Error al actualizar alumno');
+        throw new Error(data.error || t('error'));
       }
 
       onStudentUpdated();
       onClose();
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Ocurrió un error');
+      setError(err.message || tAdd('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -114,9 +118,10 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Editar Alumno</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
+        {/* Header - Fixed */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
@@ -125,7 +130,8 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {/* Form Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
               {error}
@@ -135,7 +141,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Nombre *
+                {tAdd('firstName')}
               </label>
               <input
                 type="text"
@@ -147,7 +153,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
                 }}
                 onBlur={() => {
                   if (!formData.firstName.trim()) {
-                    setFieldErrors(prev => ({ ...prev, firstName: 'Este campo es obligatorio' }));
+                    setFieldErrors(prev => ({ ...prev, firstName: tAdd('errors.required') }));
                   }
                 }}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${fieldErrors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
@@ -159,7 +165,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
             </div>
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Apellido *
+                {tAdd('lastName')}
               </label>
               <input
                 type="text"
@@ -171,7 +177,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
                 }}
                 onBlur={() => {
                   if (!formData.lastName.trim()) {
-                    setFieldErrors(prev => ({ ...prev, lastName: 'Este campo es obligatorio' }));
+                    setFieldErrors(prev => ({ ...prev, lastName: tAdd('errors.required') }));
                   }
                 }}
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${fieldErrors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
@@ -185,7 +191,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
 
           <div>
             <label htmlFor="externalId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Legajo / ID (Opcional)
+              {tAdd('externalId')}
             </label>
             <input
               type="text"
@@ -198,7 +204,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email (Opcional)
+              {tAdd('email')}
             </label>
             <input
               type="email"
@@ -210,7 +216,7 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
               }}
               onBlur={() => {
                 if (formData.email && !isValidEmail(formData.email)) {
-                  setFieldErrors(prev => ({ ...prev, email: 'El formato del email no es válido' }));
+                  setFieldErrors(prev => ({ ...prev, email: tAdd('errors.email') }));
                 }
               }}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 ${fieldErrors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-indigo-500'
@@ -232,26 +238,26 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
 
           <div>
             <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Observaciones / Notas (Opcional)
+              {tAdd('notes')}
             </label>
             <textarea
               id="notes"
               rows={3}
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Ingrese detalles adicionales, conducta, notas médicas, etc."
+              placeholder={tAdd('notesPlaceholder')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800 resize-none"
             />
           </div>
 
-          <div className="pt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="pt-2 flex flex-col gap-4">
             <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
               <div>
                 <label htmlFor="requiresAttention" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  ¿Requiere atención especial?
+                  {tAdd('requiresAttention')}
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Comportamiento o seguimiento
+                  {tAdd('requiresAttentionDesc')}
                 </p>
               </div>
               <button
@@ -277,10 +283,10 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
             <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
               <div>
                 <label htmlFor="isRepeating" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  ¿Es recursante?
+                  {tAdd('isRepeating')}
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Ya cursó anteriormente
+                  {tAdd('isRepeatingDesc')}
                 </p>
               </div>
               <button
@@ -303,25 +309,26 @@ export function EditStudentModal({ isOpen, onClose, student, onStudentUpdated }:
               </button>
             </div>
           </div>
+        </div>
 
-          <div className="pt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 flex items-center gap-2"
-            >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Guardar Cambios
-            </button>
-          </div>
-        </form>
+        {/* Footer - Fixed */}
+        <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row-reverse gap-3 shrink-0 bg-white dark:bg-gray-900">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {t('saveChanges')}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          >
+            {tCommon('cancel')}
+          </button>
+        </div>
       </div>
     </div>
   );

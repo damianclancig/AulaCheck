@@ -5,6 +5,7 @@ import { X, Loader2, Check, XCircle, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { JoinRequest } from '@/types/models';
 import { useModal } from '@/hooks/useModal';
+import { useTranslations } from 'next-intl';
 
 interface JoinRequestsModalProps {
   isOpen: boolean;
@@ -18,6 +19,9 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
   const [requests, setRequests] = useState<JoinRequest[]>([]);
   const [processing, setProcessing] = useState<string | null>(null);
   const { showAlert } = useModal();
+  const t = useTranslations('students.joinRequests');
+  const tCommon = useTranslations('common');
+
 
   useEffect(() => {
     if (isOpen) {
@@ -30,7 +34,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
     try {
       const response = await fetch(`/api/courses/${courseId}/join-requests`);
 
-      if (!response.ok) throw new Error('Error al cargar solicitudes');
+      if (!response.ok) throw new Error(t('alerts.errorLoad'));
 
       const data = await response.json();
       setRequests(data);
@@ -52,7 +56,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
         body: JSON.stringify({ requestId, action }),
       });
 
-      if (!response.ok) throw new Error('Error al procesar solicitud');
+      if (!response.ok) throw new Error(t('alerts.error'));
 
       // Remove from list
       setRequests(requests.filter(r => r._id.toString() !== requestId));
@@ -60,8 +64,8 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
     } catch (error) {
       console.error(error);
       await showAlert({
-        title: 'Error',
-        description: 'Ocurrió un error al procesar la solicitud.',
+        title: tCommon('error'),
+        description: t('alerts.error'),
         variant: 'danger'
       });
     } finally {
@@ -78,7 +82,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
           <div className="flex items-center gap-2">
             <User className="w-5 h-5 text-indigo-600" />
             <h2 className="text-xl font-semibold text-gray-900">
-              Solicitudes Pendientes ({requests.length})
+              {t('title', { count: requests.length })}
             </h2>
           </div>
           <button
@@ -97,7 +101,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
           ) : requests.length === 0 ? (
             <div className="text-center py-12">
               <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">No hay solicitudes pendientes</p>
+              <p className="text-gray-500">{t('noRequests')}</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
@@ -119,7 +123,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
                           <p>🆔 Legajo: {request.externalId}</p>
                         )}
                         <p className="text-xs text-gray-400 mt-2">
-                          Solicitado: {new Date(request.createdAt).toLocaleString('es-AR')}
+                          {t('requestedAt', { date: new Date(request.createdAt).toLocaleString() })}
                         </p>
                       </div>
                     </div>
@@ -134,7 +138,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
                         ) : (
                           <Check className="w-4 h-4" />
                         )}
-                        Aprobar
+                        {t('approve')}
                       </button>
                       <button
                         onClick={() => handleProcess(request._id.toString(), 'reject')}
@@ -142,7 +146,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
                         className="px-4 py-2 bg-red-50 border border-red-300 text-red-700 rounded-lg hover:bg-red-100 flex items-center gap-2 disabled:opacity-50 text-sm font-medium"
                       >
                         <XCircle className="w-4 h-4" />
-                        Rechazar
+                        {t('reject')}
                       </button>
                     </div>
                   </div>

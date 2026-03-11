@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
 import { useModal } from '@/hooks/useModal';
+import { useTranslations } from 'next-intl';
 
 interface GradeModalProps {
   isOpen: boolean;
@@ -34,6 +35,9 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [score, setScore] = useState<string>('');
   const { showAlert } = useModal();
+  const t = useTranslations('grades.modal');
+  const tCommon = useTranslations('common');
+
 
   if (!isOpen) return null;
 
@@ -41,8 +45,8 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
     e.preventDefault();
     if (!selectedStudentId) {
       await showAlert({
-        title: 'Atención',
-        description: 'Debes seleccionar un alumno para calificar.',
+        title: tCommon('attention'),
+        description: t('alerts.selectStudent'),
         variant: 'warning'
       });
       return;
@@ -65,7 +69,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
       });
 
       if (!response.ok) {
-        throw new Error('Error al guardar calificación');
+        throw new Error(t('alerts.error'));
       }
 
       onGradeSaved();
@@ -73,15 +77,15 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
       setScore('');
       setSelectedStudentId('');
       await showAlert({
-        title: 'Éxito',
-        description: 'Calificación guardada correctamente.',
+        title: tCommon('success'),
+        description: t('alerts.success'),
         variant: 'info'
       });
     } catch (error) {
       console.error('Error saving grade:', error);
       await showAlert({
-        title: 'Error',
-        description: 'Hubo un problema al guardar la calificación.',
+        title: tCommon('error'),
+        description: t('alerts.error'),
         variant: 'danger'
       });
     } finally {
@@ -93,7 +97,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Nueva Calificación</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
@@ -105,7 +109,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label htmlFor="assessment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Nombre de la Evaluación *
+              {t('assessmentLabel')}
             </label>
             <input
               type="text"
@@ -114,14 +118,14 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
               value={assessment}
               onChange={(e) => setAssessment(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-              placeholder="Ej: Parcial 1"
+              placeholder={t('assessmentPlaceholder')}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Fecha *
+                {t('dateLabel')}
               </label>
               <input
                 type="date"
@@ -134,7 +138,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
             </div>
             <div>
               <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Peso (1-10) *
+                {t('weightLabel')}
               </label>
               <input
                 type="number"
@@ -151,7 +155,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
 
           <div>
             <label htmlFor="student" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Alumno *
+              {t('studentLabel')}
             </label>
             <select
               id="student"
@@ -160,7 +164,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
               onChange={(e) => setSelectedStudentId(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
             >
-              <option value="">Seleccionar alumno...</option>
+              <option value="">{t('studentPlaceholder')}</option>
               {students.map((student) => (
                 <option key={student._id.toString()} value={student._id.toString()}>
                   {student.lastName}, {student.firstName}
@@ -171,7 +175,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
 
           <div>
             <label htmlFor="score" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Nota (0-10) *
+              {t('scoreLabel')}
             </label>
             <input
               type="number"
@@ -193,7 +197,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
             >
-              Cerrar
+              {tCommon('close')}
             </button>
             <button
               type="submit"
@@ -201,7 +205,7 @@ export function GradeModal({ isOpen, onClose, students, onGradeSaved }: GradeMod
               className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 flex items-center gap-2"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Guardar Nota
+              {t('saveButton')}
             </button>
           </div>
         </form>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, Download, Loader2, CheckSquare, Square, ChevronDown, ChevronRight, User, BarChart3, Calendar } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -20,6 +21,8 @@ export interface ExportOptions {
 }
 
 export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportModalProps) {
+  const t = useTranslations('courses.export');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<ExportOptions>({
     dni: true,
@@ -98,10 +101,11 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Exportar Datos</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
           <button 
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            aria-label={tCommon('close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -109,10 +113,12 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
 
         <div className="p-6 overflow-y-auto flex-1">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-            Configura el reporte para <span className="font-medium text-gray-900 dark:text-white">{courseName}</span>.
+            {t.rich('description', {
+              course: (chunks) => <span className="font-medium text-gray-900 dark:text-white">{courseName}</span>
+            })}
             <br />
             <span className="text-xs text-gray-400 dark:text-gray-500 mt-1 block">
-              * Apellido y Nombre se incluyen siempre automáticamente.
+              {t('automaticNotice')}
             </span>
           </p>
 
@@ -144,7 +150,7 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
                   </div>
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <span className="font-medium text-gray-900 dark:text-white text-sm">Datos del Alumno</span>
+                    <span className="font-medium text-gray-900 dark:text-white text-sm">{t('personalData')}</span>
                   </div>
                 </div>
                 <button onClick={() => toggleSection('personal')} className="p-1">
@@ -154,9 +160,9 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
               
               {expandedSections.personal && (
                 <div className="p-4 space-y-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 animate-in slide-in-from-top-2 duration-200">
-                  <Checkbox label="Legajo / DNI" checked={options.dni} onChange={() => handleToggle('dni')} />
-                  <Checkbox label="Email" checked={options.email} onChange={() => handleToggle('email')} />
-                  <Checkbox label="Teléfono" checked={options.phone} onChange={() => handleToggle('phone')} />
+                  <Checkbox label={t('dni')} checked={options.dni} onChange={() => handleToggle('dni')} />
+                  <Checkbox label={t('email')} checked={options.email} onChange={() => handleToggle('email')} />
+                  <Checkbox label={t('phone')} checked={options.phone} onChange={() => handleToggle('phone')} />
                 </div>
               )}
             </div>
@@ -188,7 +194,7 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
                   </div>
                   <div className="flex items-center gap-2">
                     <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <span className="font-medium text-gray-900 dark:text-white text-sm">Métricas y Promedios</span>
+                    <span className="font-medium text-gray-900 dark:text-white text-sm">{t('metrics')}</span>
                   </div>
                 </div>
                 <button onClick={() => toggleSection('metrics')} className="p-1">
@@ -198,8 +204,8 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
               
               {expandedSections.metrics && (
                 <div className="p-4 space-y-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 animate-in slide-in-from-top-2 duration-200">
-                  <Checkbox label="Promedio de Calificaciones" checked={options.grades} onChange={() => handleToggle('grades')} />
-                  <Checkbox label="Estadísticas de Asistencia (Presente/Ausente)" checked={options.attendanceStats} onChange={() => handleToggle('attendanceStats')} />
+                  <Checkbox label={t('gradesAvg')} checked={options.grades} onChange={() => handleToggle('grades')} />
+                  <Checkbox label={t('attendanceStats')} checked={options.attendanceStats} onChange={() => handleToggle('attendanceStats')} />
                 </div>
               )}
             </div>
@@ -226,7 +232,7 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <span className="font-medium text-gray-900 dark:text-white text-sm">Detalles</span>
+                    <span className="font-medium text-gray-900 dark:text-white text-sm">{t('details')}</span>
                   </div>
                 </div>
                 <button onClick={() => toggleSection('details')} className="p-1">
@@ -237,8 +243,8 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
               {expandedSections.details && (
                 <div className="p-4 space-y-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 animate-in slide-in-from-top-2 duration-200">
                   <Checkbox 
-                    label="Detalle de Asistencias por Fecha" 
-                    description="Incluye una columna por cada día de clase con el estado (P/A/T)"
+                    label={t('attendanceDetails')} 
+                    description={t('attendanceDetailsDesc')}
                     checked={options.attendanceDetails} 
                     onChange={() => handleToggle('attendanceDetails')} 
                   />
@@ -253,7 +259,7 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
           >
-            Cancelar
+            {tCommon('cancel')}
           </button>
           <button
             onClick={handleExportClick}
@@ -261,7 +267,7 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
             className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            Exportar CSV
+            {t('button')}
           </button>
         </div>
       </div>

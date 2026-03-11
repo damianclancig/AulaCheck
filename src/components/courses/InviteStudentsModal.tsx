@@ -5,6 +5,7 @@ import { X, Copy, Check, RefreshCw, Link2, AlertCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useModal } from '@/hooks/useModal';
+import { useTranslations } from 'next-intl';
 
 interface InviteStudentsModalProps {
   isOpen: boolean;
@@ -28,6 +29,9 @@ export function InviteStudentsModal({
   const [isEnabled, setIsEnabled] = useState(allowJoinRequests);
   const [copied, setCopied] = useState(false);
   const { showAlert, showConfirm } = useModal();
+  const t = useTranslations('courses.invite');
+  const tCommon = useTranslations('common');
+
 
   if (!isOpen) return null;
 
@@ -40,7 +44,7 @@ export function InviteStudentsModal({
         method: 'POST',
       });
 
-      if (!response.ok) throw new Error('Error al generar código');
+      if (!response.ok) throw new Error('generate_error');
 
       const data = await response.json();
       setJoinCode(data.joinCode);
@@ -48,8 +52,8 @@ export function InviteStudentsModal({
     } catch (error) {
       console.error(error);
       await showAlert({
-        title: 'Error',
-        description: 'No se pudo generar el código de invitación.',
+        title: tCommon('error'),
+        description: t('alerts.errorGenerate'),
         variant: 'danger'
       });
     } finally {
@@ -59,10 +63,10 @@ export function InviteStudentsModal({
 
   const handleDisable = async () => {
     const isConfirmed = await showConfirm({
-      title: 'Desactivar link',
-      description: '¿Estás seguro de desactivar el link de invitación? Los alumnos ya no podrán usar este código y el QR desaparecerá.',
-      confirmText: 'Desactivar',
-      cancelText: 'Cancelar',
+      title: t('disableConfirm.title'),
+      description: t('disableConfirm.desc'),
+      confirmText: t('disableConfirm.confirm'),
+      cancelText: tCommon('cancel'),
       variant: 'warning'
     });
 
@@ -74,19 +78,19 @@ export function InviteStudentsModal({
         method: 'DELETE',
       });
 
-      if (!response.ok) throw new Error('Error al desactivar');
+      if (!response.ok) throw new Error('disable_error');
 
       setIsEnabled(false);
       await showAlert({
-        title: 'Link Desactivado',
-        description: 'El link de invitación ha sido desactivado exitosamente.',
+        title: tCommon('success'),
+        description: t('alerts.successDisable'),
         variant: 'info'
       });
     } catch (error) {
       console.error(error);
       await showAlert({
-        title: 'Error',
-        description: 'Ocurrió un error al intentar desactivar el link.',
+        title: tCommon('error'),
+        description: t('alerts.errorDisable'),
         variant: 'danger'
       });
     } finally {
@@ -106,11 +110,12 @@ export function InviteStudentsModal({
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-2">
             <Link2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Invitar Alumnos</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
           </div>
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            aria-label={tCommon('close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -121,22 +126,22 @@ export function InviteStudentsModal({
             <div className="flex gap-3">
               <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
               <div className="text-sm text-blue-800 dark:text-blue-300">
-                <p className="font-medium mb-1">¿Cómo funciona?</p>
-                <p>Comparte este link con tus alumnos. Ellos podrán registrarse desde su celular y tú aprobarás las solicitudes.</p>
+                <p className="font-medium mb-1">{t('howItWorks')}</p>
+                <p>{t('howItWorksDesc')}</p>
               </div>
             </div>
           </div>
 
           {!joinCode ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Genera un link de invitación para que los alumnos se registren solos</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">{t('generateLinkDesc')}</p>
               <button
                 onClick={handleGenerateCode}
                 disabled={loading}
                 className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50 flex items-center gap-2 mx-auto"
               >
                 {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4" />}
-                Generar Link de Invitación
+                {t('generateLink')}
               </button>
             </div>
           ) : (
@@ -144,7 +149,7 @@ export function InviteStudentsModal({
               {isEnabled && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Link de Invitación (Activo)
+                    {t('activeLink')}
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -158,7 +163,7 @@ export function InviteStudentsModal({
                       className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
                     >
                       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      {copied ? 'Copiado' : 'Copiar'}
+                      {copied ? t('copied') : t('copy')}
                     </button>
                   </div>
                 </div>
@@ -167,7 +172,7 @@ export function InviteStudentsModal({
               {isEnabled && (
                 <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg p-6 border-2 border-indigo-200 dark:border-indigo-800 transition-colors">
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
-                    📱 Escanea el QR en clase
+                    {t('qrTitle')}
                   </p>
                   <div className="flex justify-center bg-white p-4 rounded-lg">
                     <QRCodeSVG
@@ -178,7 +183,7 @@ export function InviteStudentsModal({
                     />
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">
-                    Los alumnos pueden escanear este código con su celular. Recuerda que la vigencia del link es de 2 horas.
+                    {t('qrDesc')}
                   </p>
                 </div>
               )}
@@ -190,16 +195,16 @@ export function InviteStudentsModal({
                   className="flex-1 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  Regenerar Código
+                  {t('regenerate')}
                 </button>
                 {isEnabled && (
-                  <button
-                    onClick={handleDisable}
-                    disabled={loading}
-                    className="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 disabled:opacity-50 transition-colors"
-                  >
-                    Desactivar Link
-                  </button>
+                    <button
+                      onClick={handleDisable}
+                      disabled={loading}
+                      className="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 disabled:opacity-50 transition-colors"
+                    >
+                      {t('disable')}
+                    </button>
                 )}
               </div>
             </>

@@ -7,6 +7,7 @@ import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useModal } from '@/hooks/useModal';
+import { useTranslations } from 'next-intl';
 
 interface AttendanceModalProps {
   isOpen: boolean;
@@ -37,6 +38,10 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
   const [suspensionReason, setSuspensionReason] = useState<'none' | 'class_suspension' | 'teacher_leave' | 'other'>('none');
   const [suspensionNote, setSuspensionNote] = useState('');
   const { showAlert } = useModal();
+  const t = useTranslations('attendance.modal');
+  const tLegends = useTranslations('attendance.sheet.legends');
+  const tCommon = useTranslations('common');
+
 
   // Carousel State
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -138,7 +143,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
       });
 
       if (!response.ok) {
-        throw new Error('Error al guardar asistencia');
+        throw new Error(tCommon('error'));
       }
 
       onAttendanceSaved();
@@ -146,8 +151,8 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
     } catch (error) {
       console.error('Error saving attendance:', error);
       await showAlert({
-        title: 'Error',
-        description: 'No se pudo guardar la asistencia.',
+        title: tCommon('error'),
+        description: tCommon('error'),
         variant: 'danger'
       });
     } finally {
@@ -198,14 +203,15 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         {/* Header */}
         <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div>
-            <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Tomar Asistencia</h2>
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
             <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {sortedStudents.length} alumnos registrados
+              {t('count', { count: sortedStudents.length })}
             </p>
           </div>
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            aria-label={tCommon('close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -217,7 +223,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
             {/* Fecha de la clase */}
             <div>
               <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Fecha de la clase
+                {t('dateLabel')}
               </label>
               <input
                 type="date"
@@ -231,7 +237,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
             {/* Motivo de suspensión */}
             <div>
               <label htmlFor="suspensionReason" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Estado de la clase
+                {t('statusLabel')}
               </label>
               <select
                 id="suspensionReason"
@@ -244,10 +250,10 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                 }}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900 [color-scheme:light] dark:[color-scheme:dark]"
               >
-                <option value="none">Clase normal</option>
-                <option value="class_suspension">Suspensión de clases</option>
-                <option value="teacher_leave">Licencia del docente</option>
-                <option value="other">Otro motivo</option>
+                <option value="none">{t('normalClass')}</option>
+                <option value="class_suspension">{t('suspension')}</option>
+                <option value="teacher_leave">{t('teacherLeave')}</option>
+                <option value="other">{t('otherReason')}</option>
               </select>
             </div>
           </div>
@@ -256,14 +262,14 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
           {suspensionReason === 'other' && (
             <div className="mt-4">
               <label htmlFor="suspensionNote" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Especificar motivo
+                {t('specifyReason')}
               </label>
               <input
                 type="text"
                 id="suspensionNote"
                 value={suspensionNote}
                 onChange={(e) => setSuspensionNote(e.target.value)}
-                placeholder="Ej: Día feriado, evento especial, etc."
+                placeholder={t('reasonPlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900"
               />
             </div>
@@ -276,10 +282,10 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
               </svg>
               <div className="flex-1">
                 <p className="text-sm font-medium text-orange-800 dark:text-orange-300">
-                  Ya existe asistencia para esta fecha
+                  {t('duplicateWarning')}
                 </p>
                 <p className="text-xs text-orange-700 dark:text-orange-400 mt-1">
-                  Si continúas, se sobrescribirá la asistencia existente para este día.
+                  {t('duplicateDesc')}
                 </p>
               </div>
             </div>
@@ -308,7 +314,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       <p className="font-medium text-gray-900 dark:text-white">{student.lastName}, {student.firstName}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Legajo: {student.externalId || '-'}</p>
                       {!status && (
-                        <p className="text-xs text-orange-600 dark:text-orange-400 font-medium mt-0.5">⚠ Falta marcar asistencia</p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400 font-medium mt-0.5">{t('missingAttendance')}</p>
                       )}
                     </div>
                   </div>
@@ -324,7 +330,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       )}
                     >
                       <Check className="w-4 h-4" />
-                      <span className="hidden sm:inline">Presente</span>
+                      <span className="hidden sm:inline">{tLegends('present')}</span>
                     </button>
 
                     <button
@@ -337,7 +343,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       )}
                     >
                       <Clock className="w-4 h-4" />
-                      <span className="hidden sm:inline">Tarde</span>
+                      <span className="hidden sm:inline">{tLegends('late')}</span>
                     </button>
 
                     <button
@@ -350,7 +356,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       )}
                     >
                       <XCircle className="w-4 h-4" />
-                      <span className="hidden sm:inline">Ausente</span>
+                      <span className="hidden sm:inline">{tLegends('absent')}</span>
                     </button>
                   </div>
                 </div>
@@ -378,7 +384,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
 
                 {/* Progress Indicator */}
                 <div className="w-full flex justify-between text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">
-                  <span>Alumno {currentIndex + 1} de {sortedStudents.length}</span>
+                  <span>{t('carousel.progress', { current: currentIndex + 1, total: sortedStudents.length })}</span>
                   <span>{Math.round(((currentIndex + 1) / sortedStudents.length) * 100)}%</span>
                 </div>
 
@@ -389,7 +395,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       {currentStudent.lastName}, {currentStudent.firstName}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
-                      Legajo: {currentStudent.externalId || 'Sin legajo'}
+                      Legajo: {currentStudent.externalId || t('carousel.noLegajo')}
                     </p>
                   </div>
                 </div>
@@ -407,7 +413,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       )}
                     >
                       <Check className="w-6 h-6" />
-                      <span className="font-bold text-sm">Presente</span>
+                      <span className="font-bold text-sm">{tLegends('present')}</span>
                     </button>
 
                     <button
@@ -420,7 +426,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       )}
                     >
                       <XCircle className="w-6 h-6" />
-                      <span className="font-bold text-sm">Ausente</span>
+                      <span className="font-bold text-sm">{tLegends('absent')}</span>
                     </button>
                   </div>
 
@@ -434,7 +440,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                     )}
                   >
                     <Clock className="w-4 h-4" />
-                    <span className="font-medium text-sm">Llegada Tarde</span>
+                    <span className="font-medium text-sm">{tLegends('late')}</span>
                   </button>
                 </div>
 
@@ -481,13 +487,13 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Clase suspendida
+                {t('suspendedMessage.title')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                No es necesario tomar asistencia para esta fecha.
+                {t('suspendedMessage.desc')}
                 {suspensionReason === 'other' && suspensionNote && (
                   <span className="block mt-2 font-medium text-gray-700 dark:text-gray-300">
-                    Motivo: {suspensionNote}
+                    {t('suspendedMessage.reason', { note: suspensionNote })}
                   </span>
                 )}
               </p>
@@ -501,19 +507,19 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
             {suspensionReason === 'none' && !allStudentsMarked && (
               <p className="text-orange-600 dark:text-orange-400 font-medium flex items-center gap-1.5">
                 <span className="inline-block w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-                Falta marcar {sortedStudents.filter(s => !attendanceMap[s._id.toString()]).length} alumno{sortedStudents.filter(s => !attendanceMap[s._id.toString()]).length !== 1 ? 's' : ''}
+                {t('missingCount', { count: sortedStudents.filter(s => !attendanceMap[s._id.toString()]).length })}
               </p>
             )}
             {suspensionReason === 'none' && allStudentsMarked && (
               <p className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1.5">
                 <Check className="w-4 h-4" />
-                Todos los alumnos marcados
+                {t('allMarked')}
               </p>
             )}
             {suspensionReason !== 'none' && (
               <p className="text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1.5">
                 <Check className="w-4 h-4" />
-                Listo para guardar
+                {t('readyToSave')}
               </p>
             )}
           </div>
@@ -522,7 +528,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
               onClick={onClose}
               className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
-              Cancelar
+              {tCommon('cancel')}
             </button>
             <button
               onClick={handleSubmit}
@@ -530,7 +536,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
               className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 transition-all"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Guardar Asistencia
+              {t('saveButton')}
             </button>
           </div>
         </div>

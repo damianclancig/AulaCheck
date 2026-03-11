@@ -1,0 +1,364 @@
+{
+  "landing": {
+    "title": "Benvindo ao AulaCheck",
+    "login": "Entrar",
+    "goToDashboard": "Ir para o Dashboard",
+    "heroTitle": "Gestão escolar",
+    "heroSubtitle": "inteligente e simples",
+    "heroDescription": "Simplifique sua vida docente. Acompanhe presença, notas e alunos em um só lugar, acessível de qualquer dispositivo.",
+    "startNow": "Comece Agora",
+    "feature1": "Controle Rápido de Presença",
+    "feature2": "Médias Automáticas",
+    "feature3": "Gestão de Alunos",
+    "feature4": "Exportação para CSV",
+    "footerRights": "Todos los derechos reservados.",
+    "privacyPolicy": "Política de Privacidade"
+  },
+  "login": {
+    "description": "Gestão inteligente de presenças e notas para professores.",
+    "errorGoogle": "Erro ao fazer login com o Google. Por favor, tente novamente.",
+    "continueGoogle": "Continuar com o Google",
+    "loggingIn": "Entrando...",
+    "termsText1": "Ao continuar, você concorda com nossa",
+    "termsText2": "política de privacidade",
+    "needHelp": "Precisa de ajuda?",
+    "contactSupport": "Contatar suporte"
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "Desculpe, a página que você procura não existe ou foi movida.",
+    "backButton": "Voltar"
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "updated": "Última atualização: 11 de março de 2026",
+    "introduction": "No AulaCheck, valorizamos sua privacidade e estamos comprometidos em proteger seus dados pessoais.",
+    "dataCollection": "Informações que Coletamos",
+    "dataCollectionDesc": "Coletamos informações básicas como nome e e-mail através da autenticação do Google para gerenciar seu acesso.",
+    "usage": "Uso das Informações",
+    "usageDesc": "Seus datos são usados exclusivamente para fornecer o serviço AulaCheck e melhorar a experiência de ensino.",
+    "contact": "Contato",
+    "contactDesc": "Se você tiver dúvidas sobre esta política, entre em contato conosco em suporte@aulacheck.com"
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo, {name}",
+    "aria": {
+      "openMenu": "Abrir menu"
+    }
+  },
+  "sidebar": {
+    "aria": {
+      "closeMenu": "Fechar menu"
+    },
+    "nav": {
+      "dashboard": "Dashboard"
+    },
+    "links": {
+      "privacy": "Privacidade",
+      "logout": "Sair"
+    }
+  },
+  "courses": {
+    "card": {
+      "institution": "Instituição",
+      "course": "Curso",
+      "shift": "Turno",
+      "students": "{count, plural, =1 {# Aluno} other {# Alunos}}",
+      "startDate": "Início",
+      "attendance": "Presença",
+      "avg": "Média",
+      "viewManagement": "Ver Gestão Completa"
+    },
+    "shifts": {
+      "morning": "Manhã",
+      "afternoon": "Tarde",
+      "night": "Noite"
+    },
+    "dashboard": {
+      "title": "Meus Cursos",
+      "description": "Gerencie suas aulas e alunos a partir daqui.",
+      "newCourse": "Novo Curso",
+      "empty": {
+        "title": "Você não tem cursos creados",
+        "description": "Comece criando seu primeiro curso para gerenciar presenças e notas.",
+        "button": "Criar meu primeiro curso →"
+      },
+      "errors": {
+        "fetch": "Erro ao carregar cursos. Por favor, tente recarregar a página.",
+        "generic": "Erro ao carregar dados"
+      }
+    },
+    "form": {
+      "newTitle": "Novo Curso",
+      "editTitle": "Editar Curso",
+      "labels": {
+        "institution": "Instituição *",
+        "name": "Nome do Curso *",
+        "shift": "Turno (Opcional)",
+        "startDate": "Data de Início *",
+        "classCount": "Quantidade de Aulas Anual (Opcional)",
+        "description": "Descrição (Opcional)"
+      },
+      "placeholders": {
+        "institution": "Ex: Universidade Nacional",
+        "name": "Ex: Matemática 1A",
+        "classCount": "Ex: 120",
+        "description": "Breve descrição do curso..."
+      },
+      "buttons": {
+        "create": "Criar Curso",
+        "save": "Salvar Alterações",
+        "cancel": "Cancelar"
+      },
+      "errors": {
+        "create": "Erro ao criar curso",
+        "update": "Erro ao atualizar curso",
+        "generic": "Ocorreu um erro"
+      }
+    },
+    "detail": {
+      "error": "Erro ao carregar curso.",
+      "backToDashboard": "Voltar ao Dashboard",
+      "shift": "Turno",
+      "noDescription": "Sem descrição",
+      "students": "alunos",
+      "stats": {
+        "avgAttendance": "Média de Presença",
+        "overallAvg": "Média Geral"
+      },
+      "tabs": {
+        "list": "Lista de Alunos",
+        "sheet": "Folha de Presença",
+        "listLabel": "Lista",
+        "sheetLabel": "Folha"
+      },
+      "buttons": {
+        "attendance": "Presença",
+        "grade": "Avaliar",
+        "export": "Exportar",
+        "invite": "Convidar Alunos",
+        "addStudent": "Adicionar Aluno"
+      }
+    },
+    "invite": {
+      "title": "Convidar Alunos",
+      "howItWorks": "Como funciona?",
+      "howItWorksDesc": "Compartilhe este link com seus alunos. Eles poderão registrar-se pelo celular e você aprovará as solicitações.",
+      "generateLink": "Gerar Link de Convite",
+      "activeLink": "Link de Convite (Ativo)",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "qrTitle": "📱 Escaneie o QR na aula",
+      "qrDesc": "Os alunos podem escanear este código com seus celulares. Lembre-se que a validade do link é de 2 horas.",
+      "regenerate": "Regenerar Código",
+      "disable": "Desativar Link",
+      "disableConfirm": {
+        "title": "Desativar link",
+        "desc": "Tem certeza que deseja desativar o link de convite? Os alunos não poderão mais usar este código e o QR desaparecerá.",
+        "confirm": "Desativar"
+      },
+      "alerts": {
+        "successDisable": "O link de convite foi desativado com sucesso.",
+        "errorDisable": "Ocorreu um erro ao tentar desativar o link.",
+        "errorGenerate": "Não foi possível gerar o código de convite."
+      }
+    },
+    "export": {
+      "title": "Exportar Dados",
+      "description": "Configure o relatório para {course}.",
+      "automaticNotice": "* Sobrenome e Nome são incluídos sempre automaticamente.",
+      "personalData": "Dados do Aluno",
+      "dni": "Matrícula / DNI",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "metrics": "Métricas e Médias",
+      "gradesAvg": "Média de Notas",
+      "attendanceStats": "Estatísticas de Presença (Presente/Ausente)",
+      "details": "Detalhes",
+      "attendanceDetails": "Detalhe de Presenças por Data",
+      "attendanceDetailsDesc": "Inclui uma coluna para cada dia de aula com o status (P/A/T)",
+      "button": "Exportar CSV"
+    }
+  },
+  "students": {
+    "list": {
+      "searchPlaceholder": "Buscar por nome, e-mail ou matrícula...",
+      "sort": "Ordenar",
+      "sortBy": "Ordenar por",
+      "studentAZ": "Aluno (A-Z)",
+      "attendance": "Presença",
+      "average": "Média",
+      "direction": "Direção",
+      "count": "{filtered} de {total} alunos",
+      "indicators": "Indicadores",
+      "requiresAttention": "Requer atenção",
+      "isRepeating": "É repetente",
+      "externalIdPlaceholder": "Matrícula",
+      "headers": {
+        "student": "Aluno",
+        "attendance": "Presença",
+        "average": "Média"
+      },
+      "empty": {
+        "search": "Nenhum aluno encontrado com esses critérios",
+        "noStudents": "Não há alunos inscritos"
+      },
+      "actions": {
+        "edit": "Editar",
+        "withdrawal": "Dar baixa",
+        "withdrawalDetails": "Ver detalhes da baixa"
+      },
+      "inactive": "Baixa",
+      "contact": "Ver contato"
+    },
+    "addModal": {
+      "title": "Adicionar Aluno",
+      "firstName": "Nome *",
+      "lastName": "Sobrenome *",
+      "externalId": "Matrícula / ID (Opcional)",
+      "email": "E-mail (Opcional)",
+      "notes": "Observações / Notas (Opcional)",
+      "notesPlaceholder": "Insira detalhes adicionais, comportamento, notas médicas, etc.",
+      "requiresAttention": "Requer atenção especial?",
+      "requiresAttentionDesc": "Comportamento ou acompanhamento",
+      "isRepeating": "É repetente?",
+      "isRepeatingDesc": "Já cursou anteriormente",
+      "addAndAnother": "Salvar e Adicionar Outro",
+      "addStudent": "Salvar Aluno",
+      "errors": {
+        "required": "Este campo é obrigatório",
+        "email": "O formato do e-mail não é válido",
+        "phone": "O número parece incompleto (mínimo 10 dígitos)"
+      }
+    },
+    "editModal": {
+      "title": "Editar Aluno",
+      "saveChanges": "Salvar Alterações"
+    },
+    "withdrawModal": {
+      "title": "Dar baixa no aluno",
+      "description": "Você está prestes a dar baixa em {name}. O aluno não será excluído do banco de dados para manter seus registros históricos, mas não aparecerá mais nas listas de presença.",
+      "label": "Motivo da baixa *",
+      "reasons": {
+        "courseChange": "Mudança de curso",
+        "schoolChange": "Mudança de escola",
+        "other": "Outro motivo"
+      },
+      "noteLabel": "Especificar motivo (opcional)",
+      "notePlaceholder": "Insira detalhes adicionais...",
+      "errorSelection": "Por favor selecione un motivo",
+      "confirmButton": "Confirmar Baixa"
+    },
+    "joinRequests": {
+      "title": "Solicitações de Inscrição",
+      "pending": "{count} pendentes",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "noRequests": "Não há solicitações pendentes.",
+      "description": "Os seguintes alunos escanearam o código QR e estão aguardando sua aprovação para ingressar no curso.",
+      "successApprove": "Solicitação aprovada com sucesso.",
+      "successReject": "Solicitação rejeitada.",
+      "error": "Ocorreu um erro ao processar a solicitação."
+    },
+    "contact": {
+      "title": "Contato de {name}",
+      "email": "E-mail",
+      "phone": "Telefone / WhatsApp",
+      "copyEmail": "Copiar e-mail",
+      "sendEmail": "Enviar E-mail",
+      "copyPhone": "Copiar telefone",
+      "sendWhatsApp": "Enviar WhatsApp",
+      "noData": "Não há dados de contato registrados."
+    }
+  },
+  "attendance": {
+    "sheet": {
+      "noRecords": "Não há registros de presença para este curso.",
+      "howToStart": "Comece fazendo a chamada para ver a folha.",
+      "stats": "{students} alunos • {dates} aulas registradas",
+      "helpDesktop": "Clique com o botão direito em um ícone para editar.",
+      "helpMobile": "Pressione e segure para editar.",
+      "loading": "Carregando mais alunos...",
+      "columnHeader": "Estatística",
+      "legends": {
+        "present": "Presente",
+        "absent": "Ausente",
+        "late": "Atrasado",
+        "delete": "Excluir registro",
+        "future": "Aula futura",
+        "suspended": "Aula suspensa",
+        "inactive": "Aluno inativo"
+      }
+    },
+    "modal": {
+      "title": "Fazer Chamada",
+      "count": "{count} alunos registrados",
+      "dateLabel": "Data da aula",
+      "statusLabel": "Status da aula",
+      "normalClass": "Aula normal",
+      "suspension": "Suspensão de aulas",
+      "teacherLeave": "Licença do professor",
+      "otherReason": "Outro motivo",
+      "specifyReason": "Especificar motivo",
+      "reasonPlaceholder": "Ex: Feriado, evento especial, etc.",
+      "duplicateWarning": "Já existe presença para esta data",
+      "duplicateDesc": "Se você continuar, a presença existente para este dia será sobrescrita.",
+      "missingAttendance": "⚠ Falta marcar presença",
+      "missingCount": "Falta marcar {count} {count, plural, =1 {aluno} other {alunos}}",
+      "allMarked": "Todos os alunos marcados",
+      "readyToSave": "Pronto para salvar",
+      "saveButton": "Salvar Chamada",
+      "carousel": {
+        "progress": "Aluno {current} de {total}",
+        "noLegajo": "Sem matrícula"
+      },
+      "suspendedMessage": {
+        "title": "Aula suspensa",
+        "desc": "Não é necessário fazer a chamada para esta data.",
+        "reason": "Motivo: {note}"
+      }
+    }
+  },
+  "grades": {
+    "modal": {
+      "title": "Nova Nota",
+      "assessmentLabel": "Nome da Avaliação *",
+      "assessmentPlaceholder": "Ex: Prova 1",
+      "dateLabel": "Data *",
+      "weightLabel": "Peso (1-10) *",
+      "studentLabel": "Aluno *",
+      "studentPlaceholder": "Selecionar aluno...",
+      "scoreLabel": "Nota (0-10) *",
+      "saveButton": "Salvar Nota",
+      "alerts": {
+        "selectStudent": "Você deve selecionar um aluno para avaliar.",
+        "success": "Nota salva com sucesso.",
+        "error": "Houve um problema ao salvar a nota."
+      }
+    }
+  },
+  "common": {
+    "switchLanguage": "Mudar idioma",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "error": "Erro",
+    "attention": "Atenção",
+    "success": "Sucesso",
+    "actions": "Ações",
+    "student": "Aluno",
+    "phoneInput": {
+      "label": "Telefone / WhatsApp (Opcional)",
+      "placeholder": "11 1234 5678",
+      "helpText": "Insira o código de área e o número (sem 0 ou 15)",
+      "error": "O número parece incompleto (mínimo 10 dígitos)"
+    }
+  },
+  "theme": {
+    "toggle": "Mudar tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  }
+}

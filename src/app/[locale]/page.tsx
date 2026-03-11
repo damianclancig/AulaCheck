@@ -1,28 +1,35 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-import logoPic from '../../public/assets/logo.webp';
+import logoPic from '../../../public/assets/logo.webp';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default function Home() {
+  const t = useTranslations('landing');
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white dark:from-gray-950 dark:to-gray-900 transition-colors duration-200">
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center -ml-2">
           <Image src={logoPic} alt="AulaCheck Logo" className="h-12 w-auto object-contain" priority />
         </div>
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          <LanguageSwitcher />
           <Link
             href="/login"
-            className="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 transition-colors"
+            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium px-4 py-2 transition-colors"
           >
-            Iniciar Sesión
+            {t('login')}
           </Link>
           <Link
             href="/dashboard"
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
           >
-            Ir al Dashboard
+            {t('goToDashboard')}
           </Link>
         </div>
       </nav>
@@ -30,12 +37,12 @@ export default function Home() {
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-6 pt-16 pb-24 text-center lg:text-left lg:flex lg:items-center lg:gap-16">
         <div className="lg:w-1/2">
-          <h1 className="text-5xl font-extrabold text-gray-900 leading-tight mb-6">
-            Gestión escolar <br />
-            <span className="text-indigo-600">inteligente y simple</span>
+          <h1 className="text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6 transition-colors duration-200">
+            {t('heroTitle')} <br />
+            <span className="text-indigo-600 dark:text-indigo-400">{t('heroSubtitle')}</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Simplifica tu vida docente. Lleva el control de asistencias, calificaciones y alumnos en un solo lugar, accesible desde cualquier dispositivo.
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed transition-colors duration-200">
+            {t('heroDescription')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -43,18 +50,18 @@ export default function Home() {
               href="/dashboard"
               className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-xl hover:bg-indigo-700 transition-all text-lg font-semibold shadow-lg hover:shadow-indigo-200"
             >
-              Comenzar Ahora <ArrowRight className="w-5 h-5" />
+              {t('startNow')} <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
 
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
             {[
-              "Control de Asistencia Rápido",
-              "Promedios Automáticos",
-              "Gestión de Alumnos",
-              "Exportación a CSV"
+              t('feature1'),
+              t('feature2'),
+              t('feature3'),
+              t('feature4')
             ].map((feature) => (
-              <div key={feature} className="flex items-center gap-2 text-gray-700">
+              <div key={feature} className="flex items-center gap-2 text-gray-700 dark:text-gray-300 transition-colors duration-200">
                 <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
                 <span>{feature}</span>
               </div>
@@ -89,12 +96,12 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white py-8 text-center text-gray-500 text-sm">
+      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 py-8 text-center text-gray-500 dark:text-gray-400 text-sm transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>&copy; {new Date().getFullYear()} AulaCheck. Todos los derechos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} AulaCheck. {t('footerRights')}</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
-              Política de Privacidad
+              {t('privacyPolicy')}
             </Link>
           </div>
         </div>

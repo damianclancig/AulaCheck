@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Sun, CloudSun, Moon } from 'lucide-react';
 import { useInstitutions } from '@/hooks/useInstitutions';
+import { useTranslations } from 'next-intl';
 
 export interface CourseFormData {
   institutionName: string;
@@ -26,6 +27,7 @@ export function CourseForm({
   submitLabel,
   loading = false
 }: CourseFormProps) {
+  const t = useTranslations('courses');
   // Función para obtener fecha local en formato YYYY-MM-DD sin conversión UTC
   const getLocalDateString = () => {
     const now = new Date();
@@ -65,7 +67,7 @@ export function CourseForm({
     <form onSubmit={handleSubmit} className="p-6 space-y-4">
       <div>
         <label htmlFor="institutionName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Institución *
+          {t('form.labels.institution')}
         </label>
         <input
           type="text"
@@ -75,7 +77,7 @@ export function CourseForm({
           value={formData.institutionName}
           onChange={(e) => setFormData({ ...formData, institutionName: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-          placeholder="Ej: Universidad Nacional"
+          placeholder={t('form.placeholders.institution')}
         />
         <datalist id="institutions-list">
           {institutions.map((inst, index) => (
@@ -86,7 +88,7 @@ export function CourseForm({
 
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Nombre del Curso *
+          {t('form.labels.name')}
         </label>
         <input
           type="text"
@@ -95,19 +97,19 @@ export function CourseForm({
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-          placeholder="Ej: Matemáticas 1A"
+          placeholder={t('form.placeholders.name')}
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Turno (Opcional)
+          {t('form.labels.shift')}
         </label>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { id: 'Mañana', icon: Sun, label: 'Mañana', color: 'amber' },
-            { id: 'Tarde', icon: CloudSun, label: 'Tarde', color: 'orange' },
-            { id: 'Noche', icon: Moon, label: 'Noche', color: 'indigo' },
+            { id: 'Mañana', icon: Sun, label: t('shifts.morning'), color: 'amber' },
+            { id: 'Tarde', icon: CloudSun, label: t('shifts.afternoon'), color: 'orange' },
+            { id: 'Noche', icon: Moon, label: t('shifts.night'), color: 'indigo' },
           ].map((shift) => (
             <button
               key={shift.id}
@@ -129,7 +131,7 @@ export function CourseForm({
 
       <div>
         <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Fecha de Inicio *
+          {t('form.labels.startDate')}
         </label>
         <input
           type="date"
@@ -143,7 +145,7 @@ export function CourseForm({
 
       <div>
         <label htmlFor="annualClassCount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Cantidad de Clases Anual (Opcional)
+          {t('form.labels.classCount')}
         </label>
         <input
           type="number"
@@ -152,7 +154,7 @@ export function CourseForm({
           value={formData.annualClassCount || ''}
           onChange={(e) => setFormData({ ...formData, annualClassCount: e.target.value ? parseInt(e.target.value) : undefined })}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-          placeholder="Ej: 120"
+          placeholder={t('form.placeholders.classCount')}
         />
       </div>
 
@@ -160,7 +162,7 @@ export function CourseForm({
 
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Descripción (Opcional)
+          {t('form.labels.description')}
         </label>
         <textarea
           id="description"
@@ -168,7 +170,7 @@ export function CourseForm({
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-          placeholder="Breve descripción del curso..."
+          placeholder={t('form.placeholders.description')}
         />
       </div>
 
@@ -178,7 +180,7 @@ export function CourseForm({
           onClick={onCancel}
           className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
         >
-          Cancelar
+          {t('form.buttons.cancel')}
         </button>
         <button
           type="submit"

@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, usePathname } from '@/i18n/routing';
 import {
   LayoutDashboard,
   BookOpen,
@@ -13,6 +12,9 @@ import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import logoPic from '../../../public/assets/logo.webp';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -29,6 +31,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const t = useTranslations('sidebar');
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/login' });
@@ -59,7 +62,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             onClick={onClose}
             className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            <span className="sr-only">Cerrar sidebar</span>
+            <span className="sr-only">{t('aria.closeMenu')}</span>
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -89,7 +92,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     )}
                     aria-hidden="true"
                   />
-                  {item.name}
+                  {t(`nav.${item.name.toLowerCase()}` as any)}
                 </Link>
               );
             })}
@@ -97,13 +100,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         <div className="flex-shrink-0 flex flex-col border-t border-gray-200 dark:border-gray-800 p-4 space-y-2">
+
           <Link
             href="/privacy"
             onClick={() => onClose()}
             className="flex items-center px-2 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 rounded-md transition-colors"
           >
             <Settings className="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-            Privacidad
+            {t('links.privacy')}
           </Link>
 
           <button
@@ -114,11 +118,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <LogOut className="inline-block h-5 w-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400" />
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
-                  Cerrar Sesión
+                  {t('links.logout')}
                 </p>
               </div>
             </div>
           </button>
+
+          {/* Mobile only selectors (Footer) */}
+          <div className="flex items-center justify-around lg:hidden pt-4 border-t border-gray-100 dark:border-gray-800/50">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </>

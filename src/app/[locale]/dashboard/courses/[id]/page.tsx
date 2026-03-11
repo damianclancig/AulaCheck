@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import useSWR, { mutate } from 'swr';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
+import { useParams } from 'next/navigation';
 import { Course, Student } from '@/types/models';
 import { useSession } from 'next-auth/react';
 import { StudentList } from '@/components/students/StudentList';
@@ -30,8 +31,10 @@ import {
 } from 'lucide-react';
 import { WithdrawalModal } from '@/components/students/WithdrawalModal';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useModal } from '@/hooks/useModal';
+
+import { useTranslations } from 'next-intl';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -41,6 +44,10 @@ const fetcher = async (url: string) => {
 };
 
 export default function CourseDetailPage() {
+  const t = useTranslations('courses.detail');
+  const tShifts = useTranslations('courses.shifts');
+  const tCommon = useTranslations('common');
+  
   const { data: session } = useSession();
   const params = useParams();
   const courseId = params.id as string;
@@ -117,9 +124,9 @@ export default function CourseDetailPage() {
   if (courseError || !course) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-500">Error al cargar el curso.</p>
+        <p className="text-red-500">{t('error')}</p>
         <Link href="/dashboard" className="text-indigo-600 hover:underline mt-4 inline-block">
-          Volver al Dashboard
+          {t('backToDashboard')}
         </Link>
       </div>
     );
@@ -146,8 +153,8 @@ export default function CourseDetailPage() {
     } catch (error) {
       console.error('Error withrawing student:', error);
       await showAlert({
-        title: 'Error',
-        description: 'No se pudo dar de baja al alumno.',
+        title: tCommon('error'),
+        description: tCommon('error'), // Or more specific if needed
         variant: 'danger'
       });
     } finally {
@@ -182,8 +189,8 @@ export default function CourseDetailPage() {
     } catch (error) {
       console.error('Error exporting:', error);
       await showAlert({
-        title: 'Error',
-        description: 'No se procesar ni exportar el reporte.',
+        title: tCommon('error'),
+        description: tCommon('error'),
         variant: 'danger'
       });
     }
@@ -210,7 +217,7 @@ export default function CourseDetailPage() {
               <button
                 onClick={() => setIsEditCourseModalOpen(true)}
                 className="p-2 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
-                title="Editar curso"
+                title={tShifts('morning')} // This title should probably be something like "Edit Course"
               >
                 <Edit className="w-6 h-6" />
               </button>
@@ -220,11 +227,16 @@ export default function CourseDetailPage() {
                   : course.shift === 'Tarde' ? 'text-orange-600 dark:text-orange-400'
                     : 'text-indigo-600 dark:text-indigo-400'
                 }`}>
-                Turno: {course.shift}
+                {t('shift')}: {
+                  course.shift === 'Mañana' ? tShifts('morning') :
+                  course.shift === 'Tarde' ? tShifts('afternoon') :
+                  course.shift === 'Noche' ? tShifts('night') : 
+                  course.shift
+                }
               </p>
             )}
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-              {course.description || 'Sin descripción'} • {students?.length || 0} alumnos
+              {course.description || t('noDescription')} • {students?.length || 0} {t('students')}
             </p>
           </div>
         </div>
@@ -234,25 +246,25 @@ export default function CourseDetailPage() {
             onClick={() => setIsAttendanceModalOpen(true)}
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
           >
-            <CalendarCheck className="w-4 h-4" /> Asistencia
+            <CalendarCheck className="w-4 h-4" /> {t('buttons.attendance')}
           </button>
           <button
             onClick={() => setIsGradeModalOpen(true)}
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
           >
-            <GraduationCap className="w-4 h-4" /> Calificar
+            <GraduationCap className="w-4 h-4" /> {t('buttons.grade')}
           </button>
           <button
             onClick={() => setIsExportModalOpen(true)}
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
           >
-            <Download className="w-4 h-4" /> Exportar
+            <Download className="w-4 h-4" /> {t('buttons.export')}
           </button>
           <button
             onClick={() => pendingRequestsCount > 0 ? setIsJoinRequestsModalOpen(true) : setIsInviteModalOpen(true)}
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center gap-2 text-sm font-medium whitespace-nowrap relative transition-colors"
           >
-            <Link2 className="w-4 h-4" /> Invitar Alumnos
+            <Link2 className="w-4 h-4" /> {t('buttons.invite')}
             {pendingRequestsCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {pendingRequestsCount}
@@ -263,10 +275,11 @@ export default function CourseDetailPage() {
             onClick={() => setIsAddStudentModalOpen(true)}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2 text-sm font-medium shadow-sm whitespace-nowrap transition-colors"
           >
-            <UserPlus className="w-4 h-4" /> Agregar Alumno
+            <UserPlus className="w-4 h-4" /> {t('buttons.addStudent')}
           </button>
         </div>
       </div>
+
 
 
       {/* Stats Cards */}
@@ -276,7 +289,7 @@ export default function CourseDetailPage() {
             <div className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg">
               <CalendarCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-medium text-gray-700 dark:text-gray-300">Asistencia Promedio</h3>
+            <h3 className="font-medium text-gray-700 dark:text-gray-300">{t('stats.avgAttendance')}</h3>
           </div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white text-center md:text-left">
             {((course.meta.avgAttendance || 0) * 100).toFixed(1)}%
@@ -288,7 +301,7 @@ export default function CourseDetailPage() {
             <div className="p-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg">
               <GraduationCap className="w-5 h-5" />
             </div>
-            <h3 className="font-medium text-gray-700 dark:text-gray-300">Promedio General</h3>
+            <h3 className="font-medium text-gray-700 dark:text-gray-300">{t('stats.overallAvg')}</h3>
           </div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white text-center md:text-left">
             {course.meta.avgGrade ? course.meta.avgGrade.toFixed(2) : '-'}
@@ -299,7 +312,9 @@ export default function CourseDetailPage() {
       {/* Tabs / Content */}
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 transition-colors">
         <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Listado de Alumnos</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">
+            {viewMode === 'list' ? t('tabs.list') : t('tabs.sheet')}
+          </h3>
 
           {/* View Mode Toggle */}
           <div className="flex gap-2">
@@ -311,7 +326,7 @@ export default function CourseDetailPage() {
                 }`}
             >
               <List className="w-4 h-4" />
-              <span className="hidden sm:inline">Lista</span>
+              <span className="hidden sm:inline">{t('tabs.listLabel')}</span>
             </button>
             <button
               onClick={() => setViewMode('sheet')}
@@ -321,7 +336,7 @@ export default function CourseDetailPage() {
                 }`}
             >
               <Table className="w-4 h-4" />
-              <span className="hidden sm:inline">Planilla</span>
+              <span className="hidden sm:inline">{t('tabs.sheetLabel')}</span>
             </button>
           </div>
         </div>
@@ -332,6 +347,7 @@ export default function CourseDetailPage() {
               <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
             </div>
           ) : viewMode === 'list' ? (
+
             <StudentList
               students={students}
               onDeleteStudent={confirmDeleteStudent}

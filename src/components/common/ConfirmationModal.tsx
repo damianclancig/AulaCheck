@@ -3,6 +3,7 @@
 import { X, AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -29,6 +30,7 @@ export function ConfirmationModal({
     isLoading = false,
     hideCancel = false,
 }: ConfirmationModalProps) {
+    const tCommon = useTranslations('common');
     if (!isOpen) return null;
 
     const getVariantStyles = () => {
@@ -74,7 +76,7 @@ export function ConfirmationModal({
                         disabled={isLoading}
                         className="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md transition-colors"
                     >
-                        <span className="sr-only">Cerrar</span>
+                        <span className="sr-only">{tCommon('close')}</span>
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -109,7 +111,7 @@ export function ConfirmationModal({
                         )}
                     >
                         {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        {confirmText}
+                        {confirmText === 'Confirmar' ? tCommon('confirm') : confirmText}
                     </button>
                     {!hideCancel && (
                         <button
@@ -118,7 +120,7 @@ export function ConfirmationModal({
                             disabled={isLoading}
                             className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-700 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
                         >
-                            {cancelText}
+                            {cancelText === 'Cancelar' ? tCommon('cancel') : cancelText}
                         </button>
                     )}
                 </div>

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mail, Phone, Copy, Check, ExternalLink, MessageCircle } from 'lucide-react';
 import { formatPhoneDisplay, formatPhoneWhatsApp } from '@/lib/utils/contactUtils';
+import { useTranslations } from 'next-intl';
 
 interface ContactPopoverProps {
   email?: string;
@@ -21,6 +22,7 @@ export function ContactPopover({
   onClose,
   triggerRef 
 }: ContactPopoverProps) {
+  const t = useTranslations('students.contact');
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -102,14 +104,14 @@ export function ContactPopover({
     >
       <div className="p-4 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2">
-          Contacto de {studentName}
+          {t('title', { name: studentName })}
         </h3>
 
         {email ? (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               <Mail className="w-4 h-4 text-indigo-500" />
-              Email
+              {t('email')}
             </div>
             <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg flex items-center justify-between group">
               <span className="text-sm text-gray-600 dark:text-gray-300 truncate mr-2 select-all">
@@ -118,7 +120,7 @@ export function ContactPopover({
               <button
                 onClick={() => handleCopy(email, 'email')}
                 className="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1 rounded-md hover:bg-white dark:hover:bg-gray-700 shadow-sm"
-                title="Copiar email"
+                title={t('copyEmail')}
               >
                 {copiedEmail ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
@@ -127,7 +129,7 @@ export function ContactPopover({
               href={`mailto:${email}`}
               className="block w-full text-center py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
             >
-              Enviar Correo
+              {t('sendEmail')}
             </a>
           </div>
         ) : null}
@@ -136,7 +138,7 @@ export function ContactPopover({
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               <Phone className="w-4 h-4 text-green-500" />
-              Teléfono / WhatsApp
+              {t('phone')}
             </div>
             <div className="bg-gray-50 dark:bg-gray-800 p-2 rounded-lg flex items-center justify-between group">
               <span className="text-sm text-gray-600 dark:text-gray-300 truncate mr-2 select-all">
@@ -145,7 +147,7 @@ export function ContactPopover({
               <button
                 onClick={() => handleCopy(formattedPhone, 'phone')}
                 className="text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 rounded-md hover:bg-white dark:hover:bg-gray-700 shadow-sm"
-                title="Copiar teléfono"
+                title={t('copyPhone')}
               >
                 {copiedPhone ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
@@ -157,14 +159,14 @@ export function ContactPopover({
               className="flex items-center justify-center gap-1.5 w-full py-1.5 text-xs font-medium text-white bg-green-500 hover:bg-green-600 rounded-lg transition-colors"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              Enviar WhatsApp
+              {t('sendWhatsApp')}
             </a>
           </div>
         ) : null}
 
         {!email && !phone && (
           <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-            No hay datos de contacto registrados.
+            {t('noData')}
           </div>
         )}
       </div>

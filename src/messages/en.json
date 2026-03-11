@@ -1,0 +1,364 @@
+{
+  "landing": {
+    "title": "Welcome to AulaCheck",
+    "login": "Log In",
+    "goToDashboard": "Go to Dashboard",
+    "heroTitle": "School management",
+    "heroSubtitle": "smart and simple",
+    "heroDescription": "Simplify your teaching life. Keep track of attendance, grades, and students in one place, accessible from any device.",
+    "startNow": "Start Now",
+    "feature1": "Fast Attendance Tracking",
+    "feature2": "Automatic Averages",
+    "feature3": "Student Management",
+    "feature4": "CSV Export",
+    "footerRights": "All rights reserved.",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "login": {
+    "description": "Smart attendance and grade management for teachers.",
+    "errorGoogle": "Error logging in with Google. Please try again.",
+    "continueGoogle": "Continue with Google",
+    "loggingIn": "Logging in...",
+    "termsText1": "By continuing, you agree to our",
+    "termsText2": "privacy policy",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "Sorry, the page you are looking for does not exist or has been moved.",
+    "backButton": "Go back"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: March 11, 2026",
+    "introduction": "At AulaCheck, we value your privacy and are committed to protecting your personal data.",
+    "dataCollection": "Information We Collect",
+    "dataCollectionDesc": "We collect basic information such as your name and email through Google authentication to manage your access.",
+    "usage": "Use of Information",
+    "usageDesc": "Your data is used exclusively to provide the AulaCheck service and improve the teaching experience.",
+    "contact": "Contact",
+    "contactDesc": "If you have questions about this policy, contact us at support@aulacheck.com"
+  },
+  "dashboard": {
+    "welcome": "Welcome, {name}",
+    "aria": {
+      "openMenu": "Open menu"
+    }
+  },
+  "sidebar": {
+    "aria": {
+      "closeMenu": "Close menu"
+    },
+    "nav": {
+      "dashboard": "Dashboard"
+    },
+    "links": {
+      "privacy": "Privacy",
+      "logout": "Sign Out"
+    }
+  },
+  "courses": {
+    "card": {
+      "institution": "Institution",
+      "course": "Course",
+      "shift": "Shift",
+      "students": "{count, plural, =1 {# Student} other {# Students}}",
+      "startDate": "Start",
+      "attendance": "Attendance",
+      "avg": "Average",
+      "viewManagement": "View Management"
+    },
+    "shifts": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "night": "Night"
+    },
+    "dashboard": {
+      "title": "My Courses",
+      "description": "Manage your classes and students from here.",
+      "newCourse": "New Course",
+      "empty": {
+        "title": "You have no courses created",
+        "description": "Start by creating your first course to manage attendance and grades.",
+        "button": "Create my first course →"
+      },
+      "errors": {
+        "fetch": "Error loading courses. Please try reloading the page.",
+        "generic": "Error loading data"
+      }
+    },
+    "form": {
+      "newTitle": "New Course",
+      "editTitle": "Edit Course",
+      "labels": {
+        "institution": "Institution *",
+        "name": "Course Name *",
+        "shift": "Shift (Optional)",
+        "startDate": "Start Date *",
+        "classCount": "Annual Class Count (Optional)",
+        "description": "Description (Optional)"
+      },
+      "placeholders": {
+        "institution": "e.g. National University",
+        "name": "e.g. Mathematics 1A",
+        "classCount": "e.g. 120",
+        "description": "Short course description..."
+      },
+      "buttons": {
+        "create": "Create Course",
+        "save": "Save Changes",
+        "cancel": "Cancel"
+      },
+      "errors": {
+        "create": "Error creating course",
+        "update": "Error updating course",
+        "generic": "An error occurred"
+      }
+    },
+    "detail": {
+      "error": "Error loading course.",
+      "backToDashboard": "Back to Dashboard",
+      "shift": "Shift",
+      "noDescription": "No description",
+      "students": "students",
+      "stats": {
+        "avgAttendance": "Average Attendance",
+        "overallAvg": "Overall Average"
+      },
+      "tabs": {
+        "list": "Student List",
+        "sheet": "Attendance Sheet",
+        "listLabel": "List",
+        "sheetLabel": "Sheet"
+      },
+      "buttons": {
+        "attendance": "Attendance",
+        "grade": "Grade",
+        "export": "Export",
+        "invite": "Invite Students",
+        "addStudent": "Add Student"
+      }
+    },
+    "invite": {
+      "title": "Invite Students",
+      "howItWorks": "How it works?",
+      "howItWorksDesc": "Share this link with your students. They can register from their phones and you will approve the requests.",
+      "generateLink": "Generate Invitation Link",
+      "activeLink": "Invitation Link (Active)",
+      "copy": "Copy",
+      "copied": "Copied",
+      "qrTitle": "📱 Scan QR in class",
+      "qrDesc": "Students can scan this code with their phones. Remember link is valid for 2 hours.",
+      "regenerate": "Regenerate Code",
+      "disable": "Disable Link",
+      "disableConfirm": {
+        "title": "Disable link",
+        "desc": "Are you sure you want to disable the invitation link? Students will no longer be able to use this code and the QR will disappear.",
+        "confirm": "Disable"
+      },
+      "alerts": {
+        "successDisable": "The invitation link has been successfully disabled.",
+        "errorDisable": "An error occurred while trying to disable the link.",
+        "errorGenerate": "Could not generate invitation code."
+      }
+    },
+    "export": {
+      "title": "Export Data",
+      "description": "Configure the report for {course}.",
+      "automaticNotice": "* Last Name and First Name are always included automatically.",
+      "personalData": "Student Data",
+      "dni": "ID / DNI",
+      "email": "Email",
+      "phone": "Phone",
+      "metrics": "Metrics and Averages",
+      "gradesAvg": "Grade Average",
+      "attendanceStats": "Attendance Statistics (Present/Absent)",
+      "details": "Details",
+      "attendanceDetails": "Attendance Detail by Date",
+      "attendanceDetailsDesc": "Includes one column per class day with status (P/A/T)",
+      "button": "Export CSV"
+    }
+  },
+  "students": {
+    "list": {
+      "searchPlaceholder": "Search by name, email or ID...",
+      "sort": "Sort",
+      "sortBy": "Sort by",
+      "studentAZ": "Student (A-Z)",
+      "attendance": "Attendance",
+      "average": "Average",
+      "direction": "Direction",
+      "count": "{filtered} of {total} students",
+      "indicators": "Indicators",
+      "requiresAttention": "Requires attention",
+      "isRepeating": "Is repeating",
+      "externalIdPlaceholder": "ID",
+      "headers": {
+        "student": "Student",
+        "attendance": "Attendance",
+        "average": "Average"
+      },
+      "empty": {
+        "search": "No students found with that criteria",
+        "noStudents": "No students enrolled"
+      },
+      "actions": {
+        "edit": "Edit",
+        "withdrawal": "Withdraw",
+        "withdrawalDetails": "View withdrawal details"
+      },
+      "inactive": "Inactive",
+      "contact": "View contact"
+    },
+    "addModal": {
+      "title": "Add Student",
+      "firstName": "First Name *",
+      "lastName": "Last Name *",
+      "externalId": "ID / External ID (Optional)",
+      "email": "Email (Optional)",
+      "notes": "Notes / Observations (Optional)",
+      "notesPlaceholder": "Enter additional details, behavior, medical notes, etc.",
+      "requiresAttention": "Requires special attention?",
+      "requiresAttentionDesc": "Behavior or follow-up",
+      "isRepeating": "Is repeating?",
+      "isRepeatingDesc": "Previously enrolled",
+      "addAndAnother": "Save and Add Another",
+      "addStudent": "Save Student",
+      "errors": {
+        "required": "This field is required",
+        "email": "Invalid email format",
+        "phone": "Number seems incomplete (min 10 digits)"
+      }
+    },
+    "editModal": {
+      "title": "Edit Student",
+      "saveChanges": "Save Changes"
+    },
+    "withdrawModal": {
+      "title": "Withdraw student",
+      "description": "You are about to withdraw {name}. The student will not be deleted from the database to maintain historical records, but will no longer appear in attendance lists.",
+      "label": "Reason for withdrawal *",
+      "reasons": {
+        "courseChange": "Course change",
+        "schoolChange": "School change",
+        "other": "Other reason"
+      },
+      "noteLabel": "Specify reason (optional)",
+      "notePlaceholder": "Enter additional details...",
+      "errorSelection": "Please select a reason",
+      "confirmButton": "Confirm Withdrawal"
+    },
+    "joinRequests": {
+      "title": "Join Requests",
+      "pending": "{count} pending",
+      "approve": "Approve",
+      "reject": "Reject",
+      "noRequests": "No pending requests.",
+      "description": "The following students have scanned the QR code and are waiting for your approval to join the course.",
+      "successApprove": "Request approved successfully.",
+      "successReject": "Request rejected.",
+      "error": "An error occurred while processing the request."
+    },
+    "contact": {
+      "title": "Contact of {name}",
+      "email": "Email",
+      "phone": "Phone / WhatsApp",
+      "copyEmail": "Copy email",
+      "sendEmail": "Send Email",
+      "copyPhone": "Copy phone",
+      "sendWhatsApp": "Send WhatsApp",
+      "noData": "No contact data registered."
+    }
+  },
+  "attendance": {
+    "sheet": {
+      "noRecords": "No attendance records for this course.",
+      "howToStart": "Start taking attendance to see the sheet.",
+      "stats": "{students} students • {dates} classes recorded",
+      "helpDesktop": "Right click on an icon to edit.",
+      "helpMobile": "Long press to edit.",
+      "loading": "Loading more students...",
+      "columnHeader": "Statistics",
+      "legends": {
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late",
+        "delete": "Delete record",
+        "future": "Future class",
+        "suspended": "Suspended class",
+        "inactive": "Inactive student"
+      }
+    },
+    "modal": {
+      "title": "Take Attendance",
+      "count": "{count} students registered",
+      "dateLabel": "Class date",
+      "statusLabel": "Class status",
+      "normalClass": "Normal class",
+      "suspension": "Class suspension",
+      "teacherLeave": "Teacher leave",
+      "otherReason": "Other reason",
+      "specifyReason": "Specify reason",
+      "reasonPlaceholder": "e.g. Holiday, special event, etc.",
+      "duplicateWarning": "Attendance already exists for this date",
+      "duplicateDesc": "If you continue, existing attendance for this day will be overwritten.",
+      "missingAttendance": "⚠ Missing attendance marking",
+      "missingCount": "Missing {count} {count, plural, =1 {student} other {students}} marking",
+      "allMarked": "All students marked",
+      "readyToSave": "Ready to save",
+      "saveButton": "Save Attendance",
+      "carousel": {
+        "progress": "Student {current} of {total}",
+        "noLegajo": "No ID"
+      },
+      "suspendedMessage": {
+        "title": "Class suspended",
+        "desc": "No need to take attendance for this date.",
+        "reason": "Reason: {note}"
+      }
+    }
+  },
+  "grades": {
+    "modal": {
+      "title": "New Grade",
+      "assessmentLabel": "Assessment Name *",
+      "assessmentPlaceholder": "e.g. Midterm 1",
+      "dateLabel": "Date *",
+      "weightLabel": "Weight (1-10) *",
+      "studentLabel": "Student *",
+      "studentPlaceholder": "Select student...",
+      "scoreLabel": "Score (0-10) *",
+      "saveButton": "Save Grade",
+      "alerts": {
+        "selectStudent": "You must select a student to grade.",
+        "success": "Grade saved successfully.",
+        "error": "There was a problem saving the grade."
+      }
+    }
+  },
+  "common": {
+    "switchLanguage": "Switch Language",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "close": "Close",
+    "error": "Error",
+    "attention": "Attention",
+    "success": "Success",
+    "actions": "Actions",
+    "student": "Student",
+    "phoneInput": {
+      "label": "Phone / WhatsApp (Optional)",
+      "placeholder": "11 1234 5678",
+      "helpText": "Enter area code and number (without 0 or 15)",
+      "error": "Number seems incomplete (min 10 digits)"
+    }
+  },
+  "theme": {
+    "toggle": "Change theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}

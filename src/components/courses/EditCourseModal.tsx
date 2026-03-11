@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Course } from '@/types/models';
 import { CourseForm, CourseFormData } from './CourseForm';
+import { useTranslations } from 'next-intl';
 
 interface EditCourseModalProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ interface EditCourseModalProps {
 }
 
 export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: EditCourseModalProps) {
+  const t = useTranslations('courses.form');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,14 +57,14 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
       });
 
       if (!response.ok) {
-        throw new Error('Error al actualizar el curso');
+        throw new Error(t('errors.update'));
       }
 
       onCourseUpdated();
       onClose();
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Ocurrió un error');
+      setError(err.message === t('errors.update') ? err.message : t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -71,7 +74,7 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Editar Curso</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('editTitle')}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
@@ -90,7 +93,7 @@ export function EditCourseModal({ isOpen, onClose, course, onCourseUpdated }: Ed
           initialData={initialData}
           onSubmit={handleSubmit}
           onCancel={onClose}
-          submitLabel="Guardar Cambios"
+          submitLabel={t('buttons.save')}
           loading={loading}
         />
       </div>

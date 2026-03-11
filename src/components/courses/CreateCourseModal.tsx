@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { CourseForm, CourseFormData } from './CourseForm';
+import { useTranslations } from 'next-intl';
 
 interface CreateCourseModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface CreateCourseModalProps {
 }
 
 export function CreateCourseModal({ isOpen, onClose, onCourseCreated }: CreateCourseModalProps) {
+  const t = useTranslations('courses.form');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +31,7 @@ export function CreateCourseModal({ isOpen, onClose, onCourseCreated }: CreateCo
       });
 
       if (!response.ok) {
-        throw new Error('Error al crear el curso');
+        throw new Error('create_error');
       }
 
       onCourseCreated();
@@ -46,7 +48,7 @@ export function CreateCourseModal({ isOpen, onClose, onCourseCreated }: CreateCo
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Nuevo Curso</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('newTitle')}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
@@ -57,14 +59,14 @@ export function CreateCourseModal({ isOpen, onClose, onCourseCreated }: CreateCo
 
         {error && (
           <div className="mx-6 mt-6 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
-            {error}
+            {error === 'create_error' ? t('errors.create') : t('errors.generic')}
           </div>
         )}
 
         <CourseForm
           onSubmit={handleSubmit}
           onCancel={onClose}
-          submitLabel="Crear Curso"
+          submitLabel={t('buttons.create')}
           loading={loading}
         />
       </div>
