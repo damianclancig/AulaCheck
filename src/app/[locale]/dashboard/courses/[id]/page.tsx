@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import useSWR, { mutate } from 'swr';
 import { useRouter } from '@/i18n/routing';
 import { useParams } from 'next/navigation';
@@ -12,6 +12,9 @@ import { AddStudentModal } from '@/components/students/AddStudentModal';
 import { EditStudentModal } from '@/components/students/EditStudentModal';
 import { AttendanceModal } from '@/components/attendance/AttendanceModal';
 import { GradeModal } from '@/components/grades/GradeModal';
+import { GradeTable } from '@/components/grades/GradeTable';
+import { PeriodTabs } from '@/components/grades/PeriodTabs';
+import { AnnualCloseTable } from '@/components/grades/AnnualCloseTable';
 import { EditCourseModal } from '@/components/courses/EditCourseModal';
 import { InviteStudentsModal } from '@/components/courses/InviteStudentsModal';
 import { JoinRequestsModal } from '@/components/students/JoinRequestsModal';
@@ -27,7 +30,8 @@ import {
   Link2,
   Users,
   List,
-  Table
+  Table,
+  BookOpen,
 } from 'lucide-react';
 import { WithdrawalModal } from '@/components/students/WithdrawalModal';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
@@ -67,7 +71,10 @@ export default function CourseDetailPage() {
     fetcher
   );
 
-  const [viewMode, setViewMode] = useState<'list' | 'sheet'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'sheet' | 'grades'>('list');
+  const [gradesPeriod, setGradesPeriod] = useState<1 | 2 | 'annual'>(1);
+  const [gradesYear, setGradesYear] = useState<number>(new Date().getFullYear());
+  const [isTabPending, startTabTransition] = useTransition();
 
   const { data: attendanceData, mutate: mutateAttendance } = useSWR<{
     dates: string[];
@@ -311,32 +318,45 @@ export default function CourseDetailPage() {
 
       {/* Tabs / Content */}
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 transition-colors">
-        <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+        <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
           <h3 className="font-semibold text-gray-900 dark:text-white">
-            {viewMode === 'list' ? t('tabs.list') : t('tabs.sheet')}
+            {viewMode === 'list' ? t('tabs.list') : viewMode === 'sheet' ? t('tabs.sheet') : t('tabs.grades')}
           </h3>
 
           {/* View Mode Toggle */}
           <div className="flex gap-2">
             <button
-              onClick={() => setViewMode('list')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'list'
-                ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
+              onClick={() => startTabTransition(() => setViewMode('list'))}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
             >
               <List className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.listLabel')}</span>
             </button>
             <button
-              onClick={() => setViewMode('sheet')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'sheet'
-                ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
+              onClick={() => startTabTransition(() => setViewMode('sheet'))}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'sheet'
+                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
             >
               <Table className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.sheetLabel')}</span>
+            </button>
+            <button
+              onClick={() => startTabTransition(() => setViewMode('grades'))}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'grades'
+                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('tabs.gradesLabel')}</span>
             </button>
           </div>
         </div>
@@ -357,7 +377,7 @@ export default function CourseDetailPage() {
               }}
               onStudentUpdated={() => mutateStudents()}
             />
-          ) : (
+          ) : viewMode === 'sheet' ? (
             attendanceData ? (
               <AttendanceSheet
                 students={students}
@@ -366,7 +386,6 @@ export default function CourseDetailPage() {
                 suspensions={attendanceData.suspensions}
                 onUpdate={() => {
                   mutateStudents();
-                  // Trigger re-fetch of attendance data by mutating the SWR cache
                   mutate(`/api/courses/${courseId}/attendance-records`);
                 }}
               />
@@ -375,6 +394,21 @@ export default function CourseDetailPage() {
                 <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
               </div>
             )
+          ) : (
+            /* Tab de Calificaciones */
+            <div className="space-y-4">
+              <PeriodTabs
+                selected={gradesPeriod}
+                onChange={setGradesPeriod}
+                year={gradesYear}
+                onYearChange={setGradesYear}
+              />
+              {gradesPeriod === 'annual' ? (
+                <AnnualCloseTable year={gradesYear} />
+              ) : (
+                <GradeTable period={gradesPeriod} year={gradesYear} />
+              )}
+            </div>
           )}
         </div>
       </div>

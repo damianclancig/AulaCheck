@@ -129,8 +129,10 @@
       "tabs": {
         "list": "Listado de Alumnos",
         "sheet": "Planilla",
+        "grades": "Calificaciones",
         "listLabel": "Lista",
-        "sheetLabel": "Planilla"
+        "sheetLabel": "Planilla",
+        "gradesLabel": "Notas"
       },
       "buttons": {
         "attendance": "Asistencia",
@@ -348,6 +350,45 @@
         "selectStudent": "Debes seleccionar un alumno para calificar.",
         "success": "Calificación guardada correctamente.",
         "error": "Hubo un problema al guardar la calificación."
+      }
+    },
+    "sheet": {
+      "firstSemester": "1er Cuatrimestre",
+      "secondSemester": "2do Cuatrimestre",
+      "annualClose": "Cierre Anual",
+      "student": "Alumno",
+      "average": "Promedio",
+      "attendanceHeader": "Asistencia",
+      "statusHeader": "Informe",
+      "addActivity": "+ Actividad",
+      "activityNamePlaceholder": "Ej: TP1, Parcial...",
+      "save": "Guardar cambios",
+      "attendance": "Asist.",
+      "noStudents": "No hay alumnos activos en este curso.",
+      "error": "Error al cargar la planilla.",
+      "semester1Short": "C1",
+      "semester2Short": "C2",
+      "semStatus1": "Estado C1",
+      "semStatus2": "Estado C2",
+      "finalAverage": "Prom. Final",
+      "annualAttendance": "Asistencia Anual",
+      "finalCondition": "Condición Final",
+      "overrideTitle": "Clic para modificar condición",
+      "forceCondition": "Forzar condición",
+      "resetToAutomatic": "Restaurar automático",
+      "manualOverride": "Modificado manualmente",
+      "status": {
+        "tea": "TEA",
+        "tep": "TEP",
+        "ted": "TED",
+        "approved": "Aprobado",
+        "december": "A Diciembre",
+        "february": "A Febrero"
+      },
+      "alerts": {
+        "saved": "Planilla guardada correctamente.",
+        "saveError": "Error al guardar la planilla.",
+        "overrideError": "Error al guardar la modificación."
       }
     }
   },

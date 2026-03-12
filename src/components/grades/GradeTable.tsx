@@ -1,0 +1,377 @@
+'use client';
+
+import { useState } from 'react';
+import { Plus, Save, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useModal } from '@/hooks/useModal';
+import { useGradeSheet } from '@/hooks/useGradeSheet';
+import type { PeriodType } from '@/hooks/useGradeSheet';
+import { ActivityHeader } from './ActivityHeader';
+import { GradeCell } from './GradeCell';
+import { StatusBadge } from './StatusBadge';
+import { OverrideMenu } from './OverrideMenu';
+import { calculateTrajectoryStatus } from '@/lib/calculations/trajectoryUtils';
+import type { BadgeType } from './StatusBadge';
+
+interface GradeTableProps {
+  period: 1 | 2;
+  year: number;
+}
+
+export function GradeTable({ period, year }: GradeTableProps) {
+  const t = useTranslations('grades.sheet');
+  const tCommon = useTranslations('common');
+  const { showAlert } = useModal();
+  const [newActivityName, setNewActivityName] = useState('');
+  const [showAddInput, setShowAddInput] = useState(false);
+
+  const {
+    isLoading,
+    error,
+    activities,
+    rows,
+    addActivity,
+    renameActivity,
+    removeActivity,
+    updateScore,
+    saveChanges,
+    isSaving,
+    pendingChanges,
+    overrideStatus,
+    getLocalAverage,
+    hasEmptyActivity,
+  } = useGradeSheet(period as PeriodType, year);
+
+  const handleAddActivity = async () => {
+    const name = newActivityName.trim();
+    if (!name) return;
+    await addActivity(name);
+    setNewActivityName('');
+    setShowAddInput(false);
+  };
+
+  const handleSave = async () => {
+    try {
+      await saveChanges();
+      await showAlert({
+        title: tCommon('success'),
+        description: t('alerts.saved'),
+        variant: 'info',
+      });
+    } catch {
+      await showAlert({
+        title: tCommon('error'),
+        description: t('alerts.saveError'),
+        variant: 'danger',
+      });
+    }
+  };
+
+  const handleOverride = async (studentId: string, value: string | null) => {
+    const overrideKey = period === 1 ? 'semester1Override' : 'semester2Override';
+    try {
+      await overrideStatus(studentId, { [overrideKey]: value });
+    } catch {
+      await showAlert({
+        title: tCommon('error'),
+        description: t('alerts.overrideError'),
+        variant: 'danger',
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12 text-red-500 dark:text-red-400">
+        {t('error')}
+      </div>
+    );
+  }
+
+  // ─── Vista mobile: cards por alumno ────────────────────────────────────────
+  const mobileView = (
+    <div className="md:hidden space-y-3">
+      {rows.length === 0 ? (
+        <p className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
+          {t('noStudents')}
+        </p>
+      ) : (
+        rows.map((row) => {
+          const avg = getLocalAverage(row.studentId);
+          const empty = hasEmptyActivity(row.studentId);
+          const status = row.statusOverride || calculateTrajectoryStatus(avg, row.absencePercent, empty);
+
+          return (
+            <div
+              key={row.studentId}
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-3 shadow-sm"
+            >
+              {/* Encabezado del alumno */}
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                    {row.lastName}, {row.firstName}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <span className={row.absencePercent > 30 ? 'text-red-500' : 'text-green-500'}>
+                      {row.attendancePercent.toFixed(0)}%
+                    </span>
+                    {' / '}
+                    <span className="text-red-500">{row.absencePercent.toFixed(0)}%</span>
+                    {' '}({t('attendance')})
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {avg !== null && (
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                      {avg.toFixed(1)}
+                    </span>
+                  )}
+                  <OverrideMenu
+                    target={period === 1 ? 'semester1' : 'semester2'}
+                    currentStatus={status}
+                    isManual={!!row.statusOverride}
+                    onSelect={(val) => handleOverride(row.studentId, val)}
+                  />
+                </div>
+              </div>
+
+              {/* Actividades */}
+              {activities.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {activities.map((act) => (
+                    <div key={act.id}>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">{act.name}</p>
+                      <GradeCell
+                        value={row.scores[act.id] ?? null}
+                        onChange={(score) => updateScore(row.studentId, act.id, score)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+
+  // ─── Vista desktop: tabla ──────────────────────────────────────────────────
+  const desktopView = (
+    <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+      <table className="w-full text-sm border-collapse">
+        <thead>
+          <tr className="bg-gray-50 dark:bg-gray-800/50">
+            {/* Columna fija: nombre */}
+            <th className="sticky left-0 z-10 bg-gray-50 dark:bg-gray-800/50 text-left px-4 py-3 font-semibold text-gray-700 dark:text-gray-300 border-b border-r border-gray-200 dark:border-gray-700 min-w-[180px]">
+              {t('student')}
+            </th>
+            {/* Columnas de actividades */}
+            {activities.map((act) => (
+              <th
+                key={act.id}
+                className="px-2 py-3 border-b border-gray-200 dark:border-gray-700 min-w-[90px]"
+              >
+                <ActivityHeader
+                  activity={act}
+                  onRename={renameActivity}
+                  onRemove={removeActivity}
+                />
+              </th>
+            ))}
+            {/* Botón + agregar actividad */}
+            <th className="px-2 py-3 border-b border-gray-200 dark:border-gray-700 min-w-[80px]">
+              {showAddInput ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    autoFocus
+                    value={newActivityName}
+                    onChange={(e) => setNewActivityName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddActivity();
+                      if (e.key === 'Escape') setShowAddInput(false);
+                    }}
+                    placeholder="Nombre"
+                    className="w-full text-xs px-1 py-0.5 border border-indigo-400 rounded outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    maxLength={30}
+                  />
+                  <button onClick={handleAddActivity} className="text-green-500 flex-shrink-0">
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAddInput(true)}
+                  className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors font-medium"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  {t('addActivity')}
+                </button>
+              )}
+            </th>
+            {/* Columnas de resultado */}
+            <th className="px-3 py-3 border-b border-l border-gray-200 dark:border-gray-700 text-center font-semibold text-gray-700 dark:text-gray-300 min-w-[80px] bg-gray-100 dark:bg-gray-800">
+              {t('average')}
+            </th>
+            <th className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-center font-semibold text-gray-700 dark:text-gray-300 min-w-[90px] bg-gray-100 dark:bg-gray-800">
+              {t('attendanceHeader')}
+            </th>
+            <th className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-center font-semibold text-gray-700 dark:text-gray-300 min-w-[80px] bg-gray-100 dark:bg-gray-800">
+              {t('statusHeader')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length === 0 ? (
+            <tr>
+              <td
+                colSpan={activities.length + 4}
+                className="text-center py-12 text-gray-400 dark:text-gray-500"
+              >
+                {t('noStudents')}
+              </td>
+            </tr>
+          ) : (
+            rows.map((row, idx) => {
+              const avg = getLocalAverage(row.studentId);
+              const empty = hasEmptyActivity(row.studentId);
+              const calcStatus = calculateTrajectoryStatus(avg, row.absencePercent, empty);
+              const effectiveStatus = (row.statusOverride || calcStatus) as BadgeType;
+
+              return (
+                <tr
+                  key={row.studentId}
+                  className={`border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors ${
+                    idx % 2 === 0 ? '' : 'bg-gray-50/50 dark:bg-gray-800/20'
+                  }`}
+                >
+                  {/* Nombre (columna fija) */}
+                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-4 py-2 font-medium text-gray-900 dark:text-white border-r border-gray-100 dark:border-gray-800">
+                    {row.lastName}, {row.firstName}
+                  </td>
+                  {/* Celdas de notas */}
+                  {activities.map((act) => (
+                    <td key={act.id} className="px-1.5 py-1.5">
+                      <GradeCell
+                        value={row.scores[act.id] ?? null}
+                        onChange={(score) => updateScore(row.studentId, act.id, score)}
+                      />
+                    </td>
+                  ))}
+                  {/* Celda vacía bajo el + */}
+                  <td />
+                  {/* Promedio */}
+                  <td className="px-3 py-2 text-center bg-gray-50 dark:bg-gray-800/30 border-l border-gray-100 dark:border-gray-800">
+                    {avg !== null ? (
+                      <span
+                        className={`font-bold text-sm ${
+                          avg >= 7
+                            ? 'text-green-600 dark:text-green-400'
+                            : avg >= 4
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}
+                      >
+                        {avg.toFixed(2)}
+                      </span>
+                    ) : (
+                      <span className="text-gray-300 dark:text-gray-600">-</span>
+                    )}
+                  </td>
+                  {/* Asistencia */}
+                  <td className="px-3 py-2 text-center bg-gray-50 dark:bg-gray-800/30 text-xs whitespace-nowrap">
+                    <span className="text-green-600 dark:text-green-400 font-medium">
+                      {row.attendancePercent.toFixed(0)}%
+                    </span>
+                    {' / '}
+                    <span className="text-red-500 dark:text-red-400 font-medium">
+                      {row.absencePercent.toFixed(0)}%
+                    </span>
+                  </td>
+                  {/* Informe / Estado */}
+                  <td className="px-3 py-2 text-center bg-gray-50 dark:bg-gray-800/30">
+                    <OverrideMenu
+                      target={period === 1 ? 'semester1' : 'semester2'}
+                      currentStatus={effectiveStatus}
+                      isManual={!!row.statusOverride}
+                      onSelect={(val) => handleOverride(row.studentId, val)}
+                    />
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      {/* Barra de acciones */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Mobile: botón agregar actividad */}
+        <div className="md:hidden">
+          {showAddInput ? (
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={newActivityName}
+                onChange={(e) => setNewActivityName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddActivity();
+                  if (e.key === 'Escape') setShowAddInput(false);
+                }}
+                placeholder={t('activityNamePlaceholder')}
+                className="px-3 py-2 text-sm border border-indigo-400 rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              />
+              <button
+                onClick={handleAddActivity}
+                className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowAddInput(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              {t('addActivity')}
+            </button>
+          )}
+        </div>
+
+        {/* Botón Guardar */}
+        <button
+          onClick={handleSave}
+          disabled={!pendingChanges || isSaving}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            pendingChanges
+              ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+          }`}
+        >
+          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {t('save')}
+          {pendingChanges && !isSaving && (
+            <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+          )}
+        </button>
+      </div>
+
+      {mobileView}
+      {desktopView}
+    </div>
+  );
+}

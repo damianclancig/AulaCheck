@@ -2,7 +2,7 @@
 
 import { Student } from '@/types/models';
 import { MoreVertical, Mail, Phone, Trash2, UserCog, Search, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, Check, X, AlertTriangle, RefreshCw, Loader2, MessageSquare } from 'lucide-react';
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ContactPopover } from './ContactPopover';
@@ -93,6 +93,8 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
   });
   const [loadingFlags, setLoadingFlags] = useState<Record<string, Record<string, boolean | undefined>>>({});
   const [optimisticFlags, setOptimisticFlags] = useState<Record<string, Record<string, boolean | undefined>>>({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [, startTransition] = useTransition();
 
   // Close context menu on click outside
   useEffect(() => {
@@ -124,30 +126,25 @@ export function StudentList({ students, onDeleteStudent, onEditStudent, onStuden
       clientY = (e as React.MouseEvent).clientY;
     }
 
+    // Cálculos de posición (síncrono, no bloquea)
     const menuWidth = 220;
-    const menuHeight = 280; // Estimated height for title + 5 items + separators
+    const menuHeight = 280;
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
     let x = clientX;
-    if (x + menuWidth > windowWidth) {
-      x = clientX - menuWidth;
-    }
+    if (x + menuWidth > windowWidth) x = clientX - menuWidth;
 
     let y = clientY;
-    if (y + menuHeight > windowHeight) {
-      y = clientY - menuHeight;
-    }
+    if (y + menuHeight > windowHeight) y = clientY - menuHeight;
 
-    // Ensure it doesn't go off the left or top edge
     x = Math.max(10, x);
     y = Math.max(10, y);
 
-    setContextMenu({
-      visible: true,
-      x,
-      y,
-      studentId,
+    // Diferir el re-render fuera del handler del evento para no bloquear el hilo principal.
+    // Esto elimina el warning "contextmenu handler took Xms".
+    startTransition(() => {
+      setContextMenu({ visible: true, x, y, studentId });
     });
   };
 
