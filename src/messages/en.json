@@ -358,6 +358,8 @@
       "addActivity": "+ Activity",
       "activityNamePlaceholder": "e.g. HW1, Midterm...",
       "save": "Save changes",
+      "saving": "Saving...",
+      "savedShort": "Done!",
       "attendance": "Att.",
       "noStudents": "No active students in this course.",
       "error": "Error loading the grade sheet.",

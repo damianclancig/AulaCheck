@@ -363,6 +363,8 @@
       "addActivity": "+ Actividad",
       "activityNamePlaceholder": "Ej: TP1, Parcial...",
       "save": "Guardar cambios",
+      "saving": "Guardando...",
+      "savedShort": "¡Listo!",
       "attendance": "Asist.",
       "noStudents": "No hay alumnos activos en este curso.",
       "error": "Error al cargar la planilla.",

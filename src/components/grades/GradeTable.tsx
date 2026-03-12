@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Save, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Save, Loader2, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useModal } from '@/hooks/useModal';
 import { useGradeSheet } from '@/hooks/useGradeSheet';
@@ -22,8 +22,11 @@ export function GradeTable({ period, year }: GradeTableProps) {
   const t = useTranslations('grades.sheet');
   const tCommon = useTranslations('common');
   const { showAlert } = useModal();
+  
   const [newActivityName, setNewActivityName] = useState('');
   const [showAddInput, setShowAddInput] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const {
     isLoading,
@@ -42,6 +45,15 @@ export function GradeTable({ period, year }: GradeTableProps) {
     hasEmptyActivity,
   } = useGradeSheet(period as PeriodType, year);
 
+  // Auto-colapsar texto después de 2 segundos cuando hay cambios pendientes
+  useEffect(() => {
+    if (pendingChanges && !isSaving && !showSuccess) {
+      setIsExpanded(true);
+      const timer = setTimeout(() => setIsExpanded(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingChanges, isSaving, showSuccess]);
+
   const handleAddActivity = async () => {
     const name = newActivityName.trim();
     if (!name) return;
@@ -52,12 +64,10 @@ export function GradeTable({ period, year }: GradeTableProps) {
 
   const handleSave = async () => {
     try {
+      setIsExpanded(true); // Asegurar que se vea el texto al guardar
       await saveChanges();
-      await showAlert({
-        title: tCommon('success'),
-        description: t('alerts.saved'),
-        variant: 'info',
-      });
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
     } catch {
       await showAlert({
         title: tCommon('error'),
@@ -98,7 +108,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
 
   // ─── Vista mobile: cards por alumno ────────────────────────────────────────
   const mobileView = (
-    <div className="md:hidden space-y-3">
+    <div className="md:hidden space-y-3 pb-24">
       {rows.length === 0 ? (
         <p className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
           {t('noStudents')}
@@ -167,7 +177,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
 
   // ─── Vista desktop: tabla ──────────────────────────────────────────────────
   const desktopView = (
-    <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+    <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 pb-16">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="bg-gray-50 dark:bg-gray-800/50">
@@ -317,9 +327,8 @@ export function GradeTable({ period, year }: GradeTableProps) {
 
   return (
     <div className="space-y-4">
-      {/* Barra de acciones */}
+      {/* Barra de acciones (sólo para agregar actividad) */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Mobile: botón agregar actividad */}
         <div className="md:hidden">
           {showAddInput ? (
             <div className="flex items-center gap-2">
@@ -351,27 +360,58 @@ export function GradeTable({ period, year }: GradeTableProps) {
             </button>
           )}
         </div>
-
-        {/* Botón Guardar */}
-        <button
-          onClick={handleSave}
-          disabled={!pendingChanges || isSaving}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            pendingChanges
-              ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
-          }`}
-        >
-          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          {t('save')}
-          {pendingChanges && !isSaving && (
-            <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-          )}
-        </button>
       </div>
 
       {mobileView}
       {desktopView}
+
+      {/* Floating Save Button */}
+      {(pendingChanges || showSuccess) && (
+        <div className="fixed bottom-8 right-8 z-[60] flex items-center justify-end animate-in fade-in slide-in-from-bottom-6 duration-500 ease-out">
+          <button
+            onClick={handleSave}
+            disabled={(!pendingChanges && !showSuccess) || isSaving}
+            onMouseEnter={() => !isSaving && !showSuccess && setIsExpanded(true)}
+            onMouseLeave={() => !isSaving && !showSuccess && setIsExpanded(false)}
+            className={`
+              flex items-center gap-3 px-4 py-3.5 rounded-full shadow-2xl transition-all duration-700 overflow-hidden group
+              ${showSuccess 
+                ? 'bg-emerald-600 text-white ring-4 ring-emerald-500/20' 
+                : isExpanded || isSaving
+                  ? 'bg-indigo-600 text-white shadow-indigo-500/50' 
+                  : 'bg-indigo-600 text-white shadow-indigo-500/30'
+              }
+              ${isSaving ? 'cursor-not-allowed opacity-90' : 'hover:scale-110 active:scale-95'}
+            `}
+            style={{ 
+              maxWidth: isExpanded || isSaving || showSuccess ? '220px' : '58px',
+              minWidth: isExpanded || isSaving || showSuccess ? '140px' : '58px',
+            }}
+          >
+            <div className={`flex-shrink-0 transition-transform duration-500 ${!isExpanded && !isSaving && !showSuccess ? 'mx-auto' : ''}`}>
+              {isSaving ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : showSuccess ? (
+                <Check className="w-6 h-6" />
+              ) : (
+                <Save className="w-6 h-6" />
+              )}
+            </div>
+            
+            {(isExpanded || isSaving || showSuccess) && (
+              <span className="whitespace-nowrap font-bold text-sm tracking-tight animate-in fade-in slide-in-from-left-4 duration-500">
+                {isSaving ? t('saving') : 
+                 showSuccess ? t('savedShort') :
+                 t('save')}
+              </span>
+            )}
+            
+            {pendingChanges && !isSaving && !showSuccess && (
+              <span className="absolute top-2.5 right-2.5 w-3.5 h-3.5 bg-amber-400 rounded-full border-2 border-indigo-600 animate-pulse shadow-sm" />
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

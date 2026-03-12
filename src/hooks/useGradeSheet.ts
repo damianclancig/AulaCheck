@@ -70,16 +70,31 @@ export function useGradeSheet(period: PeriodType, year: number) {
     ? serverData as GradeSheetData
     : null;
 
-  const annualData = isAnnualView && serverData && 'rows' in serverData && 'type' in serverData
-    ? serverData as { type: 'annual'; year: number; rows: AnnualConditionRow[] }
-    : null;
+  const annualData = useMemo(() => {
+    if (!isAnnualView || !serverData || !('rows' in serverData) || !('type' in serverData)) return null;
+    const data = serverData as { type: 'annual'; year: number; rows: AnnualConditionRow[] };
+    return {
+      ...data,
+      rows: [...data.rows].sort((a, b) => {
+        const lastNameCompare = a.lastName.localeCompare(b.lastName);
+        if (lastNameCompare !== 0) return lastNameCompare;
+        return a.firstName.localeCompare(b.firstName);
+      })
+    };
+  }, [isAnnualView, serverData]);
 
   // Actividades actuales (local override > servidor)
   const activities = localActivities ?? sheetData?.activities ?? [];
 
   // Rows con scores locales aplicados (memorizado para evitar re-renders innecesarios)
   const rows: GradeSheetStudentRow[] = useMemo(() => {
-    return (sheetData?.rows ?? []).map((row) => ({
+    const rawRows = sheetData?.rows ?? [];
+    // Ordenar por Apellido y Nombre
+    return [...rawRows].sort((a, b) => {
+      const lastNameCompare = a.lastName.localeCompare(b.lastName);
+      if (lastNameCompare !== 0) return lastNameCompare;
+      return a.firstName.localeCompare(b.firstName);
+    }).map((row) => ({
       ...row,
       scores: localScores.get(row.studentId) ?? row.scores,
     }));

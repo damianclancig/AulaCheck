@@ -358,6 +358,8 @@
       "addActivity": "+ Atividade",
       "activityNamePlaceholder": "Ex: Tarefa 1, Prova...",
       "save": "Salvar alterações",
+      "saving": "Salvando...",
+      "savedShort": "Concluído!",
       "attendance": "Pres.",
       "noStudents": "Não há alunos ativos neste curso.",
       "error": "Erro ao carregar a folha de notas.",

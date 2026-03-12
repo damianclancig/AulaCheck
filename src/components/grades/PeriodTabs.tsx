@@ -22,12 +22,12 @@ export function PeriodTabs({ selected, onChange, year, onYearChange }: PeriodTab
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
       {/* Tabs de periodo */}
-      <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
-            className={`px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap flex-1 sm:flex-none ${
               selected === tab.id
                 ? 'bg-indigo-600 text-white'
                 : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'

@@ -49,6 +49,21 @@ export function OverrideMenu({ target, currentStatus, isManual, onSelect }: Over
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
+  const [menuPosition, setMenuPosition] = useState<'left' | 'right'>('left');
+
+  useEffect(() => {
+    if (open && menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      // Si el espacio a la derecha es menor que el ancho estimado del menú (150px), mostrar a la izquierda
+      if (rect.left + 150 > windowWidth) {
+        setMenuPosition('right');
+      } else {
+        setMenuPosition('left');
+      }
+    }
+  }, [open]);
+
   const handleSelect = (value: string) => {
     onSelect(value === currentStatus && isManual ? null : value);
     setOpen(false);
@@ -65,7 +80,9 @@ export function OverrideMenu({ target, currentStatus, isManual, onSelect }: Over
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 left-0 min-w-[140px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg py-1 animate-in fade-in zoom-in-95 duration-100">
+        <div className={`absolute z-50 mt-1 min-w-[140px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg py-1 animate-in fade-in zoom-in-95 duration-100 ${
+          menuPosition === 'right' ? 'right-0' : 'left-0'
+        }`}>
           <p className="px-3 py-1.5 text-xs text-gray-400 dark:text-gray-500 font-medium border-b border-gray-100 dark:border-gray-800">
             {t('forceCondition')}
           </p>
