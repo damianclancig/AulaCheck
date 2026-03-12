@@ -129,8 +129,10 @@
       "tabs": {
         "list": "Lista de Alunos",
         "sheet": "Folha de Presença",
+        "grades": "Notas",
         "listLabel": "Lista",
-        "sheetLabel": "Folha"
+        "sheetLabel": "Folha",
+        "gradesLabel": "Notas"
       },
       "buttons": {
         "attendance": "Presença",
@@ -343,6 +345,47 @@
         "selectStudent": "Você deve selecionar um aluno para avaliar.",
         "success": "Nota salva com sucesso.",
         "error": "Houve um problema ao salvar a nota."
+      }
+    },
+    "sheet": {
+      "firstSemester": "1º Semestre",
+      "secondSemester": "2º Semestre",
+      "annualClose": "Fechamento Anual",
+      "student": "Aluno",
+      "average": "Média",
+      "attendanceHeader": "Presença",
+      "statusHeader": "Relatório",
+      "addActivity": "Atividade",
+      "activityNamePlaceholder": "Ex: Tarefa 1, Prova...",
+      "save": "Salvar alterações",
+      "saving": "Salvando...",
+      "savedShort": "Concluído!",
+      "attendance": "Pres.",
+      "noStudents": "Não há alunos ativos neste curso.",
+      "error": "Erro ao carregar a folha de notas.",
+      "semester1Short": "S1",
+      "semester2Short": "S2",
+      "semStatus1": "Status S1",
+      "semStatus2": "Status S2",
+      "finalAverage": "Média Final",
+      "annualAttendance": "Presença Anual",
+      "finalCondition": "Condição Final",
+      "overrideTitle": "Clique para modificar condição",
+      "forceCondition": "Forçar condição",
+      "resetToAutomatic": "Restaurar automático",
+      "manualOverride": "Modificado manualmente",
+      "status": {
+        "tea": "AVA",
+        "tep": "EP",
+        "ted": "DESC",
+        "approved": "Aprovado",
+        "december": "Dezembro",
+        "february": "Fevereiro"
+      },
+      "alerts": {
+        "saved": "Folha de notas salva com sucesso.",
+        "saveError": "Erro ao salvar a folha de notas.",
+        "overrideError": "Erro ao salvar a modificação."
       }
     }
   },

@@ -129,8 +129,10 @@
       "tabs": {
         "list": "Student List",
         "sheet": "Attendance Sheet",
+        "grades": "Grades",
         "listLabel": "List",
-        "sheetLabel": "Sheet"
+        "sheetLabel": "Sheet",
+        "gradesLabel": "Grades"
       },
       "buttons": {
         "attendance": "Attendance",
@@ -343,6 +345,47 @@
         "selectStudent": "You must select a student to grade.",
         "success": "Grade saved successfully.",
         "error": "There was a problem saving the grade."
+      }
+    },
+    "sheet": {
+      "firstSemester": "1st Semester",
+      "secondSemester": "2nd Semester",
+      "annualClose": "Annual Close",
+      "student": "Student",
+      "average": "Average",
+      "attendanceHeader": "Attendance",
+      "statusHeader": "Report",
+      "addActivity": "Activity",
+      "activityNamePlaceholder": "e.g. HW1, Midterm...",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "savedShort": "Done!",
+      "attendance": "Att.",
+      "noStudents": "No active students in this course.",
+      "error": "Error loading the grade sheet.",
+      "semester1Short": "S1",
+      "semester2Short": "S2",
+      "semStatus1": "S1 Status",
+      "semStatus2": "S2 Status",
+      "finalAverage": "Final Avg",
+      "annualAttendance": "Annual Attendance",
+      "finalCondition": "Final Condition",
+      "overrideTitle": "Click to change condition",
+      "forceCondition": "Force condition",
+      "resetToAutomatic": "Reset to automatic",
+      "manualOverride": "Manually modified",
+      "status": {
+        "tea": "ADV",
+        "tep": "IP",
+        "ted": "DISC",
+        "approved": "Approved",
+        "december": "December",
+        "february": "February"
+      },
+      "alerts": {
+        "saved": "Grade sheet saved successfully.",
+        "saveError": "Error saving the grade sheet.",
+        "overrideError": "Error saving the modification."
       }
     }
   },

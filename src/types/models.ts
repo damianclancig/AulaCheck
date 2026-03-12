@@ -88,7 +88,80 @@ export interface Grade {
   date: string; // Formato YYYY-MM-DD
   score: number;
   weight: number; // peso para promedio ponderado
+  // Campos del módulo de calificaciones dinámicas (opcionales para retrocompatibilidad)
+  period?: 1 | 2; // Cuatrimestre al que pertenece
+  year?: number; // Año lectivo
+  activityId?: string; // ID de la actividad/columna en la planilla
+  isManual?: boolean; // Indica si fue modificada manualmente por el docente
   createdAt: Date;
+}
+
+// GradeActivity - describe una actividad/columna de la planilla de un cuatrimestre
+export interface GradeActivity {
+  id: string; // UUID local de la actividad
+  name: string; // Nombre editable (ej: "TP1", "Parcial 1")
+  order: number; // Orden de columna
+}
+
+// GradeSheetMeta - metadata del cierre anual y overrides por alumno
+export interface GradeSheetMeta {
+  _id: ObjectId;
+  courseId: ObjectId;
+  studentId: ObjectId;
+  year: number;
+  // Overrides por cuatrimestre (informe manual)
+  semester1Override?: string | null; // 'TEA' | 'TEP' | 'TED' | null
+  semester2Override?: string | null;
+  // Cierre anual
+  annualCalculatedCondition?: string; // 'APPROVED' | 'DECEMBER' | 'FEBRUARY'
+  annualForcedCondition?: string | null; // Override manual
+  isManual: boolean; // True si algún campo fue forzado manualmente
+  updatedAt: Date;
+}
+
+// Tipos para la respuesta de la API de planilla de calificaciones
+export interface GradeSheetActivity {
+  id: string;
+  name: string;
+  order: number;
+}
+
+export interface GradeSheetStudentRow {
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  scores: Record<string, number | null>; // activityId -> score (null si vacío)
+  average: number | null;
+  attendancePresent: number;
+  attendanceAbsent: number;
+  attendancePercent: number; // % de presencia
+  absencePercent: number; // % de inasistencia
+  status: 'TEA' | 'TEP' | 'TED'; // calculado automáticamente
+  statusOverride: string | null; // override manual
+  isManual: boolean;
+}
+
+export interface GradeSheetData {
+  period: 1 | 2;
+  year: number;
+  activities: GradeSheetActivity[];
+  rows: GradeSheetStudentRow[];
+}
+
+// Tipos para la vista de cierre anual
+export interface AnnualConditionRow {
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  semester1Average: number | null;
+  semester2Average: number | null;
+  finalAverage: number | null;
+  semester1Status: string;
+  semester2Status: string;
+  annualAttendancePercent: number;
+  calculatedCondition: 'APPROVED' | 'DECEMBER' | 'FEBRUARY';
+  forcedCondition: string | null;
+  isManual: boolean;
 }
 
 // Join Request (student self-registration)

@@ -1,5 +1,4 @@
-'use client';
-
+import { memo } from 'react';
 import { Check, XCircle, Clock } from 'lucide-react';
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
@@ -9,7 +8,7 @@ interface AttendanceIconProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function AttendanceIcon({ status, size = 'md' }: AttendanceIconProps) {
+export const AttendanceIcon = memo(function AttendanceIcon({ status, size = 'md' }: AttendanceIconProps) {
   if (!status) {
     return <span className="text-gray-300 text-sm">-</span>;
   }
@@ -26,4 +25,4 @@ export function AttendanceIcon({ status, size = 'md' }: AttendanceIconProps) {
     default:
       return <span className="text-gray-300 text-sm">-</span>;
   }
-}
+});
