@@ -117,7 +117,15 @@ export function GradeTable({ period, year }: GradeTableProps) {
         rows.map((row) => {
           const avg = getLocalAverage(row.studentId);
           const empty = hasEmptyActivity(row.studentId);
-          const status = row.statusOverride || calculateTrajectoryStatus(avg, row.absencePercent, empty);
+          const allEmpty = activities.length > 0 && activities.every(a => row.scores[a.id] === null || row.scores[a.id] === undefined);
+          const status = row.statusOverride || calculateTrajectoryStatus(
+            avg, 
+            row.absencePercent, 
+            empty,
+            allEmpty,
+            row.attendancePercent,
+            (row.attendancePresent + row.attendanceAbsent) > 0
+          );
 
           return (
             <div
@@ -254,7 +262,15 @@ export function GradeTable({ period, year }: GradeTableProps) {
             rows.map((row, idx) => {
               const avg = getLocalAverage(row.studentId);
               const empty = hasEmptyActivity(row.studentId);
-              const calcStatus = calculateTrajectoryStatus(avg, row.absencePercent, empty);
+              const allEmpty = activities.length > 0 && activities.every(a => row.scores[a.id] === null || row.scores[a.id] === undefined);
+              const calcStatus = calculateTrajectoryStatus(
+                avg, 
+                row.absencePercent, 
+                empty,
+                allEmpty,
+                row.attendancePercent,
+                (row.attendancePresent + row.attendanceAbsent) > 0
+              );
               const effectiveStatus = (row.statusOverride || calcStatus) as BadgeType;
 
               return (

@@ -360,7 +360,7 @@
       "average": "Promedio",
       "attendanceHeader": "Asistencia",
       "statusHeader": "Informe",
-      "addActivity": "+ Actividad",
+      "addActivity": "Actividad",
       "activityNamePlaceholder": "Ej: TP1, Parcial...",
       "save": "Guardar cambios",
       "saving": "Guardando...",

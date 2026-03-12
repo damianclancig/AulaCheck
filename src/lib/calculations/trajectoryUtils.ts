@@ -8,22 +8,32 @@ export type AnnualCondition = 'APPROVED' | 'DECEMBER' | 'FEBRUARY';
 
 /**
  * Calcula el estado de trayectoria para un alumno en un cuatrimestre.
- * TEA: Avanzada - Todas actividades completas Y Promedio >= 7 Y Faltas <= 30%
- * TEP: En Proceso - Todas actividades completas Y Promedio < 7 Y Faltas <= 30%
- * TED: Discontinua - Existe actividad vacía O Inasistencias > 30%
+ * TED: Discontinua - No entregó NINGUNA actividad O tiene 0% de asistencia (si hay datos)
+ * TEP: En Proceso - Tiene inasistencias (>30%) O adeuda alguna actividad O promedio < 7
+ * TEA: Avanzada - Asistencia al día Y Todas actividades completas Y Promedio >= 7
  */
 export function calculateTrajectoryStatus(
   average: number | null,
   absencePercent: number,
-  hasEmptyActivity: boolean
+  hasEmptyActivity: boolean,
+  allActivitiesEmpty: boolean,
+  attendancePercent: number,
+  hasAttendanceData: boolean = true
 ): TrajectoryStatus {
-  if (hasEmptyActivity || absencePercent > 30) {
+  // 1. TED (Condiciones críticas de desconexión)
+  // Si hay actividades definidas pero no entregó ninguna, o si tiene 0% de asistencia
+  if (allActivitiesEmpty || (hasAttendanceData && attendancePercent === 0)) {
     return 'TED';
   }
-  if (average !== null && average >= 7) {
-    return 'TEA';
+
+  // 2. TEP (Condiciones de proceso o riesgo)
+  // Si falta alguna actividad, o tiene muchas faltas, o el promedio es insuficiente
+  if (hasEmptyActivity || absencePercent > 30 || (average !== null && average < 7) || average === null) {
+    return 'TEP';
   }
-  return 'TEP';
+
+  // 3. TEA (Cumple con todo)
+  return 'TEA';
 }
 
 /**

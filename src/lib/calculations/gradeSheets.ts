@@ -147,13 +147,24 @@ export async function getGradeSheetData(
     const attendancePercent = total > 0 ? (att.present / total) * 100 : 100;
     const absencePercent = total > 0 ? (att.absent / total) * 100 : 0;
 
-    // Determinar si hay alguna actividad vacía
+    // Determinar si hay alguna actividad vacía o si todas están vacías
     const hasEmptyActivity =
       activities.length > 0 &&
       Object.values(scores).some((s) => s === null);
+    
+    const allActivitiesEmpty = 
+      activities.length > 0 &&
+      Object.values(scores).every((s) => s === null);
 
     // Calcular estado TEA/TEP/TED
-    const status = calculateTrajectoryStatus(average, absencePercent, hasEmptyActivity);
+    const status = calculateTrajectoryStatus(
+      average, 
+      absencePercent, 
+      hasEmptyActivity,
+      allActivitiesEmpty,
+      attendancePercent,
+      total > 0
+    );
 
     // Override manual
     const meta = metaByStudent.get(studentId);
