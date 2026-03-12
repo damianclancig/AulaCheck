@@ -290,29 +290,33 @@ export default function CourseDetailPage() {
 
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
-          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg">
-              <CalendarCheck className="w-5 h-5" />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+        <div className="bg-white dark:bg-gray-900 p-3 md:p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors flex flex-col items-center md:items-start">
+          <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
+            {t('stats.avgAttendance')}
+          </h3>
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 md:p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg">
+              <CalendarCheck className="w-4 h-4 md:w-5 h-5" />
             </div>
-            <h3 className="font-medium text-gray-700 dark:text-gray-300">{t('stats.avgAttendance')}</h3>
+            <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+              {((course.meta.avgAttendance || 0) * 100).toFixed(1)}%
+            </p>
           </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white text-center md:text-left">
-            {((course.meta.avgAttendance || 0) * 100).toFixed(1)}%
-          </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors">
-          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-            <div className="p-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg">
-              <GraduationCap className="w-5 h-5" />
+        <div className="bg-white dark:bg-gray-900 p-3 md:p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors flex flex-col items-center md:items-start">
+          <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
+            {t('stats.overallAvg')}
+          </h3>
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 md:p-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg">
+              <GraduationCap className="w-4 h-4 md:w-5 h-5" />
             </div>
-            <h3 className="font-medium text-gray-700 dark:text-gray-300">{t('stats.overallAvg')}</h3>
+            <p className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+              {course.meta.avgGrade ? course.meta.avgGrade.toFixed(2) : '-'}
+            </p>
           </div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white text-center md:text-left">
-            {course.meta.avgGrade ? course.meta.avgGrade.toFixed(2) : '-'}
-          </p>
         </div>
       </div>
 
