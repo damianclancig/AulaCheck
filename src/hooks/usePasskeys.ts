@@ -71,7 +71,9 @@ export const usePasskeys = () => {
             });
 
             const verification = await verifyResp.json();
-            if (!verification.verified) throw new Error('La verificación de identidad falló');
+            if (!verifyResp.ok || !verification.verified) {
+                throw new Error(verification.error || 'La verificación de identidad falló');
+            }
 
             return {
                 verified: true,
@@ -80,13 +82,14 @@ export const usePasskeys = () => {
         } catch (err: any) {
             // Ignorar AbortError o NotAllowedError en Conditional UI (común en cancelaciones de autofill)
             const isCancel = err.name === 'AbortError' || err.name === 'NotAllowedError';
+            const isKnownBusinessError = err.message === 'errorPasskeyNotFound';
             
             if (isCancel && useConditionalUI) {
                 console.warn('Authentication ceremony cancelled or aborted (Conditional UI)');
                 return null;
             }
 
-            if (!isCancel) {
+            if (!isCancel && !isKnownBusinessError) {
                 console.error('WebAuthn Error:', err);
             }
             

@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('login');
-  const { authenticatePasskey, isSupported } = usePasskeys();
+  const { authenticatePasskey, isSupported, error: passkeyError } = usePasskeys();
 
   useEffect(() => {
     setMounted(true);
@@ -56,23 +56,29 @@ export default function LoginPage() {
   const handlePasskeyLogin = async () => {
     setLoading(true);
     setError(null);
-    try {
-      const result = await authenticatePasskey();
-      if (result?.verified) {
-          // Nota: Necesitaremos un Provider de 'credentials' en NextAuth
-          // que valide que el login fue verificado por Passkey.
-          await signIn('credentials', { 
+    const result = await authenticatePasskey();
+    
+    if (result?.verified) {
+        await signIn('credentials', { 
             email: result.email, 
             callbackUrl: '/dashboard',
             redirect: true 
-          });
-      }
-    } catch (err: any) {
-      setError(t('passkeyError'));
-    } finally {
-      setLoading(false);
+        });
+    } else {
+        // Al fallar, el hook usePasskeys ya habrá actualizado su estado de error interno.
+        // Solo necesitamos que la UI local sepa si hubo un error real (no cancelación).
+        setLoading(false);
     }
   };
+
+  // Sincronizar el error del hook con el estado local para mostrarlo traducido
+  useEffect(() => {
+    if (passkeyError) {
+      // Intentamos traducir el error si es una llave válida, si no usamos el mensaje original o uno genérico
+      const translatedError = t.has(passkeyError) ? t(passkeyError) : passkeyError;
+      setError(translatedError);
+    }
+  }, [passkeyError, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center p-4 transition-colors duration-200">

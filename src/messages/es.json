@@ -21,6 +21,7 @@
     "continuePasskey": "Entrar con Biometría / Passkey",
     "passkeyNotSupported": "Tu navegador no soporta Passkeys",
     "passkeyError": "Error al autenticar con Passkey",
+    "errorPasskeyNotFound": "Esta llave ya no es válida o fue eliminada de este servidor.",
     "registerPasskey": "Activar acceso con huella / FaceID",
     "passkeySuccess": "¡Passkey configurada correctamente!",
     "loggingIn": "Iniciando sesión...",

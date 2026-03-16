@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
         if (!authenticator) {
             console.error('Login Error: Autenticador no encontrado en DB para ID', body.id);
-            return NextResponse.json({ error: 'Autenticador no encontrado' }, { status: 404 });
+            return NextResponse.json({ error: 'errorPasskeyNotFound' }, { status: 404 });
         }
 
         const verification = await verifyAuthenticationResponse({

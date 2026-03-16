@@ -21,6 +21,7 @@
     "continuePasskey": "Sign in with Biometrics / Passkey",
     "passkeyNotSupported": "Your browser doesn't support Passkeys",
     "passkeyError": "Error authenticating with Passkey",
+    "errorPasskeyNotFound": "This key is no longer valid or has been removed from this server.",
     "registerPasskey": "Enable TouchID / FaceID access",
     "passkeySuccess": "Passkey configured successfully!",
     "loggingIn": "Logging in...",

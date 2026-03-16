@@ -21,6 +21,7 @@
     "continuePasskey": "Entrar com Biometria / Passkey",
     "passkeyNotSupported": "Seu navegador não suporta Passkeys",
     "passkeyError": "Erro ao autenticar com Passkey",
+    "errorPasskeyNotFound": "Esta chave não é mais válida ou foi removida deste servidor.",
     "registerPasskey": "Ativar acesso com digital / FaceID",
     "passkeySuccess": "Passkey configurada com sucesso!",
     "loggingIn": "Iniciando sessão...",
