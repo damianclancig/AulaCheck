@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useTransition } from 'react';
-import useSWR, { mutate } from 'swr';
-import { useRouter } from '@/i18n/routing';
-import { useParams } from 'next/navigation';
-import { Course, Student } from '@/types/models';
-import { useSession } from 'next-auth/react';
-import { StudentList } from '@/components/students/StudentList';
-import { AttendanceSheet } from '@/components/attendance/AttendanceSheet';
-import { AddStudentModal } from '@/components/students/AddStudentModal';
-import { EditStudentModal } from '@/components/students/EditStudentModal';
-import { AttendanceModal } from '@/components/attendance/AttendanceModal';
-import { GradeModal } from '@/components/grades/GradeModal';
-import { GradeTable } from '@/components/grades/GradeTable';
-import { PeriodTabs } from '@/components/grades/PeriodTabs';
-import { AnnualCloseTable } from '@/components/grades/AnnualCloseTable';
-import { EditCourseModal } from '@/components/courses/EditCourseModal';
-import { InviteStudentsModal } from '@/components/courses/InviteStudentsModal';
-import { JoinRequestsModal } from '@/components/students/JoinRequestsModal';
-import { ExportModal, ExportOptions } from '@/components/courses/ExportModal';
+import { useState, useEffect, useTransition, useMemo } from 'react'
+import useSWR, { mutate } from 'swr'
+import { useRouter } from '@/i18n/routing'
+import { useParams } from 'next/navigation'
+import { Course, Student } from '@/types/models'
+import { useSession } from 'next-auth/react'
+import { StudentList } from '@/components/students/StudentList'
+import { AttendanceSheet } from '@/components/attendance/AttendanceSheet'
+import { AddStudentModal } from '@/components/students/AddStudentModal'
+import { EditStudentModal } from '@/components/students/EditStudentModal'
+import { AttendanceModal } from '@/components/attendance/AttendanceModal'
+import { GradeModal } from '@/components/grades/GradeModal'
+import { GradeTable } from '@/components/grades/GradeTable'
+import { PeriodTabs } from '@/components/grades/PeriodTabs'
+import { AnnualCloseTable } from '@/components/grades/AnnualCloseTable'
+import { EditCourseModal } from '@/components/courses/EditCourseModal'
+import { InviteStudentsModal } from '@/components/courses/InviteStudentsModal'
+import { JoinRequestsModal } from '@/components/students/JoinRequestsModal'
+import { ExportModal, ExportOptions } from '@/components/courses/ExportModal'
 import {
   Loader2,
   ArrowLeft,
@@ -32,100 +32,104 @@ import {
   List,
   Table,
   BookOpen,
-} from 'lucide-react';
-import { WithdrawalModal } from '@/components/students/WithdrawalModal';
-import { ConfirmationModal } from '@/components/common/ConfirmationModal';
-import { Link } from '@/i18n/routing';
-import { useModal } from '@/hooks/useModal';
+} from 'lucide-react'
+import { WithdrawalModal } from '@/components/students/WithdrawalModal'
+import { ConfirmationModal } from '@/components/common/ConfirmationModal'
+import { Link } from '@/i18n/routing'
+import { useModal } from '@/hooks/useModal'
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url);
+  const res = await fetch(url)
 
-  if (!res.ok) throw new Error('Error al cargar datos');
-  return res.json();
-};
+  if (!res.ok) throw new Error('Error al cargar datos')
+  return res.json()
+}
 
 export default function CourseDetailPage() {
-  const t = useTranslations('courses.detail');
-  const tShifts = useTranslations('courses.shifts');
-  const tCommon = useTranslations('common');
-  
-  const { data: session } = useSession();
-  const params = useParams();
-  const courseId = params.id as string;
-  const router = useRouter();
+  const t = useTranslations('courses.detail')
+  const tShifts = useTranslations('courses.shifts')
+  const tCommon = useTranslations('common')
 
-  const { data: course, error: courseError, mutate: mutateCourse } = useSWR<Course>(
-    courseId ? `/api/courses/${courseId}` : null,
-    fetcher
-  );
+  const { data: session } = useSession()
+  const params = useParams()
+  const courseId = params.id as string
+  const router = useRouter()
 
-  const { data: students, mutate: mutateStudents } = useSWR<(Student & {
-    attendancePercentage: number;
-    gradeAverage: number | null;
-    enrollmentStatus?: 'active' | 'inactive';
-  })[]>(
-    courseId ? `/api/courses/${courseId}/students` : null,
-    fetcher
-  );
+  const {
+    data: course,
+    error: courseError,
+    mutate: mutateCourse,
+  } = useSWR<Course>(courseId ? `/api/courses/${courseId}` : null, fetcher)
 
-  const [viewMode, setViewMode] = useState<'list' | 'sheet' | 'grades'>('list');
-  const [gradesPeriod, setGradesPeriod] = useState<1 | 2 | 'annual'>(1);
-  const [gradesYear, setGradesYear] = useState<number>(new Date().getFullYear());
-  const [isTabPending, startTabTransition] = useTransition();
+  const { data: students, mutate: mutateStudents } = useSWR<
+    (Student & {
+      attendancePercentage: number
+      gradeAverage: number | null
+      enrollmentStatus?: 'active' | 'inactive'
+      withdrawalReason?: 'course_change' | 'school_change' | 'other'
+      withdrawalNote?: string
+    })[]
+  >(courseId ? `/api/courses/${courseId}/students` : null, fetcher)
+
+  const [viewMode, setViewMode] = useState<'list' | 'sheet' | 'grades'>('list')
+  const [gradesPeriod, setGradesPeriod] = useState<1 | 2 | 'annual'>(1)
+  const [gradesYear, setGradesYear] = useState<number>(new Date().getFullYear())
+  const [isTabPending, startTabTransition] = useTransition()
 
   const { data: attendanceData, mutate: mutateAttendance } = useSWR<{
-    dates: string[];
-    records: Record<string, Record<string, 'present' | 'absent' | 'late'>>;
-    suspensions: Record<string, { reason: string; note?: string }>;
-  }>(
-    courseId ? `/api/courses/${courseId}/attendance-records` : null,
-    fetcher
-  );
+    dates: string[]
+    records: Record<string, Record<string, 'present' | 'absent' | 'late'>>
+    suspensions: Record<string, { reason: string; note?: string }>
+  }>(courseId ? `/api/courses/${courseId}/attendance-records` : null, fetcher)
 
-  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
-  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
-  const [isGradeModalOpen, setIsGradeModalOpen] = useState(false);
-  const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isJoinRequestsModalOpen, setIsJoinRequestsModalOpen] = useState(false);
-  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState(false);
-  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
-  const [isDeletingStudent, setIsDeletingStudent] = useState(false);
-  const { showAlert } = useModal();
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false)
+  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false)
+  const [isGradeModalOpen, setIsGradeModalOpen] = useState(false)
+  const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
+  const [isJoinRequestsModalOpen, setIsJoinRequestsModalOpen] = useState(false)
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState(false)
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null)
+  const [isDeletingStudent, setIsDeletingStudent] = useState(false)
+  const { showAlert } = useModal()
+
+  const activeStudents = useMemo(
+    () => (students || []).filter((student) => student.enrollmentStatus !== 'inactive'),
+    [students],
+  )
 
   // Fetch pending join requests count
   useEffect(() => {
     const fetchPendingCount = async () => {
-      if (!courseId) return;
+      if (!courseId) return
       try {
-        const response = await fetch(`/api/courses/${courseId}/join-requests`);
+        const response = await fetch(`/api/courses/${courseId}/join-requests`)
         if (response.ok) {
-          const data = await response.json();
-          setPendingRequestsCount(data.length);
+          const data = await response.json()
+          setPendingRequestsCount(data.length)
         }
       } catch (error) {
-        console.error('Error fetching pending requests:', error);
+        console.error('Error fetching pending requests:', error)
       }
-    };
+    }
 
-    fetchPendingCount();
+    fetchPendingCount()
     // Refresh every 30 seconds
-    const interval = setInterval(fetchPendingCount, 30000);
-    return () => clearInterval(interval);
-  }, [courseId]);
+    const interval = setInterval(fetchPendingCount, 30000)
+    return () => clearInterval(interval)
+  }, [courseId])
 
   if (!course && !courseError) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
-    );
+    )
   }
 
   if (courseError || !course) {
@@ -136,72 +140,72 @@ export default function CourseDetailPage() {
           {t('backToDashboard')}
         </Link>
       </div>
-    );
+    )
   }
 
   const confirmDeleteStudent = (student: Student) => {
-    setStudentToDelete(student);
-  };
+    setStudentToDelete(student)
+  }
 
   const handleExecuteWithdrawal = async (reason: string, note?: string) => {
-    if (!studentToDelete) return;
-    setIsDeletingStudent(true);
+    if (!studentToDelete) return
+    setIsDeletingStudent(true)
 
     try {
       await fetch(`/api/courses/${courseId}/students/${studentToDelete._id.toString()}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ reason, note })
-      });
-      mutateStudents();
-      setStudentToDelete(null);
+        body: JSON.stringify({ reason, note }),
+      })
+      mutateStudents()
+      setStudentToDelete(null)
     } catch (error) {
-      console.error('Error withrawing student:', error);
+      console.error('Error withrawing student:', error)
       await showAlert({
         title: tCommon('error'),
         description: tCommon('error'), // Or more specific if needed
-        variant: 'danger'
-      });
+        variant: 'danger',
+      })
     } finally {
-      setIsDeletingStudent(false);
+      setIsDeletingStudent(false)
     }
-  };
+  }
 
   const handleExport = async (options: ExportOptions) => {
     try {
       // Construir query params
-      const params = new URLSearchParams();
-      if (options.dni) params.append('dni', 'true');
-      if (options.email) params.append('email', 'true');
-      if (options.phone) params.append('phone', 'true');
-      if (options.grades) params.append('grades', 'true');
-      if (options.attendanceStats) params.append('attendanceStats', 'true');
-      if (options.attendanceDetails) params.append('attendanceDetails', 'true');
+      const params = new URLSearchParams()
+      if (options.dni) params.append('dni', 'true')
+      if (options.email) params.append('email', 'true')
+      if (options.phone) params.append('phone', 'true')
+      if (options.grades) params.append('grades', 'true')
+      if (options.attendanceStats) params.append('attendanceStats', 'true')
+      if (options.attendanceDetails) params.append('attendanceDetails', 'true')
 
-      const res = await fetch(`/api/courses/${courseId}/report?${params.toString()}`);
+      const res = await fetch(`/api/courses/${courseId}/report?${params.toString()}`)
 
-      if (!res.ok) throw new Error('Error descargando reporte');
+      if (!res.ok) throw new Error('Error descargando reporte')
 
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${course.name}_reporte.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${course.name}_reporte.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
     } catch (error) {
-      console.error('Error exporting:', error);
+      console.error('Error exporting:', error)
       await showAlert({
         title: tCommon('error'),
         description: tCommon('error'),
-        variant: 'danger'
-      });
+        variant: 'danger',
+      })
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -230,20 +234,27 @@ export default function CourseDetailPage() {
               </button>
             </div>
             {course.shift && (
-              <p className={`text-sm font-semibold mt-1 ${course.shift === 'Mañana' ? 'text-amber-600 dark:text-amber-400'
-                  : course.shift === 'Tarde' ? 'text-orange-600 dark:text-orange-400'
-                    : 'text-indigo-600 dark:text-indigo-400'
-                }`}>
-                {t('shift')}: {
-                  course.shift === 'Mañana' ? tShifts('morning') :
-                  course.shift === 'Tarde' ? tShifts('afternoon') :
-                  course.shift === 'Noche' ? tShifts('night') : 
-                  course.shift
-                }
+              <p
+                className={`text-sm font-semibold mt-1 ${
+                  course.shift === 'Mañana'
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : course.shift === 'Tarde'
+                      ? 'text-orange-600 dark:text-orange-400'
+                      : 'text-indigo-600 dark:text-indigo-400'
+                }`}
+              >
+                {t('shift')}:{' '}
+                {course.shift === 'Mañana'
+                  ? tShifts('morning')
+                  : course.shift === 'Tarde'
+                    ? tShifts('afternoon')
+                    : course.shift === 'Noche'
+                      ? tShifts('night')
+                      : course.shift}
               </p>
             )}
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-              {course.description || t('noDescription')} • {students?.length || 0} {t('students')}
+              {course.description || t('noDescription')} • {activeStudents.length} {t('students')}
             </p>
           </div>
         </div>
@@ -268,7 +279,11 @@ export default function CourseDetailPage() {
             <Download className="w-4 h-4" /> {t('buttons.export')}
           </button>
           <button
-            onClick={() => pendingRequestsCount > 0 ? setIsJoinRequestsModalOpen(true) : setIsInviteModalOpen(true)}
+            onClick={() =>
+              pendingRequestsCount > 0
+                ? setIsJoinRequestsModalOpen(true)
+                : setIsInviteModalOpen(true)
+            }
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center gap-2 text-sm font-medium whitespace-nowrap relative transition-colors"
           >
             <Link2 className="w-4 h-4" /> {t('buttons.invite')}
@@ -286,8 +301,6 @@ export default function CourseDetailPage() {
           </button>
         </div>
       </div>
-
-
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
@@ -324,7 +337,11 @@ export default function CourseDetailPage() {
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 transition-colors">
         <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
           <h3 className="font-semibold text-gray-900 dark:text-white">
-            {viewMode === 'list' ? t('tabs.list') : viewMode === 'sheet' ? t('tabs.sheet') : t('tabs.grades')}
+            {viewMode === 'list'
+              ? t('tabs.list')
+              : viewMode === 'sheet'
+                ? t('tabs.sheet')
+                : t('tabs.grades')}
           </h3>
 
           {/* View Mode Toggle */}
@@ -371,13 +388,12 @@ export default function CourseDetailPage() {
               <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
             </div>
           ) : viewMode === 'list' ? (
-
             <StudentList
               students={students}
               onDeleteStudent={confirmDeleteStudent}
               onEditStudent={(student) => {
-                setSelectedStudent(student);
-                setIsEditStudentModalOpen(true);
+                setSelectedStudent(student)
+                setIsEditStudentModalOpen(true)
               }}
               onStudentUpdated={() => mutateStudents()}
             />
@@ -389,8 +405,8 @@ export default function CourseDetailPage() {
                 records={attendanceData.records}
                 suspensions={attendanceData.suspensions}
                 onUpdate={() => {
-                  mutateStudents();
-                  mutate(`/api/courses/${courseId}/attendance-records`);
+                  mutateStudents()
+                  mutate(`/api/courses/${courseId}/attendance-records`)
                 }}
               />
             ) : (
@@ -423,34 +439,25 @@ export default function CourseDetailPage() {
         onStudentAdded={() => mutateStudents()}
       />
 
-      {/* Filter active students for attendance and grades */}
-      {(() => {
-        const activeStudents = students?.filter(s => s.enrollmentStatus !== 'inactive') || [];
+      <AttendanceModal
+        isOpen={isAttendanceModalOpen}
+        onClose={() => setIsAttendanceModalOpen(false)}
+        students={activeStudents}
+        existingDates={attendanceData?.dates || []}
+        onAttendanceSaved={() => {
+          mutateStudents() // Update metrics
+          mutateAttendance() // Update attendance data
+        }}
+      />
 
-        return (
-          <>
-            <AttendanceModal
-              isOpen={isAttendanceModalOpen}
-              onClose={() => setIsAttendanceModalOpen(false)}
-              students={activeStudents}
-              existingDates={attendanceData?.dates || []}
-              onAttendanceSaved={() => {
-                mutateStudents(); // Update metrics
-                mutateAttendance(); // Update attendance data
-              }}
-            />
-
-            <GradeModal
-              isOpen={isGradeModalOpen}
-              onClose={() => setIsGradeModalOpen(false)}
-              students={activeStudents}
-              onGradeSaved={() => {
-                mutateStudents(); // Update metrics (averages)
-              }}
-            />
-          </>
-        );
-      })()}
+      <GradeModal
+        isOpen={isGradeModalOpen}
+        onClose={() => setIsGradeModalOpen(false)}
+        students={activeStudents}
+        onGradeSaved={() => {
+          mutateStudents() // Update metrics (averages)
+        }}
+      />
       {/* EditCourseModal */}
       {course && (
         <EditCourseModal
@@ -458,7 +465,7 @@ export default function CourseDetailPage() {
           onClose={() => setIsEditCourseModalOpen(false)}
           course={course}
           onCourseUpdated={() => {
-            mutateCourse();
+            mutateCourse()
           }}
         />
       )}
@@ -482,6 +489,7 @@ export default function CourseDetailPage() {
           courseName={course.name}
           currentJoinCode={course.joinCode}
           allowJoinRequests={course.allowJoinRequests}
+          joinCodeExpiresAt={course.joinCodeExpiresAt}
         />
       )}
 
@@ -491,7 +499,7 @@ export default function CourseDetailPage() {
         onClose={() => setIsJoinRequestsModalOpen(false)}
         courseId={courseId}
         onRequestProcessed={() => {
-          mutateStudents();
+          mutateStudents()
           // Refresh pending count
         }}
       />
@@ -500,14 +508,14 @@ export default function CourseDetailPage() {
       <EditStudentModal
         isOpen={isEditStudentModalOpen}
         onClose={() => {
-          setIsEditStudentModalOpen(false);
-          setSelectedStudent(null);
+          setIsEditStudentModalOpen(false)
+          setSelectedStudent(null)
         }}
         student={selectedStudent}
         onStudentUpdated={() => {
-          mutateStudents();
-          setIsEditStudentModalOpen(false);
-          setSelectedStudent(null);
+          mutateStudents()
+          setIsEditStudentModalOpen(false)
+          setSelectedStudent(null)
         }}
       />
 
@@ -519,5 +527,5 @@ export default function CourseDetailPage() {
         isLoading={isDeletingStudent}
       />
     </div>
-  );
+  )
 }

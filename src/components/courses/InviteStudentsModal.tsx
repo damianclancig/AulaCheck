@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Copy, Check, RefreshCw, Link2, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Copy, Check, RefreshCw, Link2, AlertCircle, Clock } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useModal } from '@/hooks/useModal';
@@ -14,6 +14,13 @@ interface InviteStudentsModalProps {
   courseName: string;
   currentJoinCode?: string;
   allowJoinRequests: boolean;
+  joinCodeExpiresAt?: string | Date;
+}
+
+function isCodeExpired(code: string | undefined, expiresAt?: string | Date | null): boolean {
+  if (!code) return false;
+  if (!expiresAt) return false;
+  return new Date(expiresAt) <= new Date();
 }
 
 export function InviteStudentsModal({
@@ -22,12 +29,27 @@ export function InviteStudentsModal({
   courseId,
   courseName,
   currentJoinCode,
-  allowJoinRequests
+  allowJoinRequests,
+  joinCodeExpiresAt,
 }: InviteStudentsModalProps) {
+  const initialExpired = isCodeExpired(currentJoinCode, joinCodeExpiresAt);
+
   const [loading, setLoading] = useState(false);
-  const [joinCode, setJoinCode] = useState(currentJoinCode || '');
-  const [isEnabled, setIsEnabled] = useState(allowJoinRequests);
+  const [joinCode, setJoinCode] = useState(initialExpired ? '' : (currentJoinCode || ''));
+  const [isEnabled, setIsEnabled] = useState(allowJoinRequests && !initialExpired);
+  const [expired, setExpired] = useState(initialExpired);
   const [copied, setCopied] = useState(false);
+
+  // Re-sync state every time the modal is opened (props may have changed)
+  useEffect(() => {
+    if (isOpen) {
+      const exp = isCodeExpired(currentJoinCode, joinCodeExpiresAt);
+      setJoinCode(exp ? '' : (currentJoinCode || ''));
+      setIsEnabled(allowJoinRequests && !exp);
+      setExpired(exp);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
   const { showAlert, showConfirm } = useModal();
   const t = useTranslations('courses.invite');
   const tCommon = useTranslations('common');
@@ -49,6 +71,7 @@ export function InviteStudentsModal({
       const data = await response.json();
       setJoinCode(data.joinCode);
       setIsEnabled(true);
+      setExpired(false);
     } catch (error) {
       console.error(error);
       await showAlert({
@@ -134,6 +157,17 @@ export function InviteStudentsModal({
 
           {!joinCode ? (
             <div className="text-center py-8">
+              {expired && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4 text-left">
+                  <div className="flex gap-3">
+                    <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-sm text-amber-800 dark:text-amber-300">{t('expired')}</p>
+                      <p className="text-sm text-amber-700 dark:text-amber-400 mt-0.5">{t('expiredDesc')}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <p className="text-gray-600 dark:text-gray-400 mb-4">{t('generateLinkDesc')}</p>
               <button
                 onClick={handleGenerateCode}

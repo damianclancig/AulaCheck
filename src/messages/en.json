@@ -146,6 +146,7 @@
       "title": "Invite Students",
       "howItWorks": "How it works?",
       "howItWorksDesc": "Share this link with your students. They can register from their phones and you will approve the requests.",
+      "generateLinkDesc": "Generate an invitation link so students can register on their own",
       "generateLink": "Generate Invitation Link",
       "activeLink": "Invitation Link (Active)",
       "copy": "Copy",
@@ -154,6 +155,8 @@
       "qrDesc": "Students can scan this code with their phones. Remember link is valid for 2 hours.",
       "regenerate": "Regenerate Code",
       "disable": "Disable Link",
+      "expired": "QR code has expired",
+      "expiredDesc": "The previous code is no longer valid. Generate a new one so your students can register.",
       "disableConfirm": {
         "title": "Disable link",
         "desc": "Are you sure you want to disable the invitation link? Students will no longer be able to use this code and the QR will disappear.",
@@ -209,10 +212,22 @@
         "edit": "Edit",
         "addComment": "Add comment",
         "withdrawal": "Withdraw",
-        "withdrawalDetails": "View withdrawal details"
+        "withdrawalDetails": "View withdrawal details",
+        "hardDelete": "Delete permanently"
+      },
+      "inactiveSection": {
+        "title": "Withdrawn students",
+        "show": "Show ({count})",
+        "hide": "Hide ({count})",
+        "emptySearch": "No withdrawn students found with that criteria"
       },
       "inactive": "Inactive",
-      "contact": "View contact"
+      "contact": "View contact",
+      "hardDeleteModal": {
+        "title": "Delete student permanently",
+        "description": "You are about to permanently delete {name} and all related records. This action cannot be undone or recovered.",
+        "confirmButton": "Delete permanently"
+      }
     },
     "addModal": {
       "title": "Add Student",
@@ -248,7 +263,7 @@
     },
     "withdrawModal": {
       "title": "Withdraw student",
-      "description": "You are about to withdraw {name}. The student will not be deleted from the database to maintain historical records, but will no longer appear in attendance lists.",
+      "description": "You are about to withdraw <strong>{name}</strong>. The student will not be deleted from the database to maintain historical records, but will no longer appear in attendance lists.",
       "label": "Reason for withdrawal *",
       "reasons": {
         "courseChange": "Course change",
@@ -269,7 +284,8 @@
       "description": "The following students have scanned the QR code and are waiting for your approval to join the course.",
       "successApprove": "Request approved successfully.",
       "successReject": "Request rejected.",
-      "error": "An error occurred while processing the request."
+      "error": "An error occurred while processing the request.",
+      "requestedAt": "Requested on {date}"
     },
     "contact": {
       "title": "Contact of {name}",

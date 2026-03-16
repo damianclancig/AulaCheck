@@ -1,28 +1,32 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Loader2, CheckCircle, School, BookOpen } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import { Loader2, CheckCircle, School } from 'lucide-react'
+
+const JOIN_STORAGE_PREFIX = 'join-request'
+
+type SubmissionState = 'submitted' | 'existing' | null
 
 // Helper function to convert text to Title Case
 const toTitleCase = (text: string): string => {
   return text
     .toLowerCase()
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
 
 export default function JoinCoursePage() {
-  const params = useParams();
-  const router = useRouter();
-  const code = params.code as string;
+  const params = useParams()
+  const code = params.code as string
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [courseInfo, setCourseInfo] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [courseInfo, setCourseInfo] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [submissionState, setSubmissionState] = useState<SubmissionState>(null)
+  const [successMessage, setSuccessMessage] = useState('')
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -30,34 +34,47 @@ export default function JoinCoursePage() {
     email: '',
     phone: '',
     externalId: '',
-  });
+  })
 
   useEffect(() => {
-    fetchCourseInfo();
-  }, [code]);
+    fetchCourseInfo()
+  }, [code])
+
+  const buildStorageKey = (courseId: string) => `${JOIN_STORAGE_PREFIX}:${courseId}`
 
   const fetchCourseInfo = async () => {
     try {
-      const response = await fetch(`/api/join/${code}`);
-      
+      const response = await fetch(`/api/join/${code}`)
+
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Código inválido');
+        const data = await response.json()
+        throw new Error(data.error || 'Código inválido')
       }
 
-      const data = await response.json();
-      setCourseInfo(data);
+      const data = await response.json()
+      setCourseInfo(data)
+
+      const hasLocalSubmission =
+        typeof window !== 'undefined' &&
+        window.localStorage.getItem(buildStorageKey(data.courseId)) === 'pending'
+
+      if (data.existingRequestPending || hasLocalSubmission) {
+        setSubmissionState('existing')
+        setSuccessMessage(
+          'Ya se envió una solicitud desde este dispositivo y sigue pendiente de revisión.',
+        )
+      }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError(null);
+    e.preventDefault()
+    setSubmitting(true)
+    setError(null)
 
     try {
       // Transform names to Title Case
@@ -65,38 +82,47 @@ export default function JoinCoursePage() {
         ...formData,
         firstName: toTitleCase(formData.firstName.trim()),
         lastName: toTitleCase(formData.lastName.trim()),
-      };
+      }
 
       const response = await fetch(`/api/join/${code}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submissionData),
-      });
+      })
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Error al enviar solicitud');
+        const data = await response.json()
+        throw new Error(data.error || 'Error al enviar solicitud')
       }
 
-      setSuccess(true);
+      const data = await response.json()
+
+      if (courseInfo?.courseId && typeof window !== 'undefined') {
+        window.localStorage.setItem(buildStorageKey(courseInfo.courseId), 'pending')
+      }
+
+      setSubmissionState(data.existing ? 'existing' : 'submitted')
+      setSuccessMessage(
+        data.message || 'Solicitud enviada correctamente. El docente la revisará pronto.',
+      )
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
-    );
+    )
   }
 
   if (error && !courseInfo) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">❌</span>
@@ -105,34 +131,38 @@ export default function JoinCoursePage() {
           <p className="text-gray-600">{error}</p>
         </div>
       </div>
-    );
+    )
   }
 
-  if (success) {
+  if (submissionState) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+          <div
+            className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${submissionState === 'existing' ? 'bg-amber-100' : 'bg-green-100'}`}
+          >
+            <CheckCircle
+              className={`w-10 h-10 ${submissionState === 'existing' ? 'text-amber-600' : 'text-green-600'}`}
+            />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">¡Solicitud Enviada!</h1>
-          <p className="text-gray-600 mb-6">
-            Tu solicitud ha sido enviada correctamente. El docente la revisará pronto y te agregará al curso.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {submissionState === 'existing' ? 'Solicitud Ya Registrada' : '¡Solicitud Enviada!'}
+          </h1>
+          <p className="text-gray-600 mb-6">{successMessage}</p>
           <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 text-sm text-indigo-800">
             <p className="font-medium">Curso: {courseInfo.courseName}</p>
             <p>{courseInfo.institutionName}</p>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
+        <div className="bg-linear-to-r from-indigo-600 to-purple-600 p-6 text-white">
           <div className="flex items-center gap-3 mb-2">
             <School className="w-8 h-8" />
             <div>
@@ -152,11 +182,7 @@ export default function JoinCoursePage() {
             <p>El docente revisará tu solicitud y te agregará al curso.</p>
           </div>
 
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+          {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">{error}</div>}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -239,5 +265,5 @@ export default function JoinCoursePage() {
         </form>
       </div>
     </div>
-  );
+  )
 }

@@ -146,6 +146,7 @@
       "title": "Convidar Alunos",
       "howItWorks": "Como funciona?",
       "howItWorksDesc": "Compartilhe este link com seus alunos. Eles poderão registrar-se pelo celular e você aprovará as solicitações.",
+      "generateLinkDesc": "Gere um link de convite para que os alunos se registrem por conta própria",
       "generateLink": "Gerar Link de Convite",
       "activeLink": "Link de Convite (Ativo)",
       "copy": "Copiar",
@@ -154,6 +155,8 @@
       "qrDesc": "Os alunos podem escanear este código com seus celulares. Lembre-se que a validade do link é de 2 horas.",
       "regenerate": "Regenerar Código",
       "disable": "Desativar Link",
+      "expired": "O código QR expirou",
+      "expiredDesc": "O código anterior não é mais válido. Gere um novo para que seus alunos possam se registrar.",
       "disableConfirm": {
         "title": "Desativar link",
         "desc": "Tem certeza que deseja desativar o link de convite? Os alunos não poderão mais usar este código e o QR desaparecerá.",
@@ -209,10 +212,22 @@
         "edit": "Editar",
         "addComment": "Adicionar comentário",
         "withdrawal": "Dar baixa",
-        "withdrawalDetails": "Ver detalhes da baixa"
+        "withdrawalDetails": "Ver detalhes da baixa",
+        "hardDelete": "Excluir permanentemente"
+      },
+      "inactiveSection": {
+        "title": "Alunos com baixa",
+        "show": "Mostrar ({count})",
+        "hide": "Ocultar ({count})",
+        "emptySearch": "Não há alunos com baixa para esse critério"
       },
       "inactive": "Baixa",
-      "contact": "Ver contato"
+      "contact": "Ver contato",
+      "hardDeleteModal": {
+        "title": "Excluir aluno permanentemente",
+        "description": "Você está prestes a excluir permanentemente {name} e todos os registros relacionados. Esta ação não pode ser desfeita nem recuperada.",
+        "confirmButton": "Excluir permanentemente"
+      }
     },
     "addModal": {
       "title": "Adicionar Aluno",
@@ -248,7 +263,7 @@
     },
     "withdrawModal": {
       "title": "Dar baixa no aluno",
-      "description": "Você está prestes a dar baixa em {name}. O aluno não será excluído do banco de dados para manter seus registros históricos, mas não aparecerá mais nas listas de presença.",
+      "description": "Você está prestes a dar baixa em <strong>{name}</strong>. O aluno não será excluído do banco de dados para manter seus registros históricos, mas não aparecerá mais nas listas de presença.",
       "label": "Motivo da baixa *",
       "reasons": {
         "courseChange": "Mudança de curso",
@@ -269,7 +284,8 @@
       "description": "Os seguintes alunos escanearam o código QR e estão aguardando sua aprovação para ingressar no curso.",
       "successApprove": "Solicitação aprovada com sucesso.",
       "successReject": "Solicitação rejeitada.",
-      "error": "Ocorreu um erro ao processar a solicitação."
+      "error": "Ocorreu um erro ao processar a solicitação.",
+      "requestedAt": "Solicitado em {date}"
     },
     "contact": {
       "title": "Contato de {name}",

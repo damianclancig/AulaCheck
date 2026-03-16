@@ -68,7 +68,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     );
 
-    return NextResponse.json({ joinCode: joinCode! });
+    return NextResponse.json({ joinCode: joinCode!, joinCodeExpiresAt: expiresAt.toISOString() });
   } catch (error) {
     console.error('Error generating join code:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

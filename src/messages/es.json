@@ -128,10 +128,10 @@
       },
       "tabs": {
         "list": "Listado de Alumnos",
-        "sheet": "Planilla",
+        "sheet": "Asistencias",
         "grades": "Calificaciones",
         "listLabel": "Lista",
-        "sheetLabel": "Planilla",
+        "sheetLabel": "Asistencias",
         "gradesLabel": "Notas"
       },
       "buttons": {
@@ -155,6 +155,8 @@
       "qrDesc": "Los alumnos pueden escanear este código con su celular. Recuerda que la vigencia del link es de 2 horas.",
       "regenerate": "Regenerar Código",
       "disable": "Desactivar Link",
+      "expired": "El código QR ha vencido",
+      "expiredDesc": "El código anterior ya no es válido. Generá uno nuevo para que tus alumnos puedan registrarse.",
       "disableConfirm": {
         "title": "Desactivar link",
         "desc": "¿Estás seguro de desactivar el link de invitación? Los alumnos ya no podrán usar este código y el QR desaparecerá.",
@@ -206,14 +208,26 @@
         "search": "No se encontraron alumnos con ese criterio",
         "noStudents": "No hay alumnos inscritos"
       },
-        "actions": {
+      "actions": {
         "edit": "Editar",
         "addComment": "Añadir comentario",
         "withdrawal": "Dar de baja",
-        "withdrawalDetails": "Ver detalles baja"
+        "withdrawalDetails": "Ver detalles baja",
+        "hardDelete": "Eliminar definitivamente"
+      },
+      "inactiveSection": {
+        "title": "Alumnos dados de baja",
+        "show": "Mostrar ({count})",
+        "hide": "Ocultar ({count})",
+        "emptySearch": "No hay alumnos dados de baja con ese criterio"
       },
       "inactive": "Baja",
-      "contact": "Ver contacto"
+      "contact": "Ver contacto",
+      "hardDeleteModal": {
+        "title": "Eliminar alumno definitivamente",
+        "description": "Vas a eliminar de forma permanente a {name} y todos sus registros asociados. Esta acción no se puede deshacer ni recuperar.",
+        "confirmButton": "Eliminar definitivamente"
+      }
     },
     "addModal": {
       "title": "Agregar Alumno",
@@ -253,7 +267,7 @@
     },
     "withdrawModal": {
       "title": "Dar de baja al alumno",
-      "description": "Estás por dar de baja a {name}. El alumno no se eliminará de la base de datos para mantener sus registros históricos, pero ya no aparecerá en las listas de asistencia.",
+      "description": "Estás por dar de baja a <strong>{name}</strong>. El alumno no se eliminará de la base de datos para mantener sus registros históricos, pero ya no aparecerá en las listas de asistencia.",
       "label": "Motivo de baja *",
       "reasons": {
         "courseChange": "Cambio de curso",
@@ -274,7 +288,8 @@
       "description": "Los siguientes alumnos han escaneado el código QR y están esperando tu aprobación para unirse al curso.",
       "successApprove": "Solicitud aprobada correctamente.",
       "successReject": "Solicitud rechazada.",
-      "error": "Ocurrió un error al procesar la solicitud."
+      "error": "Ocurrió un error al procesar la solicitud.",
+      "requestedAt": "Solicitado el {date}"
     },
     "contact": {
       "title": "Contacto de {name}",
