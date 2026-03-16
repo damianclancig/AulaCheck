@@ -199,7 +199,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] md:max-h-[85vh] transition-colors">
         {/* Header */}
         <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div>
@@ -368,7 +368,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         {/* MOBILE CAROUSEL VIEW */}
         {suspensionReason === 'none' && (
           <div
-            className="md:hidden flex-1 flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-800 transition-colors"
+            className="md:hidden flex-1 overflow-y-auto flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-800 transition-colors"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}

@@ -307,6 +307,7 @@
     },
     "joinRequests": {
       "title": "Join Requests",
+      "externalId": "ID: {value}",
       "pending": "{count} pending",
       "approve": "Approve",
       "reject": "Reject",

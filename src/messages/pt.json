@@ -307,6 +307,7 @@
     },
     "joinRequests": {
       "title": "Solicitações de Inscrição",
+      "externalId": "Matrícula: {value}",
       "pending": "{count} pendentes",
       "approve": "Aprovar",
       "reject": "Rejeitar",

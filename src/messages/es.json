@@ -311,6 +311,7 @@
     },
     "joinRequests": {
       "title": "Solicitudes de Inscripción",
+      "externalId": "Legajo: {value}",
       "pending": "{count} pendientes",
       "approve": "Aprobar",
       "reject": "Rechazar",
