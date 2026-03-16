@@ -11,7 +11,6 @@ import { AttendanceSheet } from '@/components/attendance/AttendanceSheet'
 import { AddStudentModal } from '@/components/students/AddStudentModal'
 import { EditStudentModal } from '@/components/students/EditStudentModal'
 import { AttendanceModal } from '@/components/attendance/AttendanceModal'
-import { GradeModal } from '@/components/grades/GradeModal'
 import { GradeTable } from '@/components/grades/GradeTable'
 import { PeriodTabs } from '@/components/grades/PeriodTabs'
 import { AnnualCloseTable } from '@/components/grades/AnnualCloseTable'
@@ -86,7 +85,6 @@ export default function CourseDetailPage() {
 
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false)
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false)
-  const [isGradeModalOpen, setIsGradeModalOpen] = useState(false)
   const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false)
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
@@ -266,12 +264,7 @@ export default function CourseDetailPage() {
           >
             <CalendarCheck className="w-4 h-4" /> {t('buttons.attendance')}
           </button>
-          <button
-            onClick={() => setIsGradeModalOpen(true)}
-            className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
-          >
-            <GraduationCap className="w-4 h-4" /> {t('buttons.grade')}
-          </button>
+
           <button
             onClick={() => setIsExportModalOpen(true)}
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
@@ -446,14 +439,7 @@ export default function CourseDetailPage() {
         }}
       />
 
-      <GradeModal
-        isOpen={isGradeModalOpen}
-        onClose={() => setIsGradeModalOpen(false)}
-        students={activeStudents}
-        onGradeSaved={() => {
-          mutateStudents() // Update metrics (averages)
-        }}
-      />
+
       {/* EditCourseModal */}
       {course && (
         <EditCourseModal
