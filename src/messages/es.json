@@ -289,7 +289,25 @@
       "successApprove": "Solicitud aprobada correctamente.",
       "successReject": "Solicitud rechazada.",
       "error": "Ocurrió un error al procesar la solicitud.",
-      "requestedAt": "Solicitado el {date}"
+      "requestedAt": "Solicitado el {date}",
+      "duplicateBox": {
+        "title": "Posible duplicado detectado: {count} coincidencias por nombre y apellido",
+        "type": {
+          "enrolledStudent": "Alumno matriculado",
+          "pendingRequest": "Solicitud pendiente"
+        },
+        "externalId": "Legajo: {value}",
+        "externalIdMissing": "Legajo: sin dato",
+        "email": "Email: {value}",
+        "emailMissing": "Email: sin dato",
+        "phone": "Teléfono: {value}",
+        "phoneMissing": "Teléfono: sin dato",
+        "enrollmentStatus": "Estado: {value}",
+        "status": {
+          "active": "activo",
+          "inactive": "inactivo"
+        }
+      }
     },
     "contact": {
       "title": "Contacto de {name}",

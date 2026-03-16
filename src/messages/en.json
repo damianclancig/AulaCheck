@@ -285,7 +285,25 @@
       "successApprove": "Request approved successfully.",
       "successReject": "Request rejected.",
       "error": "An error occurred while processing the request.",
-      "requestedAt": "Requested on {date}"
+      "requestedAt": "Requested on {date}",
+      "duplicateBox": {
+        "title": "Possible duplicate detected: {count} name matches",
+        "type": {
+          "enrolledStudent": "Enrolled student",
+          "pendingRequest": "Pending request"
+        },
+        "externalId": "Student ID: {value}",
+        "externalIdMissing": "Student ID: missing",
+        "email": "Email: {value}",
+        "emailMissing": "Email: missing",
+        "phone": "Phone: {value}",
+        "phoneMissing": "Phone: missing",
+        "enrollmentStatus": "Status: {value}",
+        "status": {
+          "active": "active",
+          "inactive": "inactive"
+        }
+      }
     },
     "contact": {
       "title": "Contact of {name}",

@@ -1,52 +1,56 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { X, Loader2, Check, XCircle, User } from 'lucide-react';
-import { useSession } from 'next-auth/react';
-import { JoinRequest } from '@/types/models';
-import { useModal } from '@/hooks/useModal';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect } from 'react'
+import { X, Loader2, Check, XCircle, User } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { PendingJoinRequestWithMatches } from '@/types/models'
+import { useModal } from '@/hooks/useModal'
+import { useTranslations } from 'next-intl'
 
 interface JoinRequestsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  courseId: string;
-  onRequestProcessed: () => void;
+  isOpen: boolean
+  onClose: () => void
+  courseId: string
+  onRequestProcessed: () => void
 }
 
-export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcessed }: JoinRequestsModalProps) {
-  const [loading, setLoading] = useState(false);
-  const [requests, setRequests] = useState<JoinRequest[]>([]);
-  const [processing, setProcessing] = useState<string | null>(null);
-  const { showAlert } = useModal();
-  const t = useTranslations('students.joinRequests');
-  const tCommon = useTranslations('common');
-
+export function JoinRequestsModal({
+  isOpen,
+  onClose,
+  courseId,
+  onRequestProcessed,
+}: JoinRequestsModalProps) {
+  const [loading, setLoading] = useState(false)
+  const [requests, setRequests] = useState<PendingJoinRequestWithMatches[]>([])
+  const [processing, setProcessing] = useState<string | null>(null)
+  const { showAlert } = useModal()
+  const t = useTranslations('students.joinRequests')
+  const tCommon = useTranslations('common')
 
   useEffect(() => {
     if (isOpen) {
-      fetchRequests();
+      fetchRequests()
     }
-  }, [isOpen, courseId]);
+  }, [isOpen, courseId])
 
   const fetchRequests = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await fetch(`/api/courses/${courseId}/join-requests`);
+      const response = await fetch(`/api/courses/${courseId}/join-requests`)
 
-      if (!response.ok) throw new Error(t('alerts.errorLoad'));
+      if (!response.ok) throw new Error(t('alerts.errorLoad'))
 
-      const data = await response.json();
-      setRequests(data);
+      const data = await response.json()
+      setRequests(data)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleProcess = async (requestId: string, action: 'approve' | 'reject') => {
-    setProcessing(requestId);
+    setProcessing(requestId)
     try {
       const response = await fetch(`/api/courses/${courseId}/join-requests`, {
         method: 'POST',
@@ -54,26 +58,31 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ requestId, action }),
-      });
+      })
 
-      if (!response.ok) throw new Error(t('alerts.error'));
+      if (!response.ok) throw new Error(t('alerts.error'))
 
       // Remove from list
-      setRequests(requests.filter(r => r._id.toString() !== requestId));
-      onRequestProcessed();
+      setRequests(requests.filter((r) => r._id.toString() !== requestId))
+      onRequestProcessed()
     } catch (error) {
-      console.error(error);
+      console.error(error)
       await showAlert({
         title: tCommon('error'),
         description: t('alerts.error'),
-        variant: 'danger'
-      });
+        variant: 'danger',
+      })
     } finally {
-      setProcessing(null);
+      setProcessing(null)
     }
-  };
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
+
+  const renderDuplicateTypeLabel = (type: 'enrolledStudent' | 'pendingRequest') => {
+    if (type === 'enrolledStudent') return t('duplicateBox.type.enrolledStudent')
+    return t('duplicateBox.type.pendingRequest')
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -85,10 +94,7 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
               {t('title', { count: requests.length })}
             </h2>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -106,22 +112,66 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
           ) : (
             <div className="divide-y divide-gray-100">
               {requests.map((request) => (
-                <div key={request._id.toString()} className="p-6 hover:bg-gray-50 transition-colors">
+                <div
+                  key={request._id.toString()}
+                  className="p-6 hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 text-lg">
                         {request.firstName} {request.lastName}
                       </h3>
+                      {request.hasPossibleDuplicates && (
+                        <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                          <p className="text-xs italic text-amber-900">
+                            {t('duplicateBox.title', { count: request.possibleDuplicates.length })}
+                          </p>
+                          <div className="mt-2 space-y-2">
+                            {request.possibleDuplicates.map((duplicate) => (
+                              <div
+                                key={`${duplicate.type}-${duplicate.id}`}
+                                className="rounded-md border border-amber-200 bg-white/70 px-2 py-1.5 text-xs text-amber-900"
+                              >
+                                <p className="italic">
+                                  <span className="font-semibold not-italic">
+                                    {renderDuplicateTypeLabel(duplicate.type)}:
+                                  </span>{' '}
+                                  {duplicate.firstName} {duplicate.lastName}
+                                </p>
+                                <p className="italic mt-0.5">
+                                  {duplicate.externalId
+                                    ? t('duplicateBox.externalId', { value: duplicate.externalId })
+                                    : t('duplicateBox.externalIdMissing')}
+                                  {' • '}
+                                  {duplicate.email
+                                    ? t('duplicateBox.email', { value: duplicate.email })
+                                    : t('duplicateBox.emailMissing')}
+                                  {' • '}
+                                  {duplicate.phone
+                                    ? t('duplicateBox.phone', { value: duplicate.phone })
+                                    : t('duplicateBox.phoneMissing')}
+                                  {duplicate.type === 'enrolledStudent' &&
+                                    duplicate.enrollmentStatus && (
+                                      <>
+                                        {' • '}
+                                        {t('duplicateBox.enrollmentStatus', {
+                                          value:
+                                            duplicate.enrollmentStatus === 'active'
+                                              ? t('duplicateBox.status.active')
+                                              : t('duplicateBox.status.inactive'),
+                                        })}
+                                      </>
+                                    )}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <div className="mt-2 space-y-1 text-sm text-gray-600">
-                        {request.email && (
-                          <p>📧 {request.email}</p>
-                        )}
-                        {request.phone && (
-                          <p>📱 {request.phone}</p>
-                        )}
-                        {request.externalId && (
-                          <p>🆔 Legajo: {request.externalId}</p>
-                        )}
+                        {request.email && <p>📧 {request.email}</p>}
+                        {request.phone && <p>📱 {request.phone}</p>}
+                        {request.externalId && <p>🆔 Legajo: {request.externalId}</p>}
                         <p className="text-xs text-gray-400 mt-2">
                           {t('requestedAt', { date: new Date(request.createdAt).toLocaleString() })}
                         </p>
@@ -157,5 +207,5 @@ export function JoinRequestsModal({ isOpen, onClose, courseId, onRequestProcesse
         </div>
       </div>
     </div>
-  );
+  )
 }

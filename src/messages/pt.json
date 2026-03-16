@@ -285,7 +285,25 @@
       "successApprove": "Solicitação aprovada com sucesso.",
       "successReject": "Solicitação rejeitada.",
       "error": "Ocorreu um erro ao processar a solicitação.",
-      "requestedAt": "Solicitado em {date}"
+      "requestedAt": "Solicitado em {date}",
+      "duplicateBox": {
+        "title": "Possível duplicado detectado: {count} correspondências de nome",
+        "type": {
+          "enrolledStudent": "Aluno matriculado",
+          "pendingRequest": "Solicitação pendente"
+        },
+        "externalId": "Registro: {value}",
+        "externalIdMissing": "Registro: sem dado",
+        "email": "E-mail: {value}",
+        "emailMissing": "E-mail: sem dado",
+        "phone": "Telefone: {value}",
+        "phoneMissing": "Telefone: sem dado",
+        "enrollmentStatus": "Status: {value}",
+        "status": {
+          "active": "ativo",
+          "inactive": "inativo"
+        }
+      }
     },
     "contact": {
       "title": "Contato de {name}",

@@ -183,6 +183,23 @@ export interface JoinRequest {
   processedBy?: string // Teacher's Firebase UID
 }
 
+export interface JoinRequestPossibleDuplicate {
+  type: 'enrolledStudent' | 'pendingRequest'
+  id: string
+  firstName: string
+  lastName: string
+  email?: string
+  phone?: string
+  externalId?: string
+  enrollmentStatus?: 'active' | 'inactive'
+  createdAt?: Date
+}
+
+export interface PendingJoinRequestWithMatches extends JoinRequest {
+  hasPossibleDuplicates: boolean
+  possibleDuplicates: JoinRequestPossibleDuplicate[]
+}
+
 // DTOs para API responses
 export interface CourseWithMetrics extends Course {
   meta: {
