@@ -35,12 +35,13 @@ export const usePasskeys = () => {
 
             return true;
         } catch (err: any) {
-            console.error(err);
-            if (err.name === 'NotAllowedError') {
-                setError('Operación cancelada por el usuario');
-            } else {
+            const isCancel = err.name === 'NotAllowedError' || err.name === 'AbortError';
+            
+            if (!isCancel) {
+                console.error('Registration Error:', err);
                 setError(err.message || 'Error durante el registro de Passkey');
             }
+            
             return false;
         } finally {
             setIsPending(false);

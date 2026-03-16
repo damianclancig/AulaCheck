@@ -76,7 +76,9 @@
       "registered": "Registered on {date}",
       "lastUsed": "Last used: {date}",
       "remove": "Remove",
-      "removeConfirm": "Are you sure you want to remove this Passkey?"
+      "removeTitle": "Remove Passkey",
+      "removeConfirm": "Are you sure you want to remove this Passkey?",
+      "addFirst": "Protect your account with biometrics"
     }
   },
   "passkeyBanner": {

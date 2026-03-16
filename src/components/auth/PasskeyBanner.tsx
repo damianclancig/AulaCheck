@@ -37,43 +37,43 @@ export function PasskeyBanner() {
     if (!isVisible || hasPasskeys === true) return null;
 
     return (
-        <div className="mb-8 relative overflow-hidden bg-indigo-600 rounded-2xl p-6 text-white shadow-lg shadow-indigo-200 dark:shadow-none transition-all hover:shadow-indigo-300">
+        <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-700 relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-3xl p-6 md:p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none group transition-all">
             {/* Elementos decorativos de fondo */}
-            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-            <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-indigo-400/20 rounded-full blur-xl" />
+            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:bg-white/15 transition-colors duration-500" />
+            <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl flex-shrink-0" />
 
-            <div className="relative flex flex-col md:flex-row items-center gap-6">
-                <div className="bg-white/20 p-4 rounded-xl backdrop-blur-sm">
-                    <Fingerprint className="w-8 h-8" />
+            <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                <div className="bg-white/20 p-5 rounded-2xl backdrop-blur-md shadow-inner border border-white/10 shrink-0 transform group-hover:scale-110 transition-transform duration-500">
+                    <Fingerprint className="w-10 h-10 text-white" />
                 </div>
 
-                <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-xl font-bold mb-1">{t('title')}</h3>
-                    <p className="text-indigo-100 text-sm md:text-base max-w-2xl">
+                <div className="flex-1 text-center md:text-left space-y-2">
+                    <h3 className="text-2xl font-black tracking-tight">{t('title')}</h3>
+                    <p className="text-indigo-50 text-sm md:text-lg max-w-2xl leading-relaxed opacity-90">
                         {t('description')}
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
                     <button
                         onClick={() => setIsVisible(false)}
-                        className="text-indigo-200 hover:text-white text-sm font-medium transition-colors"
+                        className="w-full sm:w-auto px-4 py-2 text-indigo-100 hover:text-white text-sm font-semibold transition-colors order-2 sm:order-1"
                     >
                         {t('dismiss')}
                     </button>
                     <Link
                         href="/dashboard/security"
-                        className="bg-white text-indigo-600 px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 hover:bg-indigo-50 transition-all shadow-sm active:scale-95"
+                        className="w-full sm:w-auto bg-white text-indigo-700 px-8 py-3 rounded-xl font-extrabold flex items-center justify-center gap-2 hover:bg-indigo-50 transition-all shadow-md hover:shadow-lg active:scale-95 order-1 sm:order-2"
                     >
                         {t('button')}
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-5 h-5" />
                     </Link>
                 </div>
             </div>
 
             <button
                 onClick={() => setIsVisible(false)}
-                className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+                className="absolute top-4 right-4 p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-full transition-all md:top-6 md:right-6"
                 aria-label="Cerrar"
             >
                 <X className="w-5 h-5" />

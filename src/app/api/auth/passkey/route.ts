@@ -17,11 +17,12 @@ export async function GET() {
             .select('credentialID createdAt lastUsedAt')
             .lean();
 
-        // No enviamos keys públicas ni Buffers complejos al cliente, solo IDs y fechas
+        // No enviamos keys públicas ni Buffers complejos al cliente, solo IDs y metadatos básicos
         const formatted = authenticators.map((auth: any) => ({
             id: auth._id,
             createdAt: auth.createdAt,
             lastUsedAt: auth.lastUsedAt,
+            deviceType: auth.credentialDeviceType,
         }));
 
         return NextResponse.json(formatted);
