@@ -173,6 +173,7 @@
       }
     },
     "invite": {
+      "tabTitle": "Link & QR",
       "title": "Invite Students",
       "howItWorks": "How it works?",
       "howItWorksDesc": "Share this link with your students. They can register from their phones and you will approve the requests.",
@@ -306,6 +307,7 @@
       "confirmButton": "Confirm Withdrawal"
     },
     "joinRequests": {
+      "tabTitle": "Requests",
       "title": "Join Requests",
       "externalId": "ID: {value}",
       "pending": "{count} pending",

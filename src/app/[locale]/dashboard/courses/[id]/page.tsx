@@ -279,11 +279,7 @@ export default function CourseDetailPage() {
             <Download className="w-4 h-4" /> {t('buttons.export')}
           </button>
           <button
-            onClick={() =>
-              pendingRequestsCount > 0
-                ? setIsJoinRequestsModalOpen(true)
-                : setIsInviteModalOpen(true)
-            }
+            onClick={() => setIsInviteModalOpen(true)}
             className="px-4 py-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center gap-2 text-sm font-medium whitespace-nowrap relative transition-colors"
           >
             <Link2 className="w-4 h-4" /> {t('buttons.invite')}
@@ -480,7 +476,7 @@ export default function CourseDetailPage() {
         />
       )}
 
-      {/* InviteStudentsModal */}
+      {/* InviteStudentsModal (Now includes JoinRequests) */}
       {course && (
         <InviteStudentsModal
           isOpen={isInviteModalOpen}
@@ -490,19 +486,16 @@ export default function CourseDetailPage() {
           currentJoinCode={course.joinCode}
           allowJoinRequests={course.allowJoinRequests}
           joinCodeExpiresAt={course.joinCodeExpiresAt}
+          initialTab={pendingRequestsCount > 0 ? 'requests' : 'invite'}
+          onRequestProcessed={() => {
+            mutateStudents()
+            // The modal itself refreshes count via onCountChange if we wanted, 
+            // but the page will refresh on interval or we could add a dedicated mutator
+          }}
         />
       )}
 
-      {/* JoinRequestsModal */}
-      <JoinRequestsModal
-        isOpen={isJoinRequestsModalOpen}
-        onClose={() => setIsJoinRequestsModalOpen(false)}
-        courseId={courseId}
-        onRequestProcessed={() => {
-          mutateStudents()
-          // Refresh pending count
-        }}
-      />
+
 
       {/* EditStudentModal */}
       <EditStudentModal

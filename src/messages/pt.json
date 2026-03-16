@@ -173,6 +173,7 @@
       }
     },
     "invite": {
+      "tabTitle": "Link & QR",
       "title": "Convidar Alunos",
       "howItWorks": "Como funciona?",
       "howItWorksDesc": "Compartilhe este link com seus alunos. Eles poderão registrar-se pelo celular e você aprovará as solicitações.",
@@ -306,6 +307,7 @@
       "confirmButton": "Confirmar Baixa"
     },
     "joinRequests": {
+      "tabTitle": "Solicitações",
       "title": "Solicitações de Inscrição",
       "externalId": "Matrícula: {value}",
       "pending": "{count} pendentes",
