@@ -380,8 +380,8 @@
       "otherReason": "Outro motivo",
       "specifyReason": "Especificar motivo",
       "reasonPlaceholder": "Ex: Feriado, evento especial, etc.",
-      "duplicateWarning": "Já existe presença para esta data",
-      "duplicateDesc": "Se você continuar, a presença existente para este dia será sobrescrita.",
+      "duplicateWarning": "Presença já registrada",
+      "duplicateDesc": "A presença para esta data já foi registrada e não pode ser modificada nesta tela.",
       "missingAttendance": "⚠ Falta marcar presença",
       "missingCount": "Falta marcar {count} {count, plural, =1 {aluno} other {alunos}}",
       "allMarked": "Todos os alunos marcados",
@@ -391,6 +391,8 @@
         "progress": "Aluno {current} de {total}",
         "noLegajo": "Sem matrícula"
       },
+      "allMarkedTitle": "Chamada Completa!",
+      "allMarkedDesc": "Você registrou a presença de todos os alunos para esta data.",
       "suspendedMessage": {
         "title": "Aula suspensa",
         "desc": "Não é necessário fazer a chamada para esta data.",

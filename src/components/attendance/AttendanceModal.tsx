@@ -115,7 +115,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         setTimeout(() => {
           setCurrentIndex(nextUnmarkedIndex);
           setIsTransitioning(false);
-        }, 600);
+        }, 300);
       }
     }
   };
@@ -251,9 +251,11 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
               </label>
               <button
                 onClick={() => setShowStatusSelector(true)}
+                disabled={isDuplicateDate}
                 className={cn(
-                  "w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-600 transition-all text-sm font-medium group",
-                  suspensionReason !== 'none' ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"
+                  "w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl transition-all text-sm font-medium group",
+                  suspensionReason !== 'none' ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white",
+                  isDuplicateDate ? "opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50" : "hover:border-indigo-500 dark:hover:border-indigo-600"
                 )}
               >
                 <span className="truncate">
@@ -272,18 +274,36 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
             </div>
           </div>
 
-          {isDuplicateDate && (
-            <div className="mt-3 p-2.5 bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 rounded-xl flex items-start gap-2.5">
-              <AlertTriangle className="w-4 h-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
-              <p className="text-[11px] leading-tight text-orange-800 dark:text-orange-300 font-medium">
-                {t('duplicateWarning')}. {t('duplicateDesc')}
-              </p>
-            </div>
-          )}
         </div>
 
+        {/* DUPLICATE DATE WARNING - BIG VIEW */}
+        {isDuplicateDate && (
+          <div className="flex-1 flex items-center justify-center p-8 bg-gray-50/30 dark:bg-gray-800/10">
+            <div className="text-center max-w-md animate-in fade-in zoom-in duration-300">
+              <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-orange-100/50 dark:shadow-none">
+                <AlertTriangle className="w-10 h-10 text-orange-600 dark:text-orange-400" />
+              </div>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-tight">
+                {t('duplicateWarning')}
+              </h3>
+              <p className="text-base text-gray-600 dark:text-gray-400 font-medium leading-relaxed mb-8">
+                {t('duplicateDesc')}
+              </p>
+              
+              <div className="p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all hover:shadow-md">
+                <p className="text-xs text-gray-500 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">
+                  {t('dateLabel')}
+                </p>
+                <p className="text-lg font-black text-indigo-600 dark:text-indigo-400">
+                  {new Date(date + 'T12:00:00').toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' })}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* DESKTOP LIST VIEW */}
-        {suspensionReason === 'none' && (
+        {suspensionReason === 'none' && !isDuplicateDate && !allStudentsMarked && (
           <div className="hidden md:block overflow-y-auto p-6 space-y-4 flex-1">
             {sortedStudents.map((student) => {
               const status = attendanceMap[student._id.toString()];
@@ -356,7 +376,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         )}
 
         {/* MOBILE CAROUSEL VIEW */}
-        {suspensionReason === 'none' && (
+        {suspensionReason === 'none' && !isDuplicateDate && !allStudentsMarked && (
           <div
             className="md:hidden flex-1 flex flex-col items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/10 transition-colors overflow-hidden"
             onTouchStart={onTouchStart}
@@ -366,99 +386,103 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
             {currentStudent && (
               <div
                 className={cn(
-                  "w-full max-w-sm flex flex-col items-center justify-center space-y-6 transition-all duration-500 h-full",
+                  "w-full max-w-sm flex flex-col items-center justify-center space-y-4 transition-all duration-300 h-full",
                   isTransitioning ? "opacity-0 scale-95 translate-x-8" : "opacity-100 scale-100 translate-x-0"
                 )}
                 key={currentIndex}
               >
                 {/* Student Info Card */}
-                <div className="w-full bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center text-center space-y-4">
+                <div className="w-full bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-5 flex flex-col space-y-4">
                   {/* Progress Indicator */}
                   <div className="w-full flex justify-between text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-black">
                     <span>{t('carousel.progress', { current: currentIndex + 1, total: sortedStudents.length })}</span>
                     <span>{Math.round(((currentIndex + 1) / sortedStudents.length) * 100)}%</span>
                   </div>
 
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="h-14 w-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xl mb-2 shadow-lg shadow-indigo-200 dark:shadow-none">
+                  <div className="flex items-center justify-center gap-4 w-full">
+                    <div className="h-14 w-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-200 dark:shadow-none">
                       {currentStudent.firstName[0]}{currentStudent.lastName[0]}
                     </div>
-                    <h3 className="text-2xl font-black text-gray-900 dark:text-white leading-tight tracking-tight">
-                      {currentStudent.lastName.toUpperCase()}<br />
-                      <span className="text-indigo-600 dark:text-indigo-400 font-medium">{currentStudent.firstName}</span>
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 font-bold px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
-                      ID: {currentStudent.externalId || '---'}
-                    </p>
+                    <div className="flex flex-col items-start overflow-hidden">
+                      <h3 className="text-base font-black text-gray-900 dark:text-white leading-tight tracking-tight truncate w-full">
+                        {currentStudent.lastName.toUpperCase()}
+                      </h3>
+                      <p className="text-sm text-indigo-600 dark:text-indigo-400 font-bold truncate w-full">
+                        {currentStudent.firstName}
+                      </p>
+                      <p className="text-[9px] text-gray-500 dark:text-gray-400 mt-0.5 font-bold px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full inline-block">
+                        ID: {currentStudent.externalId || '---'}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Action Buttons - FIXED IN SCREEN */}
-                <div className="w-full space-y-3 pb-2">
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="w-full space-y-2 pb-1">
+                  <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => handleStatusChange(currentStudent._id.toString(), 'present', true)}
                       className={cn(
-                        "flex flex-col items-center justify-center gap-2 p-5 rounded-3xl border-2 transition-all active:scale-95 shadow-lg",
+                        "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl border-2 transition-all active:scale-95 shadow-lg",
                         currentStatus === 'present'
                           ? "border-green-500 bg-green-500 text-white shadow-green-200 dark:shadow-none scale-[1.02]"
                           : "border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-300 hover:border-green-200"
                       )}
                     >
-                      <Check className={cn("w-7 h-7", currentStatus === 'present' ? "text-white" : "text-green-500")} />
-                      <span className="font-black text-xs uppercase tracking-widest">{tLegends('present')}</span>
+                      <Check className={cn("w-6 h-6", currentStatus === 'present' ? "text-white" : "text-green-500")} />
+                      <span className="font-black text-[10px] uppercase tracking-widest">{tLegends('present')}</span>
                     </button>
 
                     <button
                       onClick={() => handleStatusChange(currentStudent._id.toString(), 'absent', true)}
                       className={cn(
-                        "flex flex-col items-center justify-center gap-2 p-5 rounded-3xl border-2 transition-all active:scale-95 shadow-lg",
+                        "flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl border-2 transition-all active:scale-95 shadow-lg",
                         currentStatus === 'absent'
                           ? "border-red-500 bg-red-500 text-white shadow-red-200 dark:shadow-none scale-[1.02]"
                           : "border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-300 hover:border-red-200"
                       )}
                     >
-                      <XCircle className={cn("w-7 h-7", currentStatus === 'absent' ? "text-white" : "text-red-500")} />
-                      <span className="font-black text-xs uppercase tracking-widest">{tLegends('absent')}</span>
+                      <XCircle className={cn("w-6 h-6", currentStatus === 'absent' ? "text-white" : "text-red-500")} />
+                      <span className="font-black text-[10px] uppercase tracking-widest">{tLegends('absent')}</span>
                     </button>
                   </div>
 
                   <button
                     onClick={() => handleStatusChange(currentStudent._id.toString(), 'late', true)}
                     className={cn(
-                      "w-full flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all active:scale-95",
+                      "w-full flex items-center justify-center gap-2.5 p-3 rounded-xl border-2 transition-all active:scale-95",
                       currentStatus === 'late'
                         ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300"
                         : "border-transparent bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:border-yellow-100"
                     )}
                   >
-                    <Clock className="w-5 h-5 text-yellow-500" />
-                    <span className="font-bold text-sm">{tLegends('late')}</span>
+                    <Clock className="w-4 h-4 text-yellow-500" />
+                    <span className="font-bold text-xs">{tLegends('late')}</span>
                   </button>
                 </div>
 
                 {/* Navigation Controls */}
-                <div className="flex items-center justify-between w-full px-4 text-gray-400 dark:text-gray-600">
+                <div className="flex items-center justify-between w-full px-2 text-gray-400 dark:text-gray-600">
                   <button
                     onClick={() => currentIndex > 0 && setCurrentIndex(prev => prev - 1)}
                     disabled={currentIndex === 0}
-                    className="p-3 bg-white dark:bg-gray-900 rounded-2xl shadow-sm disabled:opacity-30 disabled:shadow-none transition-all active:scale-90"
+                    className="p-2.5 bg-white dark:bg-gray-900 rounded-xl shadow-sm disabled:opacity-30 disabled:shadow-none transition-all active:scale-90"
                   >
-                    <ChevronLeft className="w-6 h-6" />
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1">
                     {sortedStudents.length <= 10 ? (
                       sortedStudents.map((_, idx) => (
                         <div
                           key={idx}
                           className={cn(
-                            "w-2 h-2 rounded-full transition-all duration-300",
-                            idx === currentIndex ? "bg-indigo-500 w-5" : "bg-gray-200 dark:bg-gray-700"
+                            "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                            idx === currentIndex ? "bg-indigo-500 w-4" : "bg-gray-200 dark:bg-gray-700"
                           )}
                         />
                       ))
                     ) : (
-                      <span className="text-xs font-black text-gray-500">
+                      <span className="text-[10px] font-black text-gray-500">
                         {currentIndex + 1} / {sortedStudents.length}
                       </span>
                     )}
@@ -466,13 +490,37 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                   <button
                     onClick={() => currentIndex < students.length - 1 && setCurrentIndex(prev => prev + 1)}
                     disabled={currentIndex === sortedStudents.length - 1}
-                    className="p-3 bg-white dark:bg-gray-900 rounded-2xl shadow-sm disabled:opacity-30 disabled:shadow-none transition-all active:scale-90"
+                    className="p-2.5 bg-white dark:bg-gray-900 rounded-xl shadow-sm disabled:opacity-30 disabled:shadow-none transition-all active:scale-90"
                   >
-                    <ChevronRight className="w-6 h-6" />
+                    <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ALL STUDENTS MARKED SUCCESS VIEW */}
+        {allStudentsMarked && suspensionReason === 'none' && !isDuplicateDate && (
+          <div className="flex-1 flex items-center justify-center p-8 bg-green-50/10 dark:bg-green-900/5">
+            <div className="text-center max-w-md animate-in fade-in zoom-in duration-300">
+              <div className="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-100/50 dark:shadow-none border-4 border-white dark:border-gray-900">
+                <Check className="w-12 h-12 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-tight">
+                {t('allMarkedTitle')}
+              </h3>
+              <p className="text-lg text-gray-600 dark:text-gray-400 font-medium leading-relaxed mb-10">
+                {t('allMarkedDesc')}
+              </p>
+              
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-gray-900 rounded-2xl border-2 border-green-100 dark:border-green-900/30 shadow-sm">
+                <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-sm font-black text-green-700 dark:text-green-400 uppercase tracking-widest">
+                  {t('readyToSave')}
+                </span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -575,7 +623,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         )}
 
         {/* MESSAGE FOR SUSPENDED CLASSES */}
-        {suspensionReason !== 'none' && (
+        {suspensionReason !== 'none' && !isDuplicateDate && (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="text-center max-w-md">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -601,40 +649,53 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         {/* Footer */}
         <div className="p-4 md:p-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0 bg-white dark:bg-gray-900 transition-colors">
           <div className="text-sm">
-            {suspensionReason === 'none' && !allStudentsMarked && (
+            {suspensionReason === 'none' && !isDuplicateDate && !allStudentsMarked && (
               <p className="text-orange-600 dark:text-orange-400 font-medium flex items-center gap-1.5">
                 <span className="inline-block w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
                 {t('missingCount', { count: sortedStudents.filter(s => !attendanceMap[s._id.toString()]).length })}
               </p>
             )}
-            {suspensionReason === 'none' && allStudentsMarked && (
+            {suspensionReason === 'none' && !isDuplicateDate && allStudentsMarked && (
               <p className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1.5">
                 <Check className="w-4 h-4" />
                 {t('allMarked')}
               </p>
             )}
-            {suspensionReason !== 'none' && (
+            {suspensionReason !== 'none' && !isDuplicateDate && (
               <p className="text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1.5">
                 <Check className="w-4 h-4" />
                 {t('readyToSave')}
+              </p>
+            )}
+            {isDuplicateDate && (
+              <p className="text-orange-600 dark:text-orange-400 font-bold flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4" />
+                {t('duplicateWarning')}
               </p>
             )}
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-95"
+              className={cn(
+                "flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold border border-gray-200 dark:border-gray-700 rounded-2xl transition-all active:scale-95",
+                isDuplicateDate 
+                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-black dark:hover:bg-gray-100" 
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              )}
             >
-              {tCommon('cancel')}
+              {isDuplicateDate ? tCommon('close') : tCommon('cancel')}
             </button>
-            <button
-              onClick={handleSubmit}
-              disabled={loading || (suspensionReason === 'none' && !allStudentsMarked) || (suspensionReason === 'other' && !suspensionNote)}
-              className="flex-1 sm:flex-none px-8 py-2.5 text-sm font-black text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-indigo-100 dark:shadow-none"
-            >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {t('saveButton').toUpperCase()}
-            </button>
+            {!isDuplicateDate && (
+              <button
+                onClick={handleSubmit}
+                disabled={loading || (suspensionReason === 'none' && !allStudentsMarked) || (suspensionReason === 'other' && !suspensionNote)}
+                className="flex-1 sm:flex-none px-8 py-2.5 text-sm font-black text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-indigo-100 dark:shadow-none"
+              >
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                {t('saveButton').toUpperCase()}
+              </button>
+            )}
           </div>
         </div>
       </div>

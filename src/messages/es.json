@@ -384,8 +384,8 @@
       "otherReason": "Otro motivo",
       "specifyReason": "Especificar motivo",
       "reasonPlaceholder": "Ej: Día feriado, evento especial, etc.",
-      "duplicateWarning": "Ya existe asistencia para esta fecha",
-      "duplicateDesc": "Si continúas, se sobrescribirá la asistencia existente para este día.",
+      "duplicateWarning": "Asistencia ya registrada",
+      "duplicateDesc": "La asistencia para esta fecha ya ha sido tomada y no puede modificarse desde esta pantalla.",
       "missingAttendance": "⚠ Falta marcar asistencia",
       "missingCount": "Falta marcar {count} {count, plural, =1 {alumno} other {alumnos}}",
       "allMarked": "Todos los alumnos marcados",
@@ -395,6 +395,8 @@
         "progress": "Alumno {current} de {total}",
         "noLegajo": "Sin legajo"
       },
+      "allMarkedTitle": "¡Asistencia Completa!",
+      "allMarkedDesc": "Has registrado la asistencia de todos los alumnos para esta fecha.",
       "suspendedMessage": {
         "title": "Clase suspendida",
         "desc": "No es necesario tomar asistencia para esta fecha.",

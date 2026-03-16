@@ -380,8 +380,8 @@
       "otherReason": "Other reason",
       "specifyReason": "Specify reason",
       "reasonPlaceholder": "e.g. Holiday, special event, etc.",
-      "duplicateWarning": "Attendance already exists for this date",
-      "duplicateDesc": "If you continue, existing attendance for this day will be overwritten.",
+      "duplicateWarning": "Attendance already recorded",
+      "duplicateDesc": "Attendance for this date has already been taken and cannot be modified from this screen.",
       "missingAttendance": "⚠ Missing attendance marking",
       "missingCount": "Missing {count} {count, plural, =1 {student} other {students}} marking",
       "allMarked": "All students marked",
@@ -391,6 +391,8 @@
         "progress": "Student {current} of {total}",
         "noLegajo": "No ID"
       },
+      "allMarkedTitle": "Attendance Complete!",
+      "allMarkedDesc": "You have recorded attendance for all students for this date.",
       "suspendedMessage": {
         "title": "Class suspended",
         "desc": "No need to take attendance for this date.",
