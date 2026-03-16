@@ -18,6 +18,11 @@
     "description": "Smart attendance and grade management for teachers.",
     "errorGoogle": "Error logging in with Google. Please try again.",
     "continueGoogle": "Continue with Google",
+    "continuePasskey": "Sign in with Biometrics / Passkey",
+    "passkeyNotSupported": "Your browser doesn't support Passkeys",
+    "passkeyError": "Error authenticating with Passkey",
+    "registerPasskey": "Enable TouchID / FaceID access",
+    "passkeySuccess": "Passkey configured successfully!",
     "loggingIn": "Logging in...",
     "termsText1": "By continuing, you agree to our",
     "termsText2": "privacy policy",
@@ -51,12 +56,34 @@
       "closeMenu": "Close menu"
     },
     "nav": {
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "security": "Security"
     },
     "links": {
       "privacy": "Privacy",
+      "security": "Security",
       "logout": "Sign Out"
     }
+  },
+  "security": {
+    "title": "Security & Access",
+    "description": "Manage your access methods and linked devices.",
+    "passkeys": {
+      "title": "Biometrics / Passkeys",
+      "description": "Use your fingerprint, FaceID or PIN to sign in securely without passwords.",
+      "noPasskeys": "You don't have any linked devices yet.",
+      "addPasskey": "Link new device",
+      "registered": "Registered on {date}",
+      "lastUsed": "Last used: {date}",
+      "remove": "Remove",
+      "removeConfirm": "Are you sure you want to remove this Passkey?"
+    }
+  },
+  "passkeyBanner": {
+    "title": "Faster access with Passkeys",
+    "description": "You can activate access with your fingerprint or FaceID so you don't have to use Google every time.",
+    "button": "Set up now",
+    "dismiss": "Later"
   },
   "courses": {
     "card": {

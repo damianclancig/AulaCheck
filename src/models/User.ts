@@ -20,6 +20,7 @@ export interface IUser extends Document {
     email: string;
     image?: string;
     role: UserRole;
+    authenticators?: string[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -43,6 +44,12 @@ const UserSchema: Schema = new Schema(
             enum: Object.values(UserRole),
             default: UserRole.PENDING
         },
+        authenticators: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Authenticator'
+            }
+        ],
     },
     {
         timestamps: true // Automáticamente maneja createdAt y updatedAt

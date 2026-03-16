@@ -32,6 +32,35 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
     }),
+    {
+      id: 'credentials',
+      type: 'credentials',
+      name: 'Passkey',
+      credentials: {
+        email: { label: 'Email', type: 'text' },
+      },
+      async authorize(credentials: Record<string, any> | undefined) {
+        if (!credentials?.email) return null;
+        
+        try {
+          await connectToDatabase();
+          const user = await User.findOne({ email: credentials.email });
+
+          if (!user) return null;
+
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error('Error en authorize:', error);
+          return null;
+        }
+      },
+    } as any, // Cast temporal para evitar conflictos de tipos complejos con NextAuth
   ],
   session: {
     strategy: 'jwt',

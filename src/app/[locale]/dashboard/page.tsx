@@ -16,6 +16,8 @@ const fetcher = async (url: string) => {
   return res.json();
 };
 
+import { PasskeyBanner } from '@/components/auth/PasskeyBanner';
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const t = useTranslations('courses.dashboard');
@@ -40,6 +42,7 @@ export default function DashboardPage() {
 
   return (
     <div>
+      <PasskeyBanner />
       <div className="flex flex-col md:flex-row md:justify-between items-center mb-8 gap-4">
         <div className="text-center md:text-left">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>

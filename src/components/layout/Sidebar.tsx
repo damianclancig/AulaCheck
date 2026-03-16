@@ -6,7 +6,8 @@ import {
   BookOpen,
   Users,
   Settings,
-  LogOut
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Security', href: '/dashboard/security', icon: ShieldCheck },
   // { name: 'Cursos', href: '/dashboard/courses', icon: BookOpen }, // Dashboard ya muestra cursos
   // { name: 'Alumnos', href: '/dashboard/students', icon: Users }, // Gestión global opcional
   // { name: 'Configuración', href: '/dashboard/settings', icon: Settings }, // Opcional

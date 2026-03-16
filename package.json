@@ -10,6 +10,8 @@
     "create-indexes": "tsx scripts/create-indexes.ts"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.555.0",

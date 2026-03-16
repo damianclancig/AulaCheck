@@ -18,6 +18,11 @@
     "description": "Gestión inteligente de asistencias y calificaciones para docentes.",
     "errorGoogle": "Error al iniciar sesión con Google. Por favor intenta nuevamente.",
     "continueGoogle": "Continuar con Google",
+    "continuePasskey": "Entrar con Biometría / Passkey",
+    "passkeyNotSupported": "Tu navegador no soporta Passkeys",
+    "passkeyError": "Error al autenticar con Passkey",
+    "registerPasskey": "Activar acceso con huella / FaceID",
+    "passkeySuccess": "¡Passkey configurada correctamente!",
     "loggingIn": "Iniciando sesión...",
     "termsText1": "Al continuar, aceptas nuestra",
     "termsText2": "política de privacidad",
@@ -51,12 +56,34 @@
       "closeMenu": "Cerrar menú"
     },
     "nav": {
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "security": "Seguridad"
     },
     "links": {
       "privacy": "Privacidad",
+      "security": "Seguridad",
       "logout": "Cerrar Sesión"
     }
+  },
+  "security": {
+    "title": "Seguridad y Acceso",
+    "description": "Gestiona tus métodos de acceso y dispositivos vinculados.",
+    "passkeys": {
+      "title": "Biometría / Passkeys",
+      "description": "Usa tu huella dactilar, FaceID o PIN para iniciar sesión de forma segura sin contraseñas.",
+      "noPasskeys": "Aún no tienes dispositivos vinculados.",
+      "addPasskey": "Vincular nuevo dispositivo",
+      "registered": "Registrado el {date}",
+      "lastUsed": "Último uso: {date}",
+      "remove": "Eliminar",
+      "removeConfirm": "¿Estás seguro de que quieres eliminar esta Passkey?"
+    }
+  },
+  "passkeyBanner": {
+    "title": "Acceso más rápido con Passkeys",
+    "description": "Puedes activar el acceso con tu huella o FaceID para no tener que usar Google cada vez.",
+    "button": "Configurar ahora",
+    "dismiss": "Más tarde"
   },
   "courses": {
     "card": {

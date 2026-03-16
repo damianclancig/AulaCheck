@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
@@ -9,21 +9,67 @@ import logoPic from '../../../../public/assets/logo.webp';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
+import { usePasskeys } from '@/hooks/usePasskeys';
+import { Fingerprint } from 'lucide-react';
+
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('login');
+  const { authenticatePasskey, isSupported } = usePasskeys();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const authCalled = useRef(false);
+
+  // Soporte para Conditional UI (Autofill)
+  useEffect(() => {
+    if (mounted && isSupported() && !authCalled.current) {
+      authCalled.current = true;
+      authenticatePasskey(true).then((result) => {
+        if (result?.verified) {
+          signIn('credentials', { 
+            email: result.email, 
+            callbackUrl: '/dashboard',
+            redirect: true 
+          });
+        }
+      });
+    }
+  }, [mounted, isSupported, authenticatePasskey]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Usamos el signIn de next-auth. Redirigirá a '/dashboard' si la config default lo permite
-      // o usará el callbackUrl si lo definimos explícitamente.
       await signIn('google', { callbackUrl: '/dashboard' });
     } catch (err: any) {
       console.error('Login error:', err);
       setError(t('errorGoogle') || 'Error general');
+      setLoading(false);
+    }
+  };
+
+  const handlePasskeyLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await authenticatePasskey();
+      if (result?.verified) {
+          // Nota: Necesitaremos un Provider de 'credentials' en NextAuth
+          // que valide que el login fue verificado por Passkey.
+          await signIn('credentials', { 
+            email: result.email, 
+            callbackUrl: '/dashboard',
+            redirect: true 
+          });
+      }
+    } catch (err: any) {
+      setError(t('passkeyError'));
+    } finally {
       setLoading(false);
     }
   };
@@ -50,24 +96,43 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all flex items-center justify-center gap-3 shadow-sm"
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />
-            ) : (
-              <img
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                alt="Google logo"
-                className="w-5 h-5"
-              />
+          <div className="space-y-4">
+            <button
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all flex items-center justify-center gap-3 shadow-sm disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />
+              ) : (
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt="Google logo"
+                  className="w-5 h-5"
+                />
+              )}
+              <span>
+                {loading ? t('loggingIn') : t('continueGoogle')}
+              </span>
+            </button>
+
+            {mounted && isSupported() && (
+              <button
+                onClick={handlePasskeyLogin}
+                disabled={loading}
+                className="w-full bg-indigo-600 border border-transparent text-white font-medium py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all flex items-center justify-center gap-3 shadow-md disabled:opacity-50"
+              >
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Fingerprint className="w-5 h-5" />
+                )}
+                <span>
+                  {t('continuePasskey')}
+                </span>
+              </button>
             )}
-            <span>
-              {loading ? t('loggingIn') : t('continueGoogle')}
-            </span>
-          </button>
+          </div>
 
           <p className="mt-8 text-xs text-gray-400">
             {t('termsText1')}{' '}

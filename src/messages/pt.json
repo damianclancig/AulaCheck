@@ -17,8 +17,13 @@
   "login": {
     "description": "Gestão inteligente de presenças e notas para professores.",
     "errorGoogle": "Erro ao fazer login com o Google. Por favor, tente novamente.",
-    "continueGoogle": "Continuar com o Google",
-    "loggingIn": "Entrando...",
+    "continueGoogle": "Continuar com Google",
+    "continuePasskey": "Entrar com Biometria / Passkey",
+    "passkeyNotSupported": "Seu navegador não suporta Passkeys",
+    "passkeyError": "Erro ao autenticar com Passkey",
+    "registerPasskey": "Ativar acesso com digital / FaceID",
+    "passkeySuccess": "Passkey configurada com sucesso!",
+    "loggingIn": "Iniciando sessão...",
     "termsText1": "Ao continuar, você concorda com nossa",
     "termsText2": "política de privacidade",
     "needHelp": "Precisa de ajuda?",
@@ -51,12 +56,34 @@
       "closeMenu": "Fechar menu"
     },
     "nav": {
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "security": "Segurança"
     },
     "links": {
       "privacy": "Privacidade",
+      "security": "Segurança",
       "logout": "Sair"
     }
+  },
+  "security": {
+    "title": "Segurança e Acesso",
+    "description": "Gerencie seus métodos de acesso e dispositivos vinculados.",
+    "passkeys": {
+      "title": "Biometria / Passkeys",
+      "description": "Use sua impressão digital, FaceID ou PIN para entrar com segurança sem senhas.",
+      "noPasskeys": "Você ainda não possui dispositivos vinculados.",
+      "addPasskey": "Vincular novo dispositivo",
+      "registered": "Registrado em {date}",
+      "lastUsed": "Último uso: {date}",
+      "remove": "Remover",
+      "removeConfirm": "Tem certeza de que deseja remover esta Passkey?"
+    }
+  },
+  "passkeyBanner": {
+    "title": "Acesso mais rápido com Passkeys",
+    "description": "Você pode ativar o acesso com sua digital ou FaceID para não ter que usar o Google toda vez.",
+    "button": "Configurar agora",
+    "dismiss": "Mais tarde"
   },
   "courses": {
     "card": {
