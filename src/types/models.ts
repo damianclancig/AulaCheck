@@ -188,6 +188,7 @@ export interface JoinRequestPossibleDuplicate {
   id: string
   firstName: string
   lastName: string
+  similarityScore: number
   email?: string
   phone?: string
   externalId?: string

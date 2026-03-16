@@ -17,6 +17,8 @@ interface RouteParams {
   }>
 }
 
+const NAME_SIMILARITY_THRESHOLD = 0.8
+
 function normalizeComparableValue(value: string) {
   return value
     .normalize('NFD')
@@ -26,10 +28,116 @@ function normalizeComparableValue(value: string) {
     .toLowerCase()
 }
 
-function buildStudentNameKey(firstName: string, lastName: string) {
-  const normalizedFirstName = normalizeComparableValue(firstName)
-  const normalizedLastName = normalizeComparableValue(lastName)
-  return `${normalizedFirstName}::${normalizedLastName}`
+function buildFullName(firstName: string, lastName: string) {
+  return normalizeComparableValue(`${firstName} ${lastName}`)
+}
+
+function getNameTokens(value: string) {
+  return normalizeComparableValue(value).split(' ').filter(Boolean)
+}
+
+function calculateLevenshteinDistance(source: string, target: string) {
+  if (source === target) return 0
+  if (source.length === 0) return target.length
+  if (target.length === 0) return source.length
+
+  const matrix = Array.from({ length: source.length + 1 }, (_, rowIndex) =>
+    Array.from({ length: target.length + 1 }, (_, columnIndex) => {
+      if (rowIndex === 0) return columnIndex
+      if (columnIndex === 0) return rowIndex
+      return 0
+    }),
+  )
+
+  for (let rowIndex = 1; rowIndex <= source.length; rowIndex += 1) {
+    for (let columnIndex = 1; columnIndex <= target.length; columnIndex += 1) {
+      const substitutionCost = source[rowIndex - 1] === target[columnIndex - 1] ? 0 : 1
+      matrix[rowIndex][columnIndex] = Math.min(
+        matrix[rowIndex - 1][columnIndex] + 1,
+        matrix[rowIndex][columnIndex - 1] + 1,
+        matrix[rowIndex - 1][columnIndex - 1] + substitutionCost,
+      )
+    }
+  }
+
+  return matrix[source.length][target.length]
+}
+
+function calculateStringSimilarity(source: string, target: string) {
+  const normalizedSource = normalizeComparableValue(source)
+  const normalizedTarget = normalizeComparableValue(target)
+
+  if (!normalizedSource || !normalizedTarget) {
+    return 0
+  }
+
+  if (normalizedSource === normalizedTarget) {
+    return 1
+  }
+
+  const maxLength = Math.max(normalizedSource.length, normalizedTarget.length)
+  const levenshteinDistance = calculateLevenshteinDistance(normalizedSource, normalizedTarget)
+
+  return maxLength === 0 ? 1 : 1 - levenshteinDistance / maxLength
+}
+
+function calculateTokenSimilarity(source: string, target: string) {
+  const sourceTokens = getNameTokens(source)
+  const targetTokens = getNameTokens(target)
+
+  if (sourceTokens.length === 0 || targetTokens.length === 0) {
+    return 0
+  }
+
+  const averageBestScore = (baseTokens: string[], candidateTokens: string[]) => {
+    const totalScore = baseTokens.reduce((sum, token) => {
+      const bestTokenScore = candidateTokens.reduce((bestScore, candidateToken) => {
+        return Math.max(bestScore, calculateStringSimilarity(token, candidateToken))
+      }, 0)
+
+      return sum + bestTokenScore
+    }, 0)
+
+    return totalScore / baseTokens.length
+  }
+
+  const sourcePerspective = averageBestScore(sourceTokens, targetTokens)
+  const targetPerspective = averageBestScore(targetTokens, sourceTokens)
+
+  return (sourcePerspective + targetPerspective) / 2
+}
+
+function calculateFieldSimilarity(source: string, target: string) {
+  const stringSimilarity = calculateStringSimilarity(source, target)
+  const tokenSimilarity = calculateTokenSimilarity(source, target)
+
+  return Number(Math.max(stringSimilarity, tokenSimilarity).toFixed(3))
+}
+
+function calculateFullNameSimilarity(
+  sourceFirstName: string,
+  sourceLastName: string,
+  targetFirstName: string,
+  targetLastName: string,
+) {
+  const firstNameSimilarity = calculateFieldSimilarity(sourceFirstName, targetFirstName)
+  const lastNameSimilarity = calculateFieldSimilarity(sourceLastName, targetLastName)
+  const sourceFullName = buildFullName(sourceFirstName, sourceLastName)
+  const targetFullName = buildFullName(targetFirstName, targetLastName)
+
+  if (!sourceFullName || !targetFullName) {
+    return 0
+  }
+
+  if (sourceFullName === targetFullName) {
+    return 1
+  }
+
+  const fullNameSimilarity = calculateFieldSimilarity(sourceFullName, targetFullName)
+
+  return Number(
+    (firstNameSimilarity * 0.45 + lastNameSimilarity * 0.45 + fullNameSimilarity * 0.1).toFixed(3),
+  )
 }
 
 // GET /api/courses/[id]/join-requests - List pending join requests
@@ -75,49 +183,69 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         ? await studentsCollection.find({ _id: { $in: enrolledStudentIds } }).toArray()
         : []
 
-    const enrolledStudentsByNameKey = new Map<string, JoinRequestPossibleDuplicate[]>()
-    for (const student of enrolledStudents) {
-      const nameKey = buildStudentNameKey(student.firstName, student.lastName)
-      const matchesForKey = enrolledStudentsByNameKey.get(nameKey) ?? []
-      matchesForKey.push({
-        type: 'enrolledStudent',
-        id: student._id.toString(),
-        firstName: student.firstName,
-        lastName: student.lastName,
-        email: student.email,
-        phone: student.phone,
-        externalId: student.externalId,
-        enrollmentStatus: enrollmentStatusByStudentId.get(student._id.toString()),
-        createdAt: student.createdAt,
-      })
-      enrolledStudentsByNameKey.set(nameKey, matchesForKey)
-    }
-
-    const pendingRequestsByNameKey = new Map<string, JoinRequestPossibleDuplicate[]>()
-    for (const pendingRequest of requests) {
-      const nameKey = buildStudentNameKey(pendingRequest.firstName, pendingRequest.lastName)
-      const matchesForKey = pendingRequestsByNameKey.get(nameKey) ?? []
-      matchesForKey.push({
-        type: 'pendingRequest',
-        id: pendingRequest._id.toString(),
-        firstName: pendingRequest.firstName,
-        lastName: pendingRequest.lastName,
-        email: pendingRequest.email,
-        phone: pendingRequest.phone,
-        externalId: pendingRequest.externalId,
-        createdAt: pendingRequest.createdAt,
-      })
-      pendingRequestsByNameKey.set(nameKey, matchesForKey)
-    }
-
     const requestsWithMatches: PendingJoinRequestWithMatches[] = requests.map((pendingRequest) => {
-      const nameKey = buildStudentNameKey(pendingRequest.firstName, pendingRequest.lastName)
-      const enrolledMatches = enrolledStudentsByNameKey.get(nameKey) ?? []
-      const pendingMatches = (pendingRequestsByNameKey.get(nameKey) ?? []).filter(
-        (match) => match.id !== pendingRequest._id.toString(),
-      )
+      const enrolledMatches = enrolledStudents.reduce<JoinRequestPossibleDuplicate[]>((matches, student) => {
+          const similarityScore = calculateFullNameSimilarity(
+            pendingRequest.firstName,
+            pendingRequest.lastName,
+            student.firstName,
+            student.lastName,
+          )
 
-      const possibleDuplicates = [...enrolledMatches, ...pendingMatches]
+          if (similarityScore < NAME_SIMILARITY_THRESHOLD) {
+            return matches
+          }
+
+          matches.push({
+            type: 'enrolledStudent' as const,
+            id: student._id.toString(),
+            firstName: student.firstName,
+            lastName: student.lastName,
+            similarityScore,
+            email: student.email,
+            phone: student.phone,
+            externalId: student.externalId,
+            enrollmentStatus: enrollmentStatusByStudentId.get(student._id.toString()),
+            createdAt: student.createdAt,
+          })
+
+          return matches
+        }, [])
+
+      const pendingMatches = requests.reduce<JoinRequestPossibleDuplicate[]>((matches, otherPendingRequest) => {
+        if (otherPendingRequest._id.toString() === pendingRequest._id.toString()) {
+          return matches
+        }
+
+          const similarityScore = calculateFullNameSimilarity(
+            pendingRequest.firstName,
+            pendingRequest.lastName,
+            otherPendingRequest.firstName,
+            otherPendingRequest.lastName,
+          )
+
+          if (similarityScore < NAME_SIMILARITY_THRESHOLD) {
+            return matches
+          }
+
+          matches.push({
+            type: 'pendingRequest' as const,
+            id: otherPendingRequest._id.toString(),
+            firstName: otherPendingRequest.firstName,
+            lastName: otherPendingRequest.lastName,
+            similarityScore,
+            email: otherPendingRequest.email,
+            phone: otherPendingRequest.phone,
+            externalId: otherPendingRequest.externalId,
+            createdAt: otherPendingRequest.createdAt,
+          })
+
+          return matches
+        }, [])
+
+      const possibleDuplicates = [...enrolledMatches, ...pendingMatches].sort(
+        (left, right) => right.similarityScore - left.similarityScore,
+      )
 
       return {
         ...pendingRequest,

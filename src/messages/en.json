@@ -287,11 +287,12 @@
       "error": "An error occurred while processing the request.",
       "requestedAt": "Requested on {date}",
       "duplicateBox": {
-        "title": "Possible duplicate detected: {count} name matches",
+        "title": "Possible duplicate detected: {count} similar name matches",
         "type": {
           "enrolledStudent": "Enrolled student",
           "pendingRequest": "Pending request"
         },
+        "similarity": "Similarity: {value}%",
         "externalId": "Student ID: {value}",
         "externalIdMissing": "Student ID: missing",
         "email": "Email: {value}",
