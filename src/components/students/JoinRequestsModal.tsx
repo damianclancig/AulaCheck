@@ -139,6 +139,10 @@ export function JoinRequestsModal({
                                   {duplicate.firstName} {duplicate.lastName}
                                 </p>
                                 <p className="italic mt-0.5">
+                                  {t('duplicateBox.similarity', {
+                                    value: Math.round(duplicate.similarityScore * 100),
+                                  })}
+                                  {' • '}
                                   {duplicate.externalId
                                     ? t('duplicateBox.externalId', { value: duplicate.externalId })
                                     : t('duplicateBox.externalIdMissing')}

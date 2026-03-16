@@ -291,11 +291,12 @@
       "error": "Ocurrió un error al procesar la solicitud.",
       "requestedAt": "Solicitado el {date}",
       "duplicateBox": {
-        "title": "Posible duplicado detectado: {count} coincidencias por nombre y apellido",
+        "title": "Posible duplicado detectado: {count} coincidencias de nombre similares",
         "type": {
           "enrolledStudent": "Alumno matriculado",
           "pendingRequest": "Solicitud pendiente"
         },
+        "similarity": "Similitud: {value}%",
         "externalId": "Legajo: {value}",
         "externalIdMissing": "Legajo: sin dato",
         "email": "Email: {value}",
