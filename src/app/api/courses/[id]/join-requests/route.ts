@@ -184,7 +184,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         : []
 
     const requestsWithMatches: PendingJoinRequestWithMatches[] = requests.map((pendingRequest) => {
-      const enrolledMatches = enrolledStudents.reduce<JoinRequestPossibleDuplicate[]>((matches, student) => {
+      const enrolledMatches = enrolledStudents.reduce<JoinRequestPossibleDuplicate[]>(
+        (matches, student) => {
           const similarityScore = calculateFullNameSimilarity(
             pendingRequest.firstName,
             pendingRequest.lastName,
@@ -210,12 +211,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           })
 
           return matches
-        }, [])
+        },
+        [],
+      )
 
-      const pendingMatches = requests.reduce<JoinRequestPossibleDuplicate[]>((matches, otherPendingRequest) => {
-        if (otherPendingRequest._id.toString() === pendingRequest._id.toString()) {
-          return matches
-        }
+      const pendingMatches = requests.reduce<JoinRequestPossibleDuplicate[]>(
+        (matches, otherPendingRequest) => {
+          if (otherPendingRequest._id.toString() === pendingRequest._id.toString()) {
+            return matches
+          }
 
           const similarityScore = calculateFullNameSimilarity(
             pendingRequest.firstName,
@@ -241,7 +245,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           })
 
           return matches
-        }, [])
+        },
+        [],
+      )
 
       const possibleDuplicates = [...enrolledMatches, ...pendingMatches].sort(
         (left, right) => right.similarityScore - left.similarityScore,
