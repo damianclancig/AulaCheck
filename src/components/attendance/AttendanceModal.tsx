@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Loader2, Check, XCircle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Loader2, Check, XCircle, Clock, ChevronLeft, ChevronRight, Calendar, AlertTriangle, UserX, MessageSquare, School } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
@@ -41,6 +41,8 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
   const t = useTranslations('attendance.modal');
   const tLegends = useTranslations('attendance.sheet.legends');
   const tCommon = useTranslations('common');
+  const [showStatusSelector, setShowStatusSelector] = useState(false);
+  const dateInputRef = useRef<HTMLInputElement>(null);
 
 
   // Carousel State
@@ -210,84 +212,72 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-2 -mr-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             aria-label={tCommon('close')}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Date Picker and Suspension Reason */}
-        <div className="p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 transition-colors">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Date Picker and Status Selectors */}
+        <div className="p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 transition-colors bg-gray-50/50 dark:bg-gray-800/30">
+          <div className="grid grid-cols-2 gap-3">
             {/* Fecha de la clase */}
             <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-[10px] md:text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
                 {t('dateLabel')}
               </label>
+              <button
+                onClick={() => dateInputRef.current?.showPicker()}
+                className="w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-600 transition-all text-sm font-medium text-gray-900 dark:text-white group"
+              >
+                <span className="truncate">{new Date(date + 'T12:00:00').toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                <Calendar className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors flex-shrink-0" />
+              </button>
               <input
+                ref={dateInputRef}
                 type="date"
                 id="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900 [color-scheme:light] dark:[color-scheme:dark]"
+                className="hidden"
               />
             </div>
 
-            {/* Motivo de suspensión */}
+            {/* Estado de la clase */}
             <div>
-              <label htmlFor="suspensionReason" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-[10px] md:text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
                 {t('statusLabel')}
               </label>
-              <select
-                id="suspensionReason"
-                value={suspensionReason}
-                onChange={(e) => {
-                  setSuspensionReason(e.target.value as any);
-                  if (e.target.value !== 'other') {
-                    setSuspensionNote('');
-                  }
-                }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900 [color-scheme:light] dark:[color-scheme:dark]"
+              <button
+                onClick={() => setShowStatusSelector(true)}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-600 transition-all text-sm font-medium group",
+                  suspensionReason !== 'none' ? "text-indigo-600 dark:text-indigo-400" : "text-gray-900 dark:text-white"
+                )}
               >
-                <option value="none">{t('normalClass')}</option>
-                <option value="class_suspension">{t('suspension')}</option>
-                <option value="teacher_leave">{t('teacherLeave')}</option>
-                <option value="other">{t('otherReason')}</option>
-              </select>
+                <span className="truncate">
+                  {suspensionReason === 'none' && t('normalClass')}
+                  {suspensionReason === 'class_suspension' && t('suspension')}
+                  {suspensionReason === 'teacher_leave' && t('teacherLeave')}
+                  {suspensionReason === 'other' && t('otherReason')}
+                </span>
+                <div className="flex-shrink-0 ml-1">
+                  {suspensionReason === 'none' && <School className="w-4 h-4 text-gray-400 group-hover:text-indigo-500" />}
+                  {suspensionReason === 'class_suspension' && <AlertTriangle className="w-4 h-4 text-indigo-500" />}
+                  {suspensionReason === 'teacher_leave' && <UserX className="w-4 h-4 text-indigo-500" />}
+                  {suspensionReason === 'other' && <MessageSquare className="w-4 h-4 text-indigo-500" />}
+                </div>
+              </button>
             </div>
           </div>
 
-          {/* Input condicional para "Otro motivo" */}
-          {suspensionReason === 'other' && (
-            <div className="mt-4">
-              <label htmlFor="suspensionNote" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('specifyReason')}
-              </label>
-              <input
-                type="text"
-                id="suspensionNote"
-                value={suspensionNote}
-                onChange={(e) => setSuspensionNote(e.target.value)}
-                placeholder={t('reasonPlaceholder')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white bg-white dark:bg-gray-900"
-              />
-            </div>
-          )}
-
           {isDuplicateDate && (
-            <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg flex items-start gap-2">
-              <svg className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-orange-800 dark:text-orange-300">
-                  {t('duplicateWarning')}
-                </p>
-                <p className="text-xs text-orange-700 dark:text-orange-400 mt-1">
-                  {t('duplicateDesc')}
-                </p>
-              </div>
+            <div className="mt-3 p-2.5 bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 rounded-xl flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] leading-tight text-orange-800 dark:text-orange-300 font-medium">
+                {t('duplicateWarning')}. {t('duplicateDesc')}
+              </p>
             </div>
           )}
         </div>
@@ -368,7 +358,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         {/* MOBILE CAROUSEL VIEW */}
         {suspensionReason === 'none' && (
           <div
-            className="md:hidden flex-1 overflow-y-auto flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-800 transition-colors"
+            className="md:hidden flex-1 flex flex-col items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/10 transition-colors overflow-hidden"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -376,104 +366,211 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
             {currentStudent && (
               <div
                 className={cn(
-                  "w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 flex flex-col items-center text-center space-y-4 transition-all duration-500",
+                  "w-full max-w-sm flex flex-col items-center justify-center space-y-6 transition-all duration-500 h-full",
                   isTransitioning ? "opacity-0 scale-95 translate-x-8" : "opacity-100 scale-100 translate-x-0"
                 )}
                 key={currentIndex}
               >
+                {/* Student Info Card */}
+                <div className="w-full bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center text-center space-y-4">
+                  {/* Progress Indicator */}
+                  <div className="w-full flex justify-between text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] font-black">
+                    <span>{t('carousel.progress', { current: currentIndex + 1, total: sortedStudents.length })}</span>
+                    <span>{Math.round(((currentIndex + 1) / sortedStudents.length) * 100)}%</span>
+                  </div>
 
-                {/* Progress Indicator */}
-                <div className="w-full flex justify-between text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">
-                  <span>{t('carousel.progress', { current: currentIndex + 1, total: sortedStudents.length })}</span>
-                  <span>{Math.round(((currentIndex + 1) / sortedStudents.length) * 100)}%</span>
-                </div>
-
-                {/* Student Info */}
-                <div className="flex flex-col items-center gap-2 py-2">
-                  <div>
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white leading-tight tracking-tight">
-                      {currentStudent.lastName}, {currentStudent.firstName}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="h-14 w-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xl mb-2 shadow-lg shadow-indigo-200 dark:shadow-none">
+                      {currentStudent.firstName[0]}{currentStudent.lastName[0]}
+                    </div>
+                    <h3 className="text-2xl font-black text-gray-900 dark:text-white leading-tight tracking-tight">
+                      {currentStudent.lastName.toUpperCase()}<br />
+                      <span className="text-indigo-600 dark:text-indigo-400 font-medium">{currentStudent.firstName}</span>
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">
-                      Legajo: {currentStudent.externalId || t('carousel.noLegajo')}
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 font-bold px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
+                      ID: {currentStudent.externalId || '---'}
                     </p>
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="w-full space-y-2">
-                  <div className="grid grid-cols-2 gap-2">
+                {/* Action Buttons - FIXED IN SCREEN */}
+                <div className="w-full space-y-3 pb-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => handleStatusChange(currentStudent._id.toString(), 'present', true)}
                       className={cn(
-                        "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-95",
+                        "flex flex-col items-center justify-center gap-2 p-5 rounded-3xl border-2 transition-all active:scale-95 shadow-lg",
                         currentStatus === 'present'
-                          ? "border-green-500 bg-green-50 text-green-700 shadow-sm"
-                          : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-green-200 bg-green-50/20 text-green-600 hover:bg-green-50 dark:border-green-800 dark:bg-green-900/10 dark:text-green-400 dark:hover:bg-green-900/20"
+                          ? "border-green-500 bg-green-500 text-white shadow-green-200 dark:shadow-none scale-[1.02]"
+                          : "border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-300 hover:border-green-200"
                       )}
                     >
-                      <Check className="w-6 h-6" />
-                      <span className="font-bold text-sm">{tLegends('present')}</span>
+                      <Check className={cn("w-7 h-7", currentStatus === 'present' ? "text-white" : "text-green-500")} />
+                      <span className="font-black text-xs uppercase tracking-widest">{tLegends('present')}</span>
                     </button>
 
                     <button
                       onClick={() => handleStatusChange(currentStudent._id.toString(), 'absent', true)}
                       className={cn(
-                        "flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all active:scale-95",
+                        "flex flex-col items-center justify-center gap-2 p-5 rounded-3xl border-2 transition-all active:scale-95 shadow-lg",
                         currentStatus === 'absent'
-                          ? "border-red-500 bg-red-50 text-red-700 shadow-sm"
-                          : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-red-200 bg-red-50/20 text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-red-900/10 dark:text-red-400 dark:hover:bg-red-900/20"
+                          ? "border-red-500 bg-red-500 text-white shadow-red-200 dark:shadow-none scale-[1.02]"
+                          : "border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-300 hover:border-red-200"
                       )}
                     >
-                      <XCircle className="w-6 h-6" />
-                      <span className="font-bold text-sm">{tLegends('absent')}</span>
+                      <XCircle className={cn("w-7 h-7", currentStatus === 'absent' ? "text-white" : "text-red-500")} />
+                      <span className="font-black text-xs uppercase tracking-widest">{tLegends('absent')}</span>
                     </button>
                   </div>
 
                   <button
                     onClick={() => handleStatusChange(currentStudent._id.toString(), 'late', true)}
                     className={cn(
-                      "w-full flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all active:scale-95",
+                      "w-full flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all active:scale-95",
                       currentStatus === 'late'
-                        ? "border-yellow-500 bg-yellow-50 text-yellow-700 shadow-sm"
-                        : currentStatus ? "border-gray-200 bg-white text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500" : "border-yellow-200 bg-yellow-50/20 text-yellow-600 hover:bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/10 dark:text-yellow-400 dark:hover:bg-yellow-900/20"
+                        ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300"
+                        : "border-transparent bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:border-yellow-100"
                     )}
                   >
-                    <Clock className="w-4 h-4" />
-                    <span className="font-medium text-sm">{tLegends('late')}</span>
+                    <Clock className="w-5 h-5 text-yellow-500" />
+                    <span className="font-bold text-sm">{tLegends('late')}</span>
                   </button>
                 </div>
 
-                {/* Navigation Hints */}
-                <div className="flex items-center justify-between w-full text-gray-300 dark:text-gray-600 pt-2">
+                {/* Navigation Controls */}
+                <div className="flex items-center justify-between w-full px-4 text-gray-400 dark:text-gray-600">
                   <button
                     onClick={() => currentIndex > 0 && setCurrentIndex(prev => prev - 1)}
                     disabled={currentIndex === 0}
-                    className="p-2 hover:text-gray-500 dark:hover:text-gray-400 disabled:opacity-30"
+                    className="p-3 bg-white dark:bg-gray-900 rounded-2xl shadow-sm disabled:opacity-30 disabled:shadow-none transition-all active:scale-90"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
-                  <div className="flex gap-1">
-                    {sortedStudents.map((_, idx) => (
-                      <div
-                        key={idx}
-                        className={cn(
-                          "w-1.5 h-1.5 rounded-full transition-all",
-                          idx === currentIndex ? "bg-indigo-500 w-3" : "bg-gray-200 dark:bg-gray-700"
-                        )}
-                      />
-                    ))}
+                  <div className="flex gap-1.5">
+                    {sortedStudents.length <= 10 ? (
+                      sortedStudents.map((_, idx) => (
+                        <div
+                          key={idx}
+                          className={cn(
+                            "w-2 h-2 rounded-full transition-all duration-300",
+                            idx === currentIndex ? "bg-indigo-500 w-5" : "bg-gray-200 dark:bg-gray-700"
+                          )}
+                        />
+                      ))
+                    ) : (
+                      <span className="text-xs font-black text-gray-500">
+                        {currentIndex + 1} / {sortedStudents.length}
+                      </span>
+                    )}
                   </div>
                   <button
                     onClick={() => currentIndex < students.length - 1 && setCurrentIndex(prev => prev + 1)}
                     disabled={currentIndex === sortedStudents.length - 1}
-                    className="p-2 hover:text-gray-500 dark:hover:text-gray-400 disabled:opacity-30"
+                    className="p-3 bg-white dark:bg-gray-900 rounded-2xl shadow-sm disabled:opacity-30 disabled:shadow-none transition-all active:scale-90"
                   >
                     <ChevronRight className="w-6 h-6" />
                   </button>
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Status Selector Modal Overlay */}
+        {showStatusSelector && (
+          <div className="absolute inset-0 z-[60] bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-6 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200">
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-8 tracking-tight">
+              {t('statusLabel')}
+            </h3>
+
+            <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
+              <button
+                onClick={() => {
+                  setSuspensionReason('none');
+                  setSuspensionNote('');
+                  setShowStatusSelector(false);
+                }}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all active:scale-95",
+                  suspensionReason === 'none'
+                    ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300"
+                    : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-500"
+                )}
+              >
+                <School className="w-8 h-8" />
+                <span className="font-bold text-xs text-center">{t('normalClass')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSuspensionReason('class_suspension');
+                  setSuspensionNote('');
+                  setShowStatusSelector(false);
+                }}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all active:scale-95",
+                  suspensionReason === 'class_suspension'
+                    ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300"
+                    : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-500"
+                )}
+              >
+                <AlertTriangle className="w-8 h-8" />
+                <span className="font-bold text-xs text-center">{t('suspension')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSuspensionReason('teacher_leave');
+                  setSuspensionNote('');
+                  setShowStatusSelector(false);
+                }}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all active:scale-95",
+                  suspensionReason === 'teacher_leave'
+                    ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300"
+                    : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-500"
+                )}
+              >
+                <UserX className="w-8 h-8" />
+                <span className="font-bold text-xs text-center">{t('teacherLeave')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setSuspensionReason('other');
+                }}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all active:scale-95",
+                  suspensionReason === 'other'
+                    ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300"
+                    : "border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-500"
+                )}
+              >
+                <MessageSquare className="w-8 h-8" />
+                <span className="font-bold text-xs text-center">{t('otherReason')}</span>
+              </button>
+            </div>
+
+            {suspensionReason === 'other' && (
+              <div className="w-full max-w-sm mt-6 animate-in slide-in-from-top-2">
+                <textarea
+                  id="suspensionNote"
+                  rows={3}
+                  value={suspensionNote}
+                  onChange={(e) => setSuspensionNote(e.target.value)}
+                  placeholder={t('reasonPlaceholder')}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-indigo-100 dark:border-indigo-900/30 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-gray-900 dark:text-white transition-all"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowStatusSelector(false)}
+              className="mt-8 px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-black text-sm uppercase tracking-widest active:scale-95 transition-all"
+            >
+              {tCommon('confirm')}
+            </button>
           </div>
         )}
 
@@ -526,17 +623,17 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
           <div className="flex gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-95"
             >
               {tCommon('cancel')}
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading || (suspensionReason === 'none' && !allStudentsMarked) || (suspensionReason === 'other' && !suspensionNote)}
-              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 transition-all"
+              className="flex-1 sm:flex-none px-8 py-2.5 text-sm font-black text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-indigo-100 dark:shadow-none"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {t('saveButton')}
+              {t('saveButton').toUpperCase()}
             </button>
           </div>
         </div>
