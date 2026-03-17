@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Save, Loader2, Check } from 'lucide-react';
+import { Plus, Save, Loader2, Check, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useModal } from '@/hooks/useModal';
 import { useGradeSheet } from '@/hooks/useGradeSheet';
@@ -382,7 +382,46 @@ export function GradeTable({ period, year }: GradeTableProps) {
   );
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-4">
+      {/* Barra de acciones (sólo para agregar actividad en móvil) */}
+      <div className="md:hidden">
+        {showAddInput ? (
+          <div className="flex items-center gap-2 mb-4 animate-in fade-in slide-in-from-top-2">
+            <input
+              autoFocus
+              value={newActivityName}
+              onChange={(e) => setNewActivityName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAddActivity();
+                if (e.key === 'Escape') setShowAddInput(false);
+              }}
+              placeholder={t('activityNamePlaceholder')}
+              className="flex-1 px-3 py-2 text-sm border border-indigo-200 dark:border-indigo-900/50 rounded-xl outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            />
+            <button
+              onClick={handleAddActivity}
+              className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/30 active:scale-95 transition-all"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowAddInput(false)}
+              className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowAddInput(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 mb-4 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 border-2 border-dashed border-indigo-200 dark:border-indigo-800/50 rounded-2xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all active:scale-[0.98]"
+          >
+            <Plus className="w-5 h-5" />
+            {t('addActivity')}
+          </button>
+        )}
+      </div>
+
       {mobileView}
       {desktopView}
 
