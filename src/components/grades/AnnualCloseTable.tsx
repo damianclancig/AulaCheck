@@ -8,6 +8,7 @@ import { OverrideMenu } from './OverrideMenu';
 import { useModal } from '@/hooks/useModal';
 import type { BadgeType } from './StatusBadge';
 import { Card } from '@/components/ui/Card';
+import { StudentAvatar } from '../students/StudentAvatar';
 
 interface AnnualCloseTableProps {
   year: number;
@@ -99,8 +100,13 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                       idx % 2 === 0 ? '' : 'bg-gray-50/50 dark:bg-gray-800/20'
                     }`}
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                      {row.lastName}, {row.firstName}
+                    <td className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-3">
+                        <StudentAvatar firstName={row.firstName} lastName={row.lastName} />
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {row.lastName}, {row.firstName}
+                        </span>
+                      </div>
                     </td>
                     {/* Promedio C1 */}
                     <td className="px-3 py-3 text-center">
@@ -179,10 +185,13 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
               variant="interactive"
               className="p-4 space-y-3"
             >
-              <div className="flex items-start justify-between gap-2">
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                  {row.lastName}, {row.firstName}
-                </p>
+              <div className="flex items-start justify-between gap-3 bg-gray-50/50 dark:bg-gray-800/10 -mx-4 -mt-4 px-4 py-3 border-b border-gray-100 dark:border-gray-800 rounded-t-xl mb-3">
+                <div className="flex items-center gap-3 truncate">
+                  <StudentAvatar firstName={row.firstName} lastName={row.lastName} />
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+                    {row.lastName}, {row.firstName}
+                  </p>
+                </div>
                 <OverrideMenu
                   target="annual"
                   currentStatus={effectiveCondition}

@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react'
 import { useModal } from '@/hooks/useModal'
 import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/Card'
+import { StudentAvatar } from '../students/StudentAvatar'
 
 type AttendanceStatus = 'present' | 'absent' | 'late'
 
@@ -80,11 +81,14 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
       <div
         className={`${isInactive ? 'bg-gray-200/70 dark:bg-gray-700/60' : 'bg-gray-50 dark:bg-gray-800'} -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center gap-2`}
       >
-        <h4
-          className={`text-base font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
-        >
-          {student.lastName}, {student.firstName}
-        </h4>
+        <div className="flex items-center gap-3 truncate">
+          <StudentAvatar firstName={student.firstName} lastName={student.lastName} isInactive={isInactive} />
+          <h4
+            className={`text-base font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
+          >
+            {student.lastName}, {student.firstName}
+          </h4>
+        </div>
 
         {/* Statistics in Header */}
         <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
@@ -485,9 +489,14 @@ export function AttendanceSheet({
                   className={`transition-colors ${isInactive ? 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200/60 dark:hover:bg-gray-700/60' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 >
                   <td
-                    className={`sticky left-0 z-10 ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} px-6 py-4 whitespace-nowrap text-base font-medium ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} border-r border-gray-200 dark:border-gray-700`}
+                    className={`sticky left-0 z-10 ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} px-6 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-700`}
                   >
-                    {student.lastName}, {student.firstName}
+                    <div className="flex items-center gap-3">
+                      <StudentAvatar firstName={student.firstName} lastName={student.lastName} isInactive={isInactive} />
+                      <span className={`text-base font-medium ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'}`}>
+                        {student.lastName}, {student.firstName}
+                      </span>
+                    </div>
                   </td>
                   {dates.map((date) => {
                     const status = studentRecords[date]

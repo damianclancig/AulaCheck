@@ -17,6 +17,7 @@ import { calculateTrajectoryStatus } from '@/lib/calculations/trajectoryUtils';
 import type { BadgeType } from './StatusBadge';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { StudentAvatar } from '../students/StudentAvatar';
 
 interface GradeTableProps {
   period: 1 | 2;
@@ -152,6 +153,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
             >
               {/* Encabezado: Nombre + Puntos (Consistencia con Asistencia) */}
               <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex items-center gap-3">
+                <StudentAvatar firstName={row.firstName} lastName={row.lastName} />
                 <h4 className="text-base font-semibold text-gray-900 dark:text-white truncate">
                   {row.lastName}, {row.firstName}
                 </h4>
@@ -337,13 +339,16 @@ export function GradeTable({ period, year }: GradeTableProps) {
                 >
                   {/* Nombre (columna fija) */}
                   <td 
-                    className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-4 py-2 font-medium text-base text-gray-900 dark:text-white border-r border-gray-100 dark:border-gray-800 cursor-context-menu"
+                    className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-4 py-2 font-medium text-gray-900 dark:text-white border-r border-gray-100 dark:border-gray-800 cursor-context-menu"
                     {...longPressHandlers}
                     onMouseDown={() => longPressHandlers.onMouseDown(row)}
                     onTouchStart={() => longPressHandlers.onTouchStart(row)}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span>{row.lastName}, {row.firstName}</span>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <StudentAvatar firstName={row.firstName} lastName={row.lastName} />
+                        <span className="text-base font-medium">{row.lastName}, {row.firstName}</span>
+                      </div>
                       <BehavioralBadge 
                         points={row.behavioralPoints} 
                         onClick={() => setBehavioralStudent({

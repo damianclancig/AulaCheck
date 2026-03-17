@@ -23,6 +23,7 @@ import {
 import { useState, useMemo, useRef, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { StudentAvatar } from './StudentAvatar'
 import { ContactPopover } from './ContactPopover'
 import { AddCommentModal } from './AddCommentModal'
 import { ConfirmationModal } from '@/components/common/ConfirmationModal'
@@ -794,16 +795,11 @@ export function StudentList({
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center">
-                            <div
-                              className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}
-                            >
-                              <span
-                                className={`font-medium text-xs ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
-                              >
-                                {student.firstName[0]}
-                                {student.lastName[0]}
-                              </span>
-                            </div>
+                            <StudentAvatar 
+                              firstName={student.firstName} 
+                              lastName={student.lastName} 
+                              isInactive={isInactive} 
+                            />
                             <div className="ml-3">
                               <div className="text-base font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                 <span
@@ -942,16 +938,11 @@ export function StudentList({
               >
                 <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-4 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-200' : 'bg-indigo-100 dark:bg-indigo-900/40'}`}
-                    >
-                      <span
-                        className={`font-medium text-[10px] ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
-                      >
-                        {student.firstName[0]}
-                        {student.lastName[0]}
-                      </span>
-                    </div>
+                    <StudentAvatar 
+                      firstName={student.firstName} 
+                      lastName={student.lastName} 
+                      isInactive={isInactive} 
+                    />
                     <div className="flex items-center gap-2">
                       <h4 className="text-base font-semibold text-gray-900 dark:text-white truncate">
                         <span
@@ -1135,16 +1126,11 @@ export function StudentList({
                               <td className="px-6 py-4">
                                 <div className="flex flex-col gap-1">
                                   <div className="flex items-center">
-                                    <div
-                                      className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}
-                                    >
-                                      <span
-                                        className={`font-medium text-xs ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
-                                      >
-                                        {student.firstName[0]}
-                                        {student.lastName[0]}
-                                      </span>
-                                    </div>
+                                    <StudentAvatar 
+                                      firstName={student.firstName} 
+                                      lastName={student.lastName} 
+                                      isInactive={isInactive} 
+                                    />
                                     <div className="ml-3">
                                       <div className="text-base font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                         <span
@@ -1282,16 +1268,11 @@ export function StudentList({
                       >
                         <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-4 transition-colors">
                           <div className="flex items-center gap-3">
-                            <div
-                              className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-200' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}
-                            >
-                              <span
-                                className={`font-medium text-[10px] ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
-                              >
-                                {student.firstName[0]}
-                                {student.lastName[0]}
-                              </span>
-                            </div>
+                            <StudentAvatar 
+                              firstName={student.firstName} 
+                              lastName={student.lastName} 
+                              isInactive={isInactive} 
+                            />
                             <div className="flex items-center gap-2">
                               <h4 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 <span
