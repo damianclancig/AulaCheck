@@ -145,14 +145,14 @@ export function GradeTable({ period, year }: GradeTableProps) {
           return (
             <div
               key={row.studentId}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-3.5 space-y-4 shadow-sm"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-2.5 space-y-3 shadow-sm"
             >
-              {/* Encabezado: Nombre + Puntos */}
-              <div className="flex items-center justify-between gap-2 border-b border-gray-50 dark:border-gray-800/50 pb-2">
-                <p className="font-bold text-gray-900 dark:text-white text-sm truncate">
+              {/* Encabezado: Nombre + Puntos (Consistencia con Asistencia) */}
+              <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex items-center gap-3">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                   {row.lastName}, {row.firstName}
-                </p>
-                <div className="flex-shrink-0">
+                </h4>
+                <div className="flex-shrink-0 scale-90 origin-left">
                   <BehavioralBadge 
                     points={row.behavioralPoints} 
                     onClick={() => setBehavioralStudent({
@@ -420,7 +420,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
   );
 
   return (
-    <div className="p-2 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-4">
+    <div className="p-0 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-4">
       {/* Barra de acciones (sólo para agregar actividad en móvil) */}
       <div className="md:hidden">
         {showAddInput ? (

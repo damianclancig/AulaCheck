@@ -79,7 +79,7 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
         className={`${isInactive ? 'bg-gray-200/70 dark:bg-gray-700/60' : 'bg-gray-50 dark:bg-gray-800'} px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center gap-2`}
       >
         <h4
-          className={`font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
+          className={`text-sm font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
         >
           {student.lastName}, {student.firstName}
         </h4>

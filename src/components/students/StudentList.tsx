@@ -937,20 +937,20 @@ export function StudentList({
                   }
                 }}
               >
-                <div className="flex justify-between items-start mb-3">
+                <div className="bg-gray-50 dark:bg-gray-800 -mx-4 -mt-4 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-xl flex justify-between items-center mb-4 transition-colors">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}
+                      className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-200' : 'bg-indigo-100 dark:bg-indigo-900/40'}`}
                     >
                       <span
-                        className={`font-medium text-sm ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
+                        className={`font-medium text-[10px] ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
                       >
                         {student.firstName[0]}
                         {student.lastName[0]}
                       </span>
                     </div>
-                    <div>
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         <span
                           className={
                             student.requiresAttention
@@ -960,29 +960,40 @@ export function StudentList({
                         >
                           {student.lastName}, {student.firstName}
                         </span>
+                      </h4>
+                      <div className="flex items-center gap-1">
+                        {student.isRepeating && (
+                          <div
+                            className="flex items-center justify-center w-5 h-5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50"
+                            title={t('isRepeating')}
+                          >
+                            <span className="font-black text-[10px]">R</span>
+                          </div>
+                        )}
+                        {isInactive && renderInactiveBadge(student)}
                         {Object.values(loadingFlags[student._id.toString()] || {}).some(
                           Boolean,
-                        ) && <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />}
-                        <div className="flex items-center gap-1.5 ml-1">
-                          {student.isRepeating && (
-                            <div
-                              className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50"
-                              title={t('isRepeating')}
-                            >
-                              <span className="font-black text-sm">R</span>
-                            </div>
-                          )}
-                        </div>
-                        {isInactive && renderInactiveBadge(student)}
-                      </h3>
-                      {student.externalId && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t('externalIdPlaceholder')}: {student.externalId}
-                        </p>
-                      )}
+                        ) && <Loader2 className="w-3 h-3 text-indigo-500 animate-spin ml-1" />}
+                      </div>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleContextMenu(e, student._id.toString())
+                    }}
+                    className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                  >
+                    <MoreVertical className="w-4 h-4 text-gray-500" />
+                  </button>
                 </div>
+
+                {student.externalId && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-1">
+                    {t('externalIdPlaceholder')}: {student.externalId}
+                  </p>
+                )}
 
                 {student.notes && (
                   <p className="text-sm text-gray-500 dark:text-gray-400 italic whitespace-pre-line line-clamp-3 mb-3">
@@ -1265,20 +1276,20 @@ export function StudentList({
                           }
                         }}
                       >
-                        <div className="flex justify-between items-start mb-3">
+                        <div className="bg-gray-50 dark:bg-gray-800 -mx-4 -mt-4 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-xl flex justify-between items-center mb-4 transition-colors">
                           <div className="flex items-center gap-3">
                             <div
-                              className={`shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-100' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}
+                              className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-200' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}
                             >
                               <span
-                                className={`font-medium text-sm ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
+                                className={`font-medium text-[10px] ${isInactive ? 'text-gray-500' : 'text-indigo-600 dark:text-indigo-400'}`}
                               >
                                 {student.firstName[0]}
                                 {student.lastName[0]}
                               </span>
                             </div>
-                            <div>
-                              <h3 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 <span
                                   className={
                                     student.requiresAttention
@@ -1288,23 +1299,18 @@ export function StudentList({
                                 >
                                   {student.lastName}, {student.firstName}
                                 </span>
-                                <div className="flex items-center gap-1.5 ml-1">
-                                  {student.isRepeating && (
-                                    <div
-                                      className="flex items-center justify-center w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50"
-                                      title={t('isRepeating')}
-                                    >
-                                      <span className="font-black text-sm">R</span>
-                                    </div>
-                                  )}
-                                </div>
+                              </h4>
+                              <div className="flex items-center gap-1.5 ml-1">
+                                {student.isRepeating && (
+                                  <div
+                                    className="flex items-center justify-center w-5 h-5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50"
+                                    title={t('isRepeating')}
+                                  >
+                                    <span className="font-black text-[10px]">R</span>
+                                  </div>
+                                )}
                                 {renderInactiveBadge(student)}
-                              </h3>
-                              {student.externalId && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                  {t('externalIdPlaceholder')}: {student.externalId}
-                                </p>
-                              )}
+                              </div>
                             </div>
                           </div>
                           <button
@@ -1312,12 +1318,18 @@ export function StudentList({
                             onClick={(e) =>
                               handleContextMenu(e, student._id.toString(), 'inactive')
                             }
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
                             aria-label={t('actions.hardDelete')}
                           >
-                            <MoreVertical className="w-4 h-4" />
+                            <MoreVertical className="w-4 h-4 text-gray-500" />
                           </button>
                         </div>
+
+                        {student.externalId && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-1">
+                            {t('externalIdPlaceholder')}: {student.externalId}
+                          </p>
+                        )}
 
                         {student.notes && (
                           <p className="text-sm text-gray-500 dark:text-gray-400 italic whitespace-pre-line line-clamp-3 mb-3">

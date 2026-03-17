@@ -218,7 +218,7 @@ export default function CourseDetailPage() {
           </Link>
 
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+            <p className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-1">
               {course.institutionName}
             </p>
             <div className="flex items-center gap-2">
@@ -233,13 +233,12 @@ export default function CourseDetailPage() {
             </div>
             {course.shift && (
               <p
-                className={`text-sm font-semibold mt-1 ${
-                  course.shift === 'Mañana'
+                className={`text-sm font-semibold mt-1 ${course.shift === 'Mañana'
                     ? 'text-amber-600 dark:text-amber-400'
                     : course.shift === 'Tarde'
                       ? 'text-orange-600 dark:text-orange-400'
                       : 'text-indigo-600 dark:text-indigo-400'
-                }`}
+                  }`}
               >
                 {t('shift')}:{' '}
                 {course.shift === 'Mañana'
@@ -256,39 +255,60 @@ export default function CourseDetailPage() {
             </p>
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-wrap justify-evenly gap-2 w-full md:w-auto">
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-3 md:gap-4">
+        <div className="grid grid-cols-3 gap-3 md:gap-4">
           <button
-            onClick={() => setIsAttendanceModalOpen(true)}
-            className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
+            onClick={() => setIsAddStudentModalOpen(true)}
+            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shadow-sm active:scale-95"
           >
-            <CalendarCheck className="w-4 h-4" /> {t('buttons.attendance')}
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+              <UserPlus className="w-4 h-4 md:w-6 md:h-6" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold text-center leading-tight">
+              {t('buttons.addStudent')}
+            </span>
           </button>
 
-          <button
-            onClick={() => setIsExportModalOpen(true)}
-            className="px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors"
-          >
-            <Download className="w-4 h-4" /> {t('buttons.export')}
-          </button>
           <button
             onClick={() => setIsInviteModalOpen(true)}
-            className="px-4 py-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center gap-2 text-sm font-medium whitespace-nowrap relative transition-colors"
+            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shadow-sm relative active:scale-95"
           >
-            <Link2 className="w-4 h-4" /> {t('buttons.invite')}
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+              <Link2 className="w-4 h-4 md:w-6 md:h-6" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold text-center leading-tight">
+              {t('buttons.invite')}
+            </span>
             {pendingRequestsCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] md:text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ring-2 ring-white dark:ring-gray-900">
                 {pendingRequestsCount}
               </span>
             )}
           </button>
+
           <button
-            onClick={() => setIsAddStudentModalOpen(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2 text-sm font-medium shadow-sm whitespace-nowrap transition-colors"
+            onClick={() => setIsExportModalOpen(true)}
+            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm active:scale-95"
           >
-            <UserPlus className="w-4 h-4" /> {t('buttons.addStudent')}
+            <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+              <Download className="w-4 h-4 md:w-6 md:h-6" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold text-center leading-tight">
+              {t('buttons.export')}
+            </span>
           </button>
         </div>
+
+        <button
+          onClick={() => setIsAttendanceModalOpen(true)}
+          className="w-full py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-3 text-base md:text-lg font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
+        >
+          <CalendarCheck className="w-6 h-6" />
+          {t('buttons.attendance')}
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -337,33 +357,30 @@ export default function CourseDetailPage() {
           <div className="flex gap-2">
             <button
               onClick={() => startTabTransition(() => setViewMode('list'))}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'list'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'list'
                   ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
                   : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+                }`}
             >
               <List className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.listLabel')}</span>
             </button>
             <button
               onClick={() => startTabTransition(() => setViewMode('sheet'))}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'sheet'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'sheet'
                   ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
                   : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+                }`}
             >
               <Table className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.sheetLabel')}</span>
             </button>
             <button
               onClick={() => startTabTransition(() => setViewMode('grades'))}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'grades'
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'grades'
                   ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
                   : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
+                }`}
             >
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.gradesLabel')}</span>
@@ -371,7 +388,7 @@ export default function CourseDetailPage() {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-2 sm:p-6">
           {!students ? (
             <div className="p-8 text-center">
               <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto" />
