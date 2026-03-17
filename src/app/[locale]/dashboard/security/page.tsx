@@ -91,7 +91,7 @@ export default function SecurityPage() {
                 </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-950 rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border)] overflow-hidden shadow-sm">
                 <div className="p-6 md:p-8 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
                         <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
@@ -120,8 +120,8 @@ export default function SecurityPage() {
                             <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
                         </div>
                     ) : authenticators.length === 0 ? (
-                        <div className="text-center py-16 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-3xl bg-gray-50/50 dark:bg-gray-900/20">
-                            <div className="bg-white dark:bg-gray-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-50 dark:border-gray-700">
+                        <div className="text-center py-16 border-2 border-dashed border-[var(--border)] rounded-3xl bg-[var(--bg-main)]">
+                            <div className="bg-[var(--bg-card)] w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-[var(--border)]">
                                 <Smartphone className="w-10 h-10 text-gray-300 dark:text-gray-600" />
                             </div>
                             <p className="text-gray-500 dark:text-gray-400 font-bold text-lg">{t('passkeys.noPasskeys')}</p>
@@ -132,10 +132,10 @@ export default function SecurityPage() {
                             {authenticators.map((auth) => (
                                 <div 
                                     key={auth.id} 
-                                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 md:p-6 bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300"
+                                    className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 md:p-6 bg-[var(--bg-main)] rounded-2xl border border-[var(--border)] hover:border-primary-300 transition-all duration-300"
                                 >
-                                    <div className="flex items-center gap-5">
-                                        <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 group-hover:scale-105 transition-transform duration-300">
+                                    <div className="flex items-start sm:items-center gap-4 sm:gap-6 mb-4 sm:mb-0">
+                                        <div className="bg-[var(--bg-card)] p-4 rounded-2xl shadow-sm border border-[var(--border)] group-hover:scale-105 transition-transform duration-300">
                                             {auth.deviceType === 'single_device' || auth.deviceType === 'platform' ? (
                                                 <Smartphone className="w-7 h-7 text-indigo-500 dark:text-indigo-400" />
                                             ) : (

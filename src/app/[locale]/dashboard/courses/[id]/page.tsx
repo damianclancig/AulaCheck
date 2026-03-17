@@ -262,7 +262,7 @@ export default function CourseDetailPage() {
         <div className="grid grid-cols-3 gap-3 md:gap-4">
           <button
             onClick={() => setIsAddStudentModalOpen(true)}
-            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shadow-sm active:scale-95"
+            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-[var(--bg-card)] border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
           >
             <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
               <UserPlus className="w-4 h-4 md:w-6 md:h-6" />
@@ -274,7 +274,7 @@ export default function CourseDetailPage() {
 
           <button
             onClick={() => setIsInviteModalOpen(true)}
-            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-white dark:bg-gray-900 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shadow-sm relative active:scale-95"
+            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-[var(--bg-card)] border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm relative active:scale-95"
           >
             <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
               <Link2 className="w-4 h-4 md:w-6 md:h-6" />
@@ -291,7 +291,7 @@ export default function CourseDetailPage() {
 
           <button
             onClick={() => setIsExportModalOpen(true)}
-            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm active:scale-95"
+            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-[var(--bg-card)] border border-gray-300 dark:border-gray-700 text-[var(--text-secondary)] rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
           >
             <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
               <Download className="w-4 h-4 md:w-6 md:h-6" />
@@ -313,7 +313,7 @@ export default function CourseDetailPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-        <div className="bg-white dark:bg-gray-900 p-3 md:p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors flex flex-col items-center md:items-start">
+        <div className="bg-[var(--bg-card)] p-3 md:p-4 rounded-xl border border-[var(--border)] shadow-sm transition-colors flex flex-col items-center md:items-start">
           <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
             {t('stats.avgAttendance')}
           </h3>
@@ -327,7 +327,7 @@ export default function CourseDetailPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 p-3 md:p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-colors flex flex-col items-center md:items-start">
+        <div className="bg-[var(--bg-card)] p-3 md:p-4 rounded-xl border border-[var(--border)] shadow-sm transition-colors flex flex-col items-center md:items-start">
           <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
             {t('stats.overallAvg')}
           </h3>
@@ -343,7 +343,7 @@ export default function CourseDetailPage() {
       </div>
 
       {/* Tabs / Content */}
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 transition-colors">
+      <div className="bg-[var(--bg-card)] rounded-xl shadow-sm border border-[var(--border)] transition-colors">
         <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
           <h3 className="font-semibold text-gray-900 dark:text-white">
             {viewMode === 'list'
@@ -358,8 +358,8 @@ export default function CourseDetailPage() {
             <button
               onClick={() => startTabTransition(() => setViewMode('list'))}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'list'
-                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-accent-100 dark:bg-accent-500/20 text-primary-900 dark:text-accent-300'
+                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent-50 dark:hover:bg-accent-500/10'
                 }`}
             >
               <List className="w-4 h-4" />
@@ -368,8 +368,8 @@ export default function CourseDetailPage() {
             <button
               onClick={() => startTabTransition(() => setViewMode('sheet'))}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'sheet'
-                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-accent-100 dark:bg-accent-500/20 text-primary-900 dark:text-accent-300'
+                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent-50 dark:hover:bg-accent-500/10'
                 }`}
             >
               <Table className="w-4 h-4" />
@@ -378,8 +378,8 @@ export default function CourseDetailPage() {
             <button
               onClick={() => startTabTransition(() => setViewMode('grades'))}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${viewMode === 'grades'
-                  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
-                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-accent-100 dark:bg-accent-500/20 text-primary-900 dark:text-accent-300'
+                  : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent-50 dark:hover:bg-accent-500/10'
                 }`}
             >
               <BookOpen className="w-4 h-4" />

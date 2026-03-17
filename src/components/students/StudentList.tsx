@@ -26,6 +26,8 @@ import { cn } from '@/lib/utils'
 import { ContactPopover } from './ContactPopover'
 import { AddCommentModal } from './AddCommentModal'
 import { ConfirmationModal } from '@/components/common/ConfirmationModal'
+import { Card } from '@/components/ui/Card'
+import { Input } from '@/components/ui/Input'
 
 interface ContextMenuState {
   visible: boolean
@@ -479,12 +481,12 @@ export function StudentList({
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-1 w-full max-w-md relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-            <input
+            <Input
               type="text"
               placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-900"
+              className="pl-10 pr-10"
             />
             {searchQuery && (
               <button
@@ -803,7 +805,7 @@ export function StudentList({
                               </span>
                             </div>
                             <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                              <div className="text-base font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                 <span
                                   className={
                                     student.requiresAttention
@@ -897,9 +899,10 @@ export function StudentList({
                   : 'text-red-600 bg-red-50'
 
             return (
-              <div
+              <Card
+                variant={isInactive ? "standard" : "interactive"}
                 key={student._id.toString()}
-                className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
+                className={`p-4 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
                 onContextMenu={(e) => {
                   if (!isInactive) {
                     handleContextMenu(e, student._id.toString())
@@ -950,7 +953,7 @@ export function StudentList({
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-white truncate">
                         <span
                           className={
                             student.requiresAttention
@@ -1033,7 +1036,7 @@ export function StudentList({
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             )
           })
         )}
@@ -1143,7 +1146,7 @@ export function StudentList({
                                       </span>
                                     </div>
                                     <div className="ml-3">
-                                      <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                      <div className="text-base font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                         <span
                                           className={
                                             student.requiresAttention
@@ -1239,9 +1242,10 @@ export function StudentList({
                     const attendanceColor = 'text-gray-400 bg-gray-100'
 
                     return (
-                      <div
+                      <Card
+                        variant="standard"
                         key={student._id.toString()}
-                        className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
+                        className={`p-4 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
                         onContextMenu={(e) =>
                           handleContextMenu(e, student._id.toString(), 'inactive')
                         }
@@ -1289,7 +1293,7 @@ export function StudentList({
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                              <h4 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 <span
                                   className={
                                     student.requiresAttention
@@ -1369,7 +1373,7 @@ export function StudentList({
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </Card>
                     )
                   })
                 )}
