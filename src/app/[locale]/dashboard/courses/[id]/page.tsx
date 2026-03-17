@@ -258,11 +258,11 @@ export default function CourseDetailPage() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-col gap-3 md:gap-4">
+      <div className="flex flex-col gap-3 md:gap-4 md:w-fit">
         <div className="grid grid-cols-3 gap-3 md:gap-4">
           <button
             onClick={() => setIsAddStudentModalOpen(true)}
-            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-[var(--bg-card)] border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
+            className="flex flex-col items-center justify-center py-2 md:py-4 md:px-8 gap-2 bg-[var(--bg-card)] border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
           >
             <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
               <UserPlus className="w-4 h-4 md:w-6 md:h-6" />
@@ -274,7 +274,7 @@ export default function CourseDetailPage() {
 
           <button
             onClick={() => setIsInviteModalOpen(true)}
-            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-[var(--bg-card)] border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm relative active:scale-95"
+            className="flex flex-col items-center justify-center py-2 md:py-4 md:px-8 gap-2 bg-[var(--bg-card)] border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm relative active:scale-95"
           >
             <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
               <Link2 className="w-4 h-4 md:w-6 md:h-6" />
@@ -291,7 +291,7 @@ export default function CourseDetailPage() {
 
           <button
             onClick={() => setIsExportModalOpen(true)}
-            className="flex flex-col items-center justify-center py-2 md:py-8 gap-2 bg-[var(--bg-card)] border border-gray-300 dark:border-gray-700 text-[var(--text-secondary)] rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
+            className="flex flex-col items-center justify-center py-2 md:py-4 md:px-8 gap-2 bg-[var(--bg-card)] border border-gray-300 dark:border-gray-700 text-[var(--text-secondary)] rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
           >
             <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
               <Download className="w-4 h-4 md:w-6 md:h-6" />
