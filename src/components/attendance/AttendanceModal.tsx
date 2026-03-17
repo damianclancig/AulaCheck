@@ -655,24 +655,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                 {t('missingCount', { count: sortedStudents.filter(s => !attendanceMap[s._id.toString()]).length })}
               </p>
             )}
-            {suspensionReason === 'none' && !isDuplicateDate && allStudentsMarked && (
-              <p className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1.5">
-                <Check className="w-4 h-4" />
-                {t('allMarked')}
-              </p>
-            )}
-            {suspensionReason !== 'none' && !isDuplicateDate && (
-              <p className="text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1.5">
-                <Check className="w-4 h-4" />
-                {t('readyToSave')}
-              </p>
-            )}
-            {isDuplicateDate && (
-              <p className="text-orange-600 dark:text-orange-400 font-bold flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4" />
-                {t('duplicateWarning')}
-              </p>
-            )}
+
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
             <button

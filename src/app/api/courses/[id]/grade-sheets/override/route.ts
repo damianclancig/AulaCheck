@@ -67,14 +67,25 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const metaCollection = await getGradeSheetMetaCollection();
+    const filter = { courseId, studentId: new ObjectId(studentId), year };
 
-    const updateFields: Record<string, unknown> = { updatedAt: new Date(), isManual: true };
+    // Obtener estado actual para calcular isManual correctamente
+    const currentMeta = await metaCollection.findOne(filter);
+
+    const updateFields: Record<string, unknown> = { updatedAt: new Date() };
     if (semester1Override !== undefined) updateFields.semester1Override = semester1Override;
     if (semester2Override !== undefined) updateFields.semester2Override = semester2Override;
     if (annualForcedCondition !== undefined) updateFields.annualForcedCondition = annualForcedCondition;
 
+    // Calcular isManual basado en el estado final resultante
+    const finalSemester1 = semester1Override !== undefined ? semester1Override : currentMeta?.semester1Override;
+    const finalSemester2 = semester2Override !== undefined ? semester2Override : currentMeta?.semester2Override;
+    const finalAnnual = annualForcedCondition !== undefined ? annualForcedCondition : currentMeta?.annualForcedCondition;
+
+    updateFields.isManual = !!(finalSemester1 || finalSemester2 || finalAnnual);
+
     await metaCollection.updateOne(
-      { courseId, studentId: new ObjectId(studentId), year },
+      filter,
       { $set: updateFields },
       { upsert: true }
     );

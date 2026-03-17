@@ -146,7 +146,7 @@ export async function getGradeSheetData(
     const filledScores = Object.values(scores).filter(
       (s): s is number => s !== null
     );
-    const average =
+    const activitiesAverage =
       activities.length > 0 && filledScores.length > 0
         ? filledScores.reduce((a, b) => a + b, 0) / filledScores.length
         : null;
@@ -154,9 +154,9 @@ export async function getGradeSheetData(
     // Puntos conductuales
     const behavioralPoints = behavioralByStudent.get(studentId) || 0;
 
-    // Nota final (promedio + puntos conductuales) clamp [1, 10]
-    const finalGrade = average !== null 
-      ? Math.min(Math.max(average + behavioralPoints, 1), 10) 
+    // Nota final (promedio actividades + puntos conductuales) clamp [1, 10]
+    const finalGrade = activitiesAverage !== null 
+      ? Math.min(Math.max(activitiesAverage + behavioralPoints, 1), 10) 
       : null;
 
     // Asistencia del periodo
@@ -194,14 +194,14 @@ export async function getGradeSheetData(
       firstName: student.firstName,
       lastName: student.lastName,
       scores,
-      average,
+      average: finalGrade,
       attendancePresent: att.present,
       attendanceAbsent: att.absent,
       attendancePercent,
       absencePercent,
       status,
       statusOverride,
-      isManual: meta?.isManual ?? false,
+      isManual: !!statusOverride,
       behavioralPoints,
     };
   });
@@ -322,7 +322,7 @@ export async function getAnnualClose(
       annualAttendancePercent,
       calculatedCondition,
       forcedCondition: meta?.annualForcedCondition ?? null,
-      isManual: meta?.isManual ?? false,
+      isManual: !!(meta?.annualForcedCondition),
     };
   });
 

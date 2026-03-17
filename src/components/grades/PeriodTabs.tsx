@@ -6,11 +6,9 @@ import type { PeriodType } from '@/hooks/useGradeSheet';
 interface PeriodTabsProps {
   selected: PeriodType;
   onChange: (period: PeriodType) => void;
-  year: number;
-  onYearChange: (year: number) => void;
 }
 
-export function PeriodTabs({ selected, onChange, year, onYearChange }: PeriodTabsProps) {
+export function PeriodTabs({ selected, onChange }: PeriodTabsProps) {
   const t = useTranslations('grades.sheet');
 
   const tabs: { id: PeriodType; label: string }[] = [
@@ -36,27 +34,6 @@ export function PeriodTabs({ selected, onChange, year, onYearChange }: PeriodTab
             {tab.label}
           </button>
         ))}
-      </div>
-
-      {/* Selector de año */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onYearChange(year - 1)}
-          className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          aria-label="Año anterior"
-        >
-          ◀
-        </button>
-        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[4rem] text-center">
-          {year}
-        </span>
-        <button
-          onClick={() => onYearChange(year + 1)}
-          className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          aria-label="Año siguiente"
-        >
-          ▶
-        </button>
       </div>
     </div>
   );

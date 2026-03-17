@@ -426,8 +426,6 @@ export default function CourseDetailPage() {
               <PeriodTabs
                 selected={gradesPeriod}
                 onChange={setGradesPeriod}
-                year={gradesYear}
-                onYearChange={setGradesYear}
               />
               {gradesPeriod === 'annual' ? (
                 <AnnualCloseTable year={gradesYear} />
