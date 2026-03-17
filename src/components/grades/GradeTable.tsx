@@ -145,57 +145,84 @@ export function GradeTable({ period, year }: GradeTableProps) {
           return (
             <div
               key={row.studentId}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-3 shadow-sm"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-3.5 space-y-4 shadow-sm"
             >
-              {/* Encabezado del alumno */}
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                      {row.lastName}, {row.firstName}
-                    </p>
-                    <BehavioralBadge 
-                      points={row.behavioralPoints} 
-                      onClick={() => setBehavioralStudent({
-                        id: row.studentId,
-                        name: `${row.lastName}, ${row.firstName}`,
-                        points: row.behavioralPoints
-                      })}
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    <span className={row.absencePercent > 30 ? 'text-red-500' : 'text-green-500'}>
-                      {row.attendancePercent.toFixed(0)}%
-                    </span>
-                    {' / '}
-                    <span className="text-red-500">{row.absencePercent.toFixed(0)}%</span>
-                    {' '}({t('attendance')})
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {avg !== null && (
-                    <span className="text-lg font-bold text-gray-900 dark:text-white">
-                      {avg.toFixed(1)}
-                    </span>
-                  )}
-                  <OverrideMenu
-                    target={period === 1 ? 'semester1' : 'semester2'}
-                    currentStatus={status}
-                    isManual={!!row.statusOverride}
-                    onSelect={(val) => handleOverride(row.studentId, val)}
+              {/* Encabezado: Nombre + Puntos */}
+              <div className="flex items-center justify-between gap-2 border-b border-gray-50 dark:border-gray-800/50 pb-2">
+                <p className="font-bold text-gray-900 dark:text-white text-sm truncate">
+                  {row.lastName}, {row.firstName}
+                </p>
+                <div className="flex-shrink-0">
+                  <BehavioralBadge 
+                    points={row.behavioralPoints} 
+                    onClick={() => setBehavioralStudent({
+                      id: row.studentId,
+                      name: `${row.lastName}, ${row.firstName}`,
+                      points: row.behavioralPoints
+                    })}
                   />
                 </div>
               </div>
 
-              {/* Actividades */}
+              {/* Fila 1: Asistencia (Izq) y Promedio/Trayectoria (Der) */}
+              <div className="flex items-center justify-between gap-4 bg-gray-50/50 dark:bg-gray-800/30 p-2 rounded-xl">
+                <div className="space-y-0.5">
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-bold">
+                    {t('attendance')}
+                  </p>
+                  <p className="text-xs font-semibold">
+                    <span className={row.absencePercent > 30 ? 'text-red-500' : 'text-green-500'}>
+                      {row.attendancePercent.toFixed(0)}%
+                    </span>
+                    <span className="text-gray-400 mx-1">/</span>
+                    <span className="text-red-500">{row.absencePercent.toFixed(0)}%</span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 text-right">
+                  <div className="flex flex-col items-end">
+                    <p className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-bold">
+                      {t('average')}
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      {avg !== null && (
+                        <span className="text-sm font-bold text-gray-900 dark:text-white">
+                          {avg.toFixed(1)}
+                        </span>
+                      )}
+                      <OverrideMenu
+                        target={period === 1 ? 'semester1' : 'semester2'}
+                        currentStatus={status}
+                        isManual={!!row.statusOverride}
+                        onSelect={(val) => handleOverride(row.studentId, val)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actividades: 3 columnas */}
               {activities.length > 0 && (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2 pt-1">
                   {activities.map((act) => (
-                    <div key={act.id}>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">{act.name}</p>
+                    <div key={act.id} className="space-y-1">
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate px-0.5">
+                        {act.name}
+                      </p>
                       <GradeCell
+                        id={`grade-${row.studentId}-${act.id}`}
                         value={row.scores[act.id] ?? null}
                         onChange={(score) => updateScore(row.studentId, act.id, score)}
+                        onNext={() => {
+                          const currentIndex = rows.findIndex(r => r.studentId === row.studentId);
+                          if (currentIndex < rows.length - 1) {
+                            const nextStudent = rows[currentIndex + 1];
+                            const nextInput = document.getElementById(`grade-${nextStudent.studentId}-${act.id}`) as HTMLElement;
+                            if (nextInput) {
+                              nextInput.click();
+                            }
+                          }
+                        }}
                       />
                     </div>
                   ))}
@@ -328,8 +355,19 @@ export function GradeTable({ period, year }: GradeTableProps) {
                   {activities.map((act) => (
                     <td key={act.id} className="px-1.5 py-1.5">
                       <GradeCell
+                        id={`grade-desktop-${row.studentId}-${act.id}`}
                         value={row.scores[act.id] ?? null}
                         onChange={(score) => updateScore(row.studentId, act.id, score)}
+                        onNext={() => {
+                          const currentIndex = rows.findIndex(r => r.studentId === row.studentId);
+                          if (currentIndex < rows.length - 1) {
+                            const nextStudent = rows[currentIndex + 1];
+                            const nextInput = document.getElementById(`grade-desktop-${nextStudent.studentId}-${act.id}`) as HTMLElement;
+                            if (nextInput) {
+                              nextInput.click();
+                            }
+                          }
+                        }}
                       />
                     </td>
                   ))}
@@ -382,7 +420,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
   );
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-4">
+    <div className="p-2 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-4">
       {/* Barra de acciones (sólo para agregar actividad en móvil) */}
       <div className="md:hidden">
         {showAddInput ? (

@@ -4,13 +4,22 @@ import { useState, useRef, useEffect, memo } from 'react';
 import { Pencil } from 'lucide-react';
 
 interface GradeCellProps {
+  id?: string;
   value: number | null;
   isManual?: boolean;
   onChange: (score: number | null) => void;
+  onNext?: () => void;
   disabled?: boolean;
 }
 
-export const GradeCell = memo(function GradeCell({ value, isManual = false, onChange, disabled = false }: GradeCellProps) {
+export const GradeCell = memo(function GradeCell({ 
+  id,
+  value, 
+  isManual = false, 
+  onChange, 
+  onNext,
+  disabled = false 
+}: GradeCellProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value !== null ? String(value) : '');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,7 +37,7 @@ export const GradeCell = memo(function GradeCell({ value, isManual = false, onCh
     if (raw === '' || raw === '-') {
       onChange(null);
     } else {
-      const num = parseFloat(raw);
+      const num = parseFloat(raw.replace(',', '.'));
       if (!isNaN(num) && num >= 1 && num <= 10) {
         onChange(num);
       } else {
@@ -37,6 +46,20 @@ export const GradeCell = memo(function GradeCell({ value, isManual = false, onCh
       }
     }
     setIsEditing(false);
+  };
+
+  const handleChange = (val: string) => {
+    // Solo permitir números, coma o punto, y el signo menos (solo si está vacío)
+    // Validar en tiempo real que no sea > 10
+    let clean = val.replace(/[^0-9,.-]/g, '');
+    
+    // Si es un número, validar que no sea > 10
+    const num = parseFloat(clean.replace(',', '.'));
+    if (!isNaN(num) && num > 10) {
+      return; // No permitir ingresar más de 10
+    }
+
+    setInputValue(clean);
   };
 
   // Color de fondo según nota
@@ -52,16 +75,18 @@ export const GradeCell = memo(function GradeCell({ value, isManual = false, onCh
   if (isEditing && !disabled) {
     return (
       <input
+        id={id}
         ref={inputRef}
-        type="number"
-        min="1"
-        max="10"
-        step="0.5"
+        type="text"
+        inputMode="decimal"
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') commit();
+          if (e.key === 'Enter') {
+            commit();
+            onNext?.();
+          }
           if (e.key === 'Escape') {
             setInputValue(value !== null ? String(value) : '');
             setIsEditing(false);
@@ -74,6 +99,7 @@ export const GradeCell = memo(function GradeCell({ value, isManual = false, onCh
 
   return (
     <div
+      id={id}
       onClick={() => !disabled && setIsEditing(true)}
       className={`relative flex items-center justify-center h-9 rounded cursor-pointer group transition-colors ${bgColor} ${
         !disabled ? 'hover:ring-2 hover:ring-indigo-300 dark:hover:ring-indigo-600' : 'cursor-default'
