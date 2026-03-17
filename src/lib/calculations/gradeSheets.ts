@@ -4,6 +4,7 @@ import {
   getEnrollmentsCollection,
   getAttendanceCollection,
   getGradeSheetMetaCollection,
+  getBehavioralPointsCollection,
 } from '../mongodb/collections';
 import {
   calculateTrajectoryStatus,
@@ -32,6 +33,7 @@ export async function getGradeSheetData(
   const enrollmentsCollection = await getEnrollmentsCollection();
   const attendanceCollection = await getAttendanceCollection();
   const metaCollection = await getGradeSheetMetaCollection();
+  const behavioralCollection = await getBehavioralPointsCollection();
 
   // Obtener alumnos activos con sus datos
   const enrollments = await enrollmentsCollection
@@ -111,6 +113,14 @@ export async function getGradeSheetData(
     metas.map((m) => [m.studentId.toString(), m])
   );
 
+  // Obtener puntos conductuales
+  const behavioralEntries = await behavioralCollection
+    .find({ courseId, year, period, studentId: { $in: studentIds } })
+    .toArray();
+  const behavioralByStudent = new Map<string, number>(
+    behavioralEntries.map((b) => [b.studentId.toString(), b.points])
+  );
+
   // Construir filas de la planilla
   const rows: GradeSheetStudentRow[] = enrollments.map((enrollment) => {
     const studentId = enrollment.studentId.toString();
@@ -141,6 +151,14 @@ export async function getGradeSheetData(
         ? filledScores.reduce((a, b) => a + b, 0) / filledScores.length
         : null;
 
+    // Puntos conductuales
+    const behavioralPoints = behavioralByStudent.get(studentId) || 0;
+
+    // Nota final (promedio + puntos conductuales) clamp [1, 10]
+    const finalGrade = average !== null 
+      ? Math.min(Math.max(average + behavioralPoints, 1), 10) 
+      : null;
+
     // Asistencia del periodo
     const att = attendanceByStudent.get(studentId) || { present: 0, absent: 0 };
     const total = att.present + att.absent;
@@ -158,7 +176,7 @@ export async function getGradeSheetData(
 
     // Calcular estado TEA/TEP/TED
     const status = calculateTrajectoryStatus(
-      average, 
+      finalGrade, 
       absencePercent, 
       hasEmptyActivity,
       allActivitiesEmpty,
@@ -184,6 +202,7 @@ export async function getGradeSheetData(
       status,
       statusOverride,
       isManual: meta?.isManual ?? false,
+      behavioralPoints,
     };
   });
 

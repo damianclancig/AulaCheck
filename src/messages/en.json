@@ -418,21 +418,26 @@
       }
     },
     "sheet": {
+      "student": "Student",
+      "noStudents": "No enrolled students",
+      "addActivity": "Add Activity",
+      "activityNamePlaceholder": "Activity name",
+      "average": "Avg.",
+      "attendanceHeader": "Att.",
+      "statusHeader": "Status",
+      "attendance": "Attendance",
+      "saving": "Saving...",
+      "save": "Save Changes",
+      "savedShort": "Saved!",
+      "error": "Error loading data",
+      "alerts": {
+        "saveError": "Changes could not be saved",
+        "overrideError": "Could not update manual status",
+        "saved": "Grade sheet saved successfully."
+      },
       "firstSemester": "1st Semester",
       "secondSemester": "2nd Semester",
       "annualClose": "Annual Close",
-      "student": "Student",
-      "average": "Average",
-      "attendanceHeader": "Attendance",
-      "statusHeader": "Report",
-      "addActivity": "Activity",
-      "activityNamePlaceholder": "e.g. HW1, Midterm...",
-      "save": "Save changes",
-      "saving": "Saving...",
-      "savedShort": "Done!",
-      "attendance": "Att.",
-      "noStudents": "No active students in this course.",
-      "error": "Error loading the grade sheet.",
       "semester1Short": "S1",
       "semester2Short": "S2",
       "semStatus1": "S1 Status",
@@ -451,12 +456,12 @@
         "approved": "Approved",
         "december": "December",
         "february": "February"
-      },
-      "alerts": {
-        "saved": "Grade sheet saved successfully.",
-        "saveError": "Error saving the grade sheet.",
-        "overrideError": "Error saving the modification."
       }
+    },
+    "behavior": {
+      "title": "Behavioral Score",
+      "description": "Adjustment of behavior points for the term",
+      "success": "Points updated"
     }
   },
   "common": {
@@ -470,6 +475,7 @@
     "success": "Success",
     "actions": "Actions",
     "student": "Student",
+    "done": "Done",
     "phoneInput": {
       "label": "Phone / WhatsApp (Optional)",
       "placeholder": "11 1234 5678",

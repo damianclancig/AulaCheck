@@ -422,17 +422,17 @@
       "secondSemester": "2º Semestre",
       "annualClose": "Fechamento Anual",
       "student": "Aluno",
-      "average": "Média",
-      "attendanceHeader": "Presença",
-      "statusHeader": "Relatório",
-      "addActivity": "Atividade",
-      "activityNamePlaceholder": "Ex: Tarefa 1, Prova...",
-      "save": "Salvar alterações",
+      "average": "Méd.",
+      "attendanceHeader": "Pres.",
+      "statusHeader": "Estado",
+      "addActivity": "Adicionar Atividade",
+      "activityNamePlaceholder": "Nome da atividade",
+      "save": "Salvar Alterações",
       "saving": "Salvando...",
-      "savedShort": "Concluído!",
-      "attendance": "Pres.",
-      "noStudents": "Não há alunos ativos neste curso.",
-      "error": "Erro ao carregar a folha de notas.",
+      "savedShort": "Salvo!",
+      "attendance": "Presença",
+      "noStudents": "Sem alunos matriculados",
+      "error": "Erro ao carregar dados",
       "semester1Short": "S1",
       "semester2Short": "S2",
       "semStatus1": "Status S1",
@@ -457,6 +457,11 @@
         "saveError": "Erro ao salvar a folha de notas.",
         "overrideError": "Erro ao salvar a modificação."
       }
+    },
+    "behavior": {
+      "title": "Pontuação Comportamental",
+      "description": "Ajuste de pontos por comportamento no quadrimestre",
+      "success": "Pontos atualizados"
     }
   },
   "common": {
@@ -470,6 +475,7 @@
     "success": "Sucesso",
     "actions": "Ações",
     "student": "Aluno",
+    "done": "Pronto",
     "phoneInput": {
       "label": "Telefone / WhatsApp (Opcional)",
       "placeholder": "11 1234 5678",

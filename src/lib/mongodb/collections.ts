@@ -10,6 +10,7 @@ import type {
   Grade,
   JoinRequest,
   GradeSheetMeta,
+  BehavioralPoints,
 } from '@/types/models';
 
 // Helper functions para acceder a colecciones tipadas
@@ -56,4 +57,9 @@ export async function getJoinRequestsCollection(): Promise<Collection<JoinReques
 export async function getGradeSheetMetaCollection(): Promise<Collection<GradeSheetMeta>> {
   const db = await getDatabase();
   return db.collection<GradeSheetMeta>('gradeSheetMeta');
+}
+
+export async function getBehavioralPointsCollection(): Promise<Collection<BehavioralPoints>> {
+  const db = await getDatabase();
+  return db.collection<BehavioralPoints>('behavioralPoints');
 }

@@ -118,6 +118,17 @@ export interface GradeSheetMeta {
   updatedAt: Date
 }
 
+// BehavioralPoints - puntos por comportamiento (+/- 5) para un cuatrimestre
+export interface BehavioralPoints {
+  _id?: ObjectId
+  courseId: ObjectId
+  studentId: ObjectId
+  period: 1 | 2
+  year: number
+  points: number // [-5, 5]
+  updatedAt: Date
+}
+
 // Tipos para la respuesta de la API de planilla de calificaciones
 export interface GradeSheetActivity {
   id: string
@@ -138,6 +149,7 @@ export interface GradeSheetStudentRow {
   status: 'TEA' | 'TEP' | 'TED' // calculado automáticamente
   statusOverride: string | null // override manual
   isManual: boolean
+  behavioralPoints: number // default 0
 }
 
 export interface GradeSheetData {

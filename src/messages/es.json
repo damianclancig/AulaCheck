@@ -461,6 +461,11 @@
         "saveError": "Error al guardar la planilla.",
         "overrideError": "Error al guardar la modificación."
       }
+    },
+    "behavior": {
+      "title": "Puntaje Conductual",
+      "description": "Ajuste de puntos por comportamiento en el cuatrimestre",
+      "success": "Puntos actualizados"
     }
   },
   "common": {
@@ -474,6 +479,7 @@
     "success": "Éxito",
     "actions": "Acciones",
     "student": "Alumno",
+    "done": "Listo",
     "phoneInput": {
       "label": "Teléfono / WhatsApp (Opcional)",
       "placeholder": "11 1234 5678",

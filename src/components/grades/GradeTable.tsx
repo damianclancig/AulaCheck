@@ -10,6 +10,9 @@ import { ActivityHeader } from './ActivityHeader';
 import { GradeCell } from './GradeCell';
 import { StatusBadge } from './StatusBadge';
 import { OverrideMenu } from './OverrideMenu';
+import { BehavioralBadge } from './BehavioralBadge';
+import { BehavioralStepperSheet } from './BehavioralStepperSheet';
+import { useLongPress } from '@/hooks/useLongPress';
 import { calculateTrajectoryStatus } from '@/lib/calculations/trajectoryUtils';
 import type { BadgeType } from './StatusBadge';
 
@@ -43,7 +46,19 @@ export function GradeTable({ period, year }: GradeTableProps) {
     overrideStatus,
     getLocalAverage,
     hasEmptyActivity,
+    updateBehavioralPoints,
   } = useGradeSheet(period as PeriodType, year);
+
+  // Estado para el stepper conductual
+  const [behavioralStudent, setBehavioralStudent] = useState<{ id: string, name: string, points: number } | null>(null);
+
+  const { isPressing, ...longPressHandlers } = useLongPress((student: any) => {
+    setBehavioralStudent({
+      id: student.studentId,
+      name: `${student.lastName}, ${student.firstName}`,
+      points: student.behavioralPoints
+    });
+  });
 
   // Auto-colapsar texto después de 2 segundos cuando hay cambios pendientes
   useEffect(() => {
@@ -135,9 +150,19 @@ export function GradeTable({ period, year }: GradeTableProps) {
               {/* Encabezado del alumno */}
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                    {row.lastName}, {row.firstName}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                      {row.lastName}, {row.firstName}
+                    </p>
+                    <BehavioralBadge 
+                      points={row.behavioralPoints} 
+                      onClick={() => setBehavioralStudent({
+                        id: row.studentId,
+                        name: `${row.lastName}, ${row.firstName}`,
+                        points: row.behavioralPoints
+                      })}
+                    />
+                  </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     <span className={row.absencePercent > 30 ? 'text-red-500' : 'text-green-500'}>
                       {row.attendancePercent.toFixed(0)}%
@@ -281,8 +306,23 @@ export function GradeTable({ period, year }: GradeTableProps) {
                   }`}
                 >
                   {/* Nombre (columna fija) */}
-                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-4 py-2 font-medium text-gray-900 dark:text-white border-r border-gray-100 dark:border-gray-800">
-                    {row.lastName}, {row.firstName}
+                  <td 
+                    className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-4 py-2 font-medium text-gray-900 dark:text-white border-r border-gray-100 dark:border-gray-800 cursor-context-menu"
+                    {...longPressHandlers}
+                    onMouseDown={() => longPressHandlers.onMouseDown(row)}
+                    onTouchStart={() => longPressHandlers.onTouchStart(row)}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{row.lastName}, {row.firstName}</span>
+                      <BehavioralBadge 
+                        points={row.behavioralPoints} 
+                        onClick={() => setBehavioralStudent({
+                          id: row.studentId,
+                          name: `${row.lastName}, ${row.firstName}`,
+                          points: row.behavioralPoints
+                        })}
+                      />
+                    </div>
                   </td>
                   {/* Celdas de notas */}
                   {activities.map((act) => (
@@ -342,42 +382,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
   );
 
   return (
-    <div className="space-y-4">
-      {/* Barra de acciones (sólo para agregar actividad) */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="md:hidden">
-          {showAddInput ? (
-            <div className="flex items-center gap-2">
-              <input
-                autoFocus
-                value={newActivityName}
-                onChange={(e) => setNewActivityName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAddActivity();
-                  if (e.key === 'Escape') setShowAddInput(false);
-                }}
-                placeholder={t('activityNamePlaceholder')}
-                className="px-3 py-2 text-sm border border-indigo-400 rounded-lg outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              />
-              <button
-                onClick={handleAddActivity}
-                className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowAddInput(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              {t('addActivity')}
-            </button>
-          )}
-        </div>
-      </div>
-
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
       {mobileView}
       {desktopView}
 
@@ -428,6 +433,21 @@ export function GradeTable({ period, year }: GradeTableProps) {
           </button>
         </div>
       )}
+
+      {/* Behavioral Stepper Sheet */}
+      <BehavioralStepperSheet
+        isOpen={!!behavioralStudent}
+        onClose={() => setBehavioralStudent(null)}
+        studentName={behavioralStudent?.name || ''}
+        initialPoints={behavioralStudent?.points || 0}
+        onUpdate={(points) => {
+          if (behavioralStudent) {
+            updateBehavioralPoints(behavioralStudent.id, points);
+            // Actualizar estado local para que el stepper refleje el cambio si sigue abierto
+            setBehavioralStudent({ ...behavioralStudent, points });
+          }
+        }}
+      />
     </div>
   );
 }
