@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useModal } from '@/hooks/useModal'
 import { useTranslations } from 'next-intl'
+import { Card } from '@/components/ui/Card'
 
 type AttendanceStatus = 'present' | 'absent' | 'late'
 
@@ -71,12 +72,13 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
   const isInactive = student.enrollmentStatus === 'inactive'
 
   return (
-    <div
-      className={`${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-colors`}
+    <Card
+      variant={isInactive ? "standard" : "interactive"}
+      className="p-2.5 transition-colors space-y-3"
     >
       {/* Student Header */}
       <div
-        className={`${isInactive ? 'bg-gray-200/70 dark:bg-gray-700/60' : 'bg-gray-50 dark:bg-gray-800'} px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center gap-2`}
+        className={`${isInactive ? 'bg-gray-200/70 dark:bg-gray-700/60' : 'bg-gray-50 dark:bg-gray-800'} -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center gap-2`}
       >
         <h4
           className={`text-base font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
@@ -194,7 +196,7 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none" />
       </div>
-    </div>
+    </Card>
   )
 })
 

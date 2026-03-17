@@ -902,7 +902,7 @@ export function StudentList({
               <Card
                 variant={isInactive ? "standard" : "interactive"}
                 key={student._id.toString()}
-                className={`p-4 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
+                className={`p-2.5 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
                 onContextMenu={(e) => {
                   if (!isInactive) {
                     handleContextMenu(e, student._id.toString())
@@ -940,7 +940,7 @@ export function StudentList({
                   }
                 }}
               >
-                <div className="bg-gray-50 dark:bg-gray-800 -mx-4 -mt-4 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-xl flex justify-between items-center mb-4 transition-colors">
+                <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-4 transition-colors">
                   <div className="flex items-center gap-3">
                     <div
                       className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-200' : 'bg-indigo-100 dark:bg-indigo-900/40'}`}
@@ -1245,7 +1245,7 @@ export function StudentList({
                       <Card
                         variant="standard"
                         key={student._id.toString()}
-                        className={`p-4 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
+                        className={`p-2.5 transition-colors select-none ${isInactive ? 'opacity-70 bg-gray-50/50' : ''}`}
                         onContextMenu={(e) =>
                           handleContextMenu(e, student._id.toString(), 'inactive')
                         }
@@ -1280,7 +1280,7 @@ export function StudentList({
                           }
                         }}
                       >
-                        <div className="bg-gray-50 dark:bg-gray-800 -mx-4 -mt-4 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-xl flex justify-between items-center mb-4 transition-colors">
+                        <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-4 transition-colors">
                           <div className="flex items-center gap-3">
                             <div
                               className={`shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${isInactive ? 'bg-gray-200' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}
