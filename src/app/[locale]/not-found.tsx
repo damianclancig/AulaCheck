@@ -25,12 +25,14 @@ export default function NotFoundPage() {
         
         {/* Cabecera / Banner */}
         <div className="bg-indigo-50/50 dark:bg-gray-800/30 p-8 flex justify-center border-b border-gray-100 dark:border-gray-800 transition-colors duration-200">
-          <Image 
-            src={logoPic} 
-            alt="AulaCheck Logo" 
-            className="h-20 w-auto object-contain drop-shadow-sm" 
-            priority 
-          />
+          <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 transition-transform duration-300 hover:scale-105">
+            <Image 
+              src={logoPic} 
+              alt="AulaCheck Logo" 
+              className="h-16 w-auto object-contain drop-shadow-sm" 
+              priority 
+            />
+          </div>
         </div>
 
         {/* Contenido (404) */}

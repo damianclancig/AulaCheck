@@ -79,7 +79,7 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
         className={`${isInactive ? 'bg-gray-200/70 dark:bg-gray-700/60' : 'bg-gray-50 dark:bg-gray-800'} px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center gap-2`}
       >
         <h4
-          className={`text-sm font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
+          className={`text-base font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
         >
           {student.lastName}, {student.firstName}
         </h4>
@@ -483,7 +483,7 @@ export function AttendanceSheet({
                   className={`transition-colors ${isInactive ? 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200/60 dark:hover:bg-gray-700/60' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 >
                   <td
-                    className={`sticky left-0 z-10 ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} px-6 py-4 whitespace-nowrap text-sm font-medium ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} border-r border-gray-200 dark:border-gray-700`}
+                    className={`sticky left-0 z-10 ${isInactive ? 'bg-gray-100 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} px-6 py-4 whitespace-nowrap text-base font-medium ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} border-r border-gray-200 dark:border-gray-700`}
                   >
                     {student.lastName}, {student.firstName}
                   </td>

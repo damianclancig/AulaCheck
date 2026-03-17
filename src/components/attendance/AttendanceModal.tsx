@@ -8,6 +8,8 @@ import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useModal } from '@/hooks/useModal';
 import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 interface AttendanceModalProps {
   isOpen: boolean;
@@ -658,26 +660,23 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
 
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
-            <button
+            <Button
               onClick={onClose}
-              className={cn(
-                "flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold border border-gray-200 dark:border-gray-700 rounded-2xl transition-all active:scale-95",
-                isDuplicateDate 
-                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-black dark:hover:bg-gray-100" 
-                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-              )}
+              variant={isDuplicateDate ? 'primary' : 'secondary'}
+              className="flex-1 sm:flex-none"
             >
               {isDuplicateDate ? tCommon('close') : tCommon('cancel')}
-            </button>
+            </Button>
             {!isDuplicateDate && (
-              <button
+              <Button
                 onClick={handleSubmit}
+                variant="primary"
                 disabled={loading || (suspensionReason === 'none' && !allStudentsMarked) || (suspensionReason === 'other' && !suspensionNote)}
-                className="flex-1 sm:flex-none px-8 py-2.5 text-sm font-black text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg shadow-indigo-100 dark:shadow-none"
+                className="flex-1 sm:flex-none"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {t('saveButton').toUpperCase()}
-              </button>
+              </Button>
             )}
           </div>
         </div>

@@ -14,7 +14,7 @@ export default function PrivacyPage() {
     const returnHref = isAuthenticated ? '/dashboard' : '/';
     
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-200 relative">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] transition-colors duration-200 relative">
             {/* Controles Top */}
             <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
                 <ThemeToggle />
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
 
                 {/* Content */}
                 <div className="space-y-12">
-                    <section className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                    <section className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-sm border border-[var(--border)]">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
                                 <ShieldCheck className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
                     </section>
 
                     <div className="grid md:grid-cols-2 gap-6">
-                        <section className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <section className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-sm border border-[var(--border)]">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                                     <UserCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
                             </p>
                         </section>
 
-                        <section className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <section className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-sm border border-[var(--border)]">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
                                     <Lock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
@@ -79,7 +79,7 @@ export default function PrivacyPage() {
                         </section>
                     </div>
 
-                    <section className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                    <section className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-sm border border-[var(--border)]">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="p-2 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
                                 <EyeOff className="w-6 h-6 text-amber-600 dark:text-amber-400" />

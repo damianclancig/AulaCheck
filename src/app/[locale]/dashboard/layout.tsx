@@ -27,7 +27,7 @@ export default function DashboardLayout({
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)]">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
     );
@@ -40,11 +40,11 @@ export default function DashboardLayout({
   const user = session.user;
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden transition-colors duration-200">
+    <div className="flex h-screen bg-[var(--bg-main)] overflow-hidden transition-colors duration-200">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden w-full">
-        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16 flex items-center justify-between px-4 sm:px-8 flex-shrink-0 transition-colors duration-200">
+        <header className="bg-[var(--bg-menu)] border-b border-[var(--border)] h-16 flex items-center justify-between px-4 sm:px-8 flex-shrink-0 transition-colors duration-200">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -73,7 +73,7 @@ export default function DashboardLayout({
             )}
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 bg-[var(--bg-main)]">
           {children}
         </main>
       </div>

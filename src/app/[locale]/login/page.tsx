@@ -82,14 +82,21 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center p-4 transition-colors duration-200">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative transition-colors duration-200">
+      <div className="bg-[var(--bg-card)] rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative transition-colors duration-200">
         <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
           <ThemeToggle />
           <LanguageSwitcher />
         </div>
         <div className="p-8 text-center pt-12">
           <div className="mx-auto flex items-center justify-center mb-6">
-            <Image src={logoPic} alt="AulaCheck Logo" className="h-24 w-auto object-contain" priority />
+            <div className="hover:scale-[1.02] transition-transform duration-300">
+              <Image 
+                src={logoPic} 
+                alt="AulaCheck Logo" 
+                className="h-16 md:h-20 w-auto object-contain transition-all" 
+                priority 
+              />
+            </div>
           </div>
           <h1 className="sr-only">AulaCheck</h1>
           <p className="text-gray-500 mb-8">
@@ -106,7 +113,7 @@ export default function LoginPage() {
             <button
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all flex items-center justify-center gap-3 shadow-sm disabled:opacity-50"
+              className="w-full bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-primary)] font-medium py-3 px-4 rounded-lg hover:bg-[var(--bg-muted)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all flex items-center justify-center gap-3 shadow-sm disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />
@@ -148,7 +155,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 text-center border-t border-gray-100 dark:border-gray-800 transition-colors duration-200">
+        <div className="bg-[var(--bg-muted)] p-4 text-center border-t border-[var(--border)] transition-colors duration-200">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {t('needHelp')} <a href="#" className="text-indigo-600 hover:underline">{t('contactSupport')}</a>
           </p>

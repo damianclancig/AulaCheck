@@ -8,6 +8,7 @@ import { CourseCard } from '@/components/courses/CourseCard';
 import { CreateCourseModal } from '@/components/courses/CreateCourseModal';
 import { Plus, Loader2, BookOpen } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/Button';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -48,13 +49,13 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h2>
           <p className="text-gray-500 dark:text-gray-400 mt-1">{t('description')}</p>
         </div>
-        <button
+        <Button
           onClick={() => setIsModalOpen(true)}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 font-medium shadow-sm"
+          className="flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           {t('newCourse')}
-        </button>
+        </Button>
       </div>
 
       {courses && courses.length > 0 ? (
@@ -77,7 +78,7 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-dashed transition-colors duration-200">
+        <div className="text-center py-16 bg-[var(--bg-card)] rounded-xl border border-gray-200 dark:border-gray-800 border-dashed transition-colors duration-200">
           <div className="bg-indigo-50 dark:bg-indigo-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-8 h-8 text-indigo-400" />
           </div>

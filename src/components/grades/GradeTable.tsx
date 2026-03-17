@@ -15,6 +15,8 @@ import { BehavioralStepperSheet } from './BehavioralStepperSheet';
 import { useLongPress } from '@/hooks/useLongPress';
 import { calculateTrajectoryStatus } from '@/lib/calculations/trajectoryUtils';
 import type { BadgeType } from './StatusBadge';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 interface GradeTableProps {
   period: 1 | 2;
@@ -143,13 +145,14 @@ export function GradeTable({ period, year }: GradeTableProps) {
           );
 
           return (
-            <div
+            <Card
               key={row.studentId}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-2.5 space-y-3 shadow-sm"
+              variant="interactive"
+              className="p-2.5 space-y-3"
             >
               {/* Encabezado: Nombre + Puntos (Consistencia con Asistencia) */}
               <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex items-center gap-3">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                <h4 className="text-base font-semibold text-gray-900 dark:text-white truncate">
                   {row.lastName}, {row.firstName}
                 </h4>
                 <div className="flex-shrink-0 scale-90 origin-left">
@@ -228,7 +231,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
                   ))}
                 </div>
               )}
-            </div>
+            </Card>
           );
         })
       )}
@@ -334,7 +337,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
                 >
                   {/* Nombre (columna fija) */}
                   <td 
-                    className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-4 py-2 font-medium text-gray-900 dark:text-white border-r border-gray-100 dark:border-gray-800 cursor-context-menu"
+                    className="sticky left-0 z-10 bg-white dark:bg-gray-900 px-4 py-2 font-medium text-base text-gray-900 dark:text-white border-r border-gray-100 dark:border-gray-800 cursor-context-menu"
                     {...longPressHandlers}
                     onMouseDown={() => longPressHandlers.onMouseDown(row)}
                     onTouchStart={() => longPressHandlers.onTouchStart(row)}
@@ -450,13 +453,14 @@ export function GradeTable({ period, year }: GradeTableProps) {
             </button>
           </div>
         ) : (
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setShowAddInput(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 mb-4 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 border-2 border-dashed border-indigo-200 dark:border-indigo-800/50 rounded-2xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all active:scale-[0.98]"
+            className="w-full"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-5 h-5 mr-1" />
             {t('addActivity')}
-          </button>
+          </Button>
         )}
       </div>
 

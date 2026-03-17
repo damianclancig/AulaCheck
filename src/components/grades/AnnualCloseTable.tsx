@@ -7,6 +7,7 @@ import { StatusBadge } from './StatusBadge';
 import { OverrideMenu } from './OverrideMenu';
 import { useModal } from '@/hooks/useModal';
 import type { BadgeType } from './StatusBadge';
+import { Card } from '@/components/ui/Card';
 
 interface AnnualCloseTableProps {
   year: number;
@@ -60,13 +61,13 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
               <th className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
                 {t('semester1Short')}
               </th>
-              <th className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
+              <th className="px-3 py-3 border-b border-r-2 border-gray-200 border-r-gray-200 dark:border-gray-700 dark:border-r-gray-700/50 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
                 {t('semStatus1')}
               </th>
               <th className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
                 {t('semester2Short')}
               </th>
-              <th className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
+              <th className="px-3 py-3 border-b border-r-2 border-gray-200 border-r-gray-200 dark:border-gray-700 dark:border-r-gray-700/50 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
                 {t('semStatus2')}
               </th>
               <th className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-center font-semibold text-gray-700 dark:text-gray-300 bg-indigo-50 dark:bg-indigo-900/20">
@@ -114,7 +115,7 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                       ) : '—'}
                     </td>
                     {/* Estado C1 */}
-                    <td className="px-3 py-3 text-center">
+                    <td className="px-3 py-3 text-center border-r-2 border-r-gray-100 dark:border-r-gray-800">
                       <StatusBadge status={row.semester1Status as BadgeType} />
                     </td>
                     {/* Promedio C2 */}
@@ -130,7 +131,7 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                       ) : '—'}
                     </td>
                     {/* Estado C2 */}
-                    <td className="px-3 py-3 text-center">
+                    <td className="px-3 py-3 text-center border-r-2 border-r-gray-100 dark:border-r-gray-800">
                       <StatusBadge status={row.semester2Status as BadgeType} />
                     </td>
                     {/* Promedio Final */}
@@ -173,9 +174,10 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
         {rows.map((row) => {
           const effectiveCondition = (row.forcedCondition || row.calculatedCondition) as BadgeType;
           return (
-            <div
+            <Card
               key={row.studentId}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm space-y-3"
+              variant="interactive"
+              className="p-4 space-y-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-gray-900 dark:text-white text-sm">
@@ -190,36 +192,36 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center">
                   <p className="text-gray-400 dark:text-gray-500 mb-1">{t('semester1Short')}</p>
                   <p className="font-bold text-gray-900 dark:text-white">
                     {row.semester1Average?.toFixed(2) ?? '—'}
                   </p>
-                  <StatusBadge status={row.semester1Status as BadgeType} size="sm" />
+                  <div className="mt-1">
+                    <StatusBadge status={row.semester1Status as BadgeType} size="sm" />
+                  </div>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center">
                   <p className="text-gray-400 dark:text-gray-500 mb-1">{t('semester2Short')}</p>
                   <p className="font-bold text-gray-900 dark:text-white">
                     {row.semester2Average?.toFixed(2) ?? '—'}
                   </p>
-                  <StatusBadge status={row.semester2Status as BadgeType} size="sm" />
+                  <div className="mt-1">
+                    <StatusBadge status={row.semester2Status as BadgeType} size="sm" />
+                  </div>
                 </div>
-                <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-2">
-                  <p className="text-gray-400 dark:text-gray-500 mb-1">{t('finalAverage')}</p>
-                  <p className={`font-bold text-base ${
-                    (row.finalAverage ?? 0) >= 7 ? 'text-emerald-600 dark:text-emerald-400'
-                    : (row.finalAverage ?? 0) >= 4 ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-red-600 dark:text-red-400'
-                  }`}>
+                <Card variant="highlight" className="p-2 flex flex-col items-center justify-center rounded-lg shadow-none">
+                  <p className="text-white/80 mb-1">{t('finalAverage')}</p>
+                  <p className="font-bold text-base text-white">
                     {row.finalAverage?.toFixed(2) ?? '—'}
                   </p>
-                </div>
+                </Card>
               </div>
 
               <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
                 {t('annualAttendance')}: <span className={row.annualAttendancePercent < 60 ? 'text-red-500 font-semibold' : ''}>{row.annualAttendancePercent.toFixed(0)}%</span>
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>

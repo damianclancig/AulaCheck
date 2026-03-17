@@ -4,6 +4,7 @@ import { Course } from '@/types/models';
 import { Calendar, Users, BarChart3, ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations, useLocale } from 'next-intl';
+import { Card } from '@/components/ui/Card';
 
 interface CourseCardProps {
   course: Course;
@@ -29,14 +30,13 @@ export function CourseCard({ course }: CourseCardProps) {
 
   return (
     <Link href={`/dashboard/courses/${course._id}`} className="block h-full">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-200 dark:border-gray-800 hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 overflow-hidden group h-full flex flex-col">
+      <Card variant="interactive" className="group h-full flex flex-col">
         {/* Cabecera de la institución separada y centrada */}
-        {/* Cabecera de la institución separada y centrada */}
-        <div className="bg-indigo-50/50 dark:bg-indigo-900/10 py-1.5 px-3 border-b border-indigo-100 dark:border-indigo-900/30 text-center">
-          <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-0 opacity-80 leading-tight">
+        <div className="bg-indigo-50/50 dark:bg-accent-500/10 py-1.5 px-3 border-b border-indigo-100 dark:border-accent-500/20 text-center">
+          <p className="text-[10px] font-bold text-indigo-500 dark:text-accent-300 uppercase tracking-widest mb-0 opacity-80 leading-tight">
             {t('card.institution')}
           </p>
-          <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white leading-tight">
+          <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-accent-50 leading-tight">
             {course.institutionName}
           </h2>
         </div>
@@ -87,11 +87,11 @@ export function CourseCard({ course }: CourseCardProps) {
           </div>
         </div>
 
-        <div className="bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center group-hover:bg-indigo-50/80 dark:group-hover:bg-indigo-900/20 transition-all">
-          <span className="text-sm font-bold text-indigo-600/80 dark:text-indigo-400/80 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">{t('card.viewManagement')}</span>
-          <ArrowRight className="w-5 h-5 text-indigo-400 transform group-hover:translate-x-1.5 transition-transform" />
+        <div className="bg-gray-50/50 dark:bg-gray-800/30 px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center group-hover:bg-primary-50/80 dark:group-hover:bg-accent-500/20 transition-all">
+          <span className="text-sm font-bold text-primary-600/80 dark:text-accent-300/80 group-hover:text-primary-600 dark:group-hover:text-accent-200">{t('card.viewManagement')}</span>
+          <ArrowRight className="w-5 h-5 text-primary-400 dark:text-accent-400 transform group-hover:translate-x-1.5 transition-transform" />
         </div>
-      </div>
+      </Card>
     </Link>
   );
 }

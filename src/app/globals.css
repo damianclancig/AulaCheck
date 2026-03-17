@@ -5,18 +5,92 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-main: var(--color-accent-50);
+  --bg-card: #ffffff;
+  --bg-menu: var(--color-accent-100);
+  --bg-muted: var(--color-accent-300);
+  --text-primary: var(--color-primary-900);
+  --text-secondary: var(--color-primary-700);
+  --text-muted: var(--color-primary-500);
+  --border: var(--color-primary-300);
+
+  /* Light mode: Indigo defaults to Purple */
+  --thm-indigo-50: #F4D6FF;
+  --thm-indigo-100: #D9B3F0;
+  --thm-indigo-200: #B88ED0;
+  --thm-indigo-300: #8D68AA;
+  --thm-indigo-400: #7C3AED;
+  --thm-indigo-500: #8B5CF6;
+  --thm-indigo-600: #7C3AED;
+  --thm-indigo-700: #6D28D9;
+  --thm-indigo-800: #5B21B6;
+  --thm-indigo-900: #010030;
+  --thm-indigo-950: #000014;
+
+  --background: var(--bg-main);
+  --foreground: var(--text-primary);
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --bg-main: #010030;
+  --bg-card: #08082A;
+  --bg-menu: #000014;
+  --bg-muted: #13133B;
+  --text-primary: var(--color-accent-50);
+  --text-secondary: var(--color-accent-100);
+  --text-muted: var(--color-accent-300);
+  --border: var(--color-accent-500);
+
+  /* Dark mode: Indigo mapped to Peach (clarito) for borders/text/buttons, Purple for dark bgs */
+  --thm-indigo-50: #FFF3ED;
+  --thm-indigo-100: #FFEAD7;
+  --thm-indigo-200: #FBD4B4;
+  --thm-indigo-300: #F4C2A1;
+  --thm-indigo-400: #EEB38F;
+  --thm-indigo-500: #E6A57E;
+  --thm-indigo-600: #D8895C;
+  --thm-indigo-700: #B66138;
+  --thm-indigo-800: #8A401D;
+  --thm-indigo-900: #010030; /* Keep dark bg purple */
+  --thm-indigo-950: #00001A; /* Keep dark bg purple */
+
+  --background: var(--bg-main);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-border: var(--border);
+
+  --color-primary-50: #F4D6FF;
+  --color-primary-100: #D9B3F0;
+  --color-primary-300: #8D68AA;
+  --color-primary-500: #8B5CF6;
+  --color-primary-700: #6D28D9;
+  --color-primary-900: #010030;
+  --color-primary-950: #000014;
+
+  --color-accent-50: #FFF3ED;
+  --color-accent-100: #FFEAD7;
+  --color-accent-300: #F4C2A1;
+  --color-accent-500: #E6A57E;
+
+  /* Overrides for hardcoded indigo classes */
+  --color-indigo-50: var(--thm-indigo-50);
+  --color-indigo-100: var(--thm-indigo-100);
+  --color-indigo-200: var(--thm-indigo-200);
+  --color-indigo-300: var(--thm-indigo-300);
+  --color-indigo-400: var(--thm-indigo-400);
+  --color-indigo-500: var(--thm-indigo-500);
+  --color-indigo-600: var(--thm-indigo-600);
+  --color-indigo-700: var(--thm-indigo-700);
+  --color-indigo-800: var(--thm-indigo-800);
+  --color-indigo-900: var(--thm-indigo-900);
+  --color-indigo-950: var(--thm-indigo-950);
+
+  --radius-2xl: 1rem;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -28,6 +102,19 @@ body {
 }
 
 @layer utilities {
+  .bg-gradient-primary {
+    background-image: linear-gradient(to bottom right, #3A294F, #8D68AA, #F4D6FF);
+    color: white;
+  }
+  .bg-gradient-dark {
+    background-image: linear-gradient(to bottom right, #010030, #160078, #7226FF);
+    color: white;
+  }
+  .bg-gradient-soft {
+    background-image: linear-gradient(to bottom right, #FFEAD7, #F4D6FF);
+    color: #010030;
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

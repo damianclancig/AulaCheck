@@ -14,7 +14,14 @@ export default function Home() {
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center -ml-2">
-          <Image src={logoPic} alt="AulaCheck Logo" className="h-12 w-auto object-contain" priority />
+          <Link href="/" className="hover:scale-105 transition-transform duration-300">
+            <Image 
+              src={logoPic} 
+              alt="AulaCheck Logo" 
+              className="h-14 w-auto object-contain md:h-16 transition-all" 
+              priority 
+            />
+          </Link>
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
