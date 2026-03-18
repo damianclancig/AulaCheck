@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { signIn } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
+import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import logoPic from '../../../../public/assets/logo.webp';
@@ -147,11 +148,15 @@ export default function LoginPage() {
             )}
           </div>
 
-          <p className="mt-8 text-xs text-gray-400">
+          <p className="mt-8 text-[10px] leading-relaxed text-gray-400 dark:text-gray-500 max-w-xs mx-auto">
             {t('termsText1')}{' '}
-            <a href="/privacy" className="text-indigo-600 hover:underline">
+            <Link href="/terms" className="text-indigo-600 dark:text-indigo-400 hover:underline">
               {t('termsText2')}
-            </a>.
+            </Link>{' '}
+            {t('termsText3')}{' '}
+            <Link href="/privacy" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+              {t('termsText4')}
+            </Link>.
           </p>
         </div>
 

@@ -11,8 +11,26 @@
     "feature2": "Automatic Averages",
     "feature3": "Student Management",
     "feature4": "CSV Export",
+    "featureQRTitle": "QR Registration",
+    "featureQRDesc": "Your students register themselves by scanning a QR code, making data entry faster and easier.",
+    "featureBioTitle": "Biometric Security",
+    "featureBioDesc": "Access faster with FaceID or Fingerprint using Passkeys.",
+    "featureGradesTitle": "Automatic Averages",
+    "featureGradesDesc": "We calculate final grades automatically.",
+    "featureExportTitle": "Comprehensive Reports",
+    "featureExportDesc": "Export attendance and grades to CSV in one click.",
+    "howItWorksTitle": "How does AulaCheck work?",
+    "step1Title": "Create your courses",
+    "step1Desc": "Define subjects and modules.",
+    "step2Title": "Invite your students",
+    "step2Desc": "Share a link or show the QR code on screen.",
+    "step3Title": "Simplify your day",
+    "step3Desc": "Take attendance in seconds without using paper.",
+    "ctaTitle": "Ready to transform your classroom?",
+    "ctaDesc": "Join teachers who already optimize their time with AulaCheck.",
     "footerRights": "All rights reserved.",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy",
+    "terms": "Terms"
   },
   "login": {
     "description": "Smart attendance and grade management for teachers.",
@@ -26,7 +44,9 @@
     "passkeySuccess": "Passkey configured successfully!",
     "loggingIn": "Logging in...",
     "termsText1": "By continuing, you agree to our",
-    "termsText2": "privacy policy",
+    "termsText2": "terms and conditions",
+    "termsText3": "and our",
+    "termsText4": "privacy policy",
     "needHelp": "Need help?",
     "contactSupport": "Contact support"
   },
@@ -62,6 +82,7 @@
     },
     "links": {
       "privacy": "Privacy",
+      "terms": "Terms",
       "security": "Security",
       "logout": "Sign Out"
     }
@@ -488,5 +509,21 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "updated": "Last updated: March 17, 2026",
+    "introTitle": "1. Acceptance of Terms",
+    "introDesc": "By accessing and using AulaCheck, you agree to comply with and be bound by these Terms and Conditions of Use, all applicable laws and regulations.",
+    "usageTitle": "2. License to Use",
+    "usageDesc": "Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted under the ISC license, provided that the above copyright notice and this permission notice appear in all copies.",
+    "disclaimerTitle": "3. Disclaimer",
+    "disclaimerDesc": "The software is provided 'as is', without warranty of any kind, express or implied. AulaCheck does not warrant the accuracy or reliability of the use of the materials in its application.",
+    "limitationsTitle": "4. Limitations",
+    "limitationsDesc": "In no event shall AulaCheck or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use AulaCheck.",
+    "dataTitle": "5. Data Protection",
+    "dataDesc": "AulaCheck is committed to protecting the privacy of student and teacher data. Data is stored securely and is not shared with third parties for commercial purposes.",
+    "conductTitle": "6. User Conduct",
+    "conductDesc": "You agree not to use the application for any purpose that is unlawful or prohibited by these terms. You are responsible for maintaining the confidentiality of your access credentials."
   }
 }

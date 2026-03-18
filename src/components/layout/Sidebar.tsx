@@ -7,7 +7,8 @@ import {
   Users,
   Settings,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  Scale
 } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
@@ -119,6 +120,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           >
             <Settings className="mr-3 h-5 w-5 text-[var(--text-muted)] group-hover:text-primary-900 transition-colors" />
             {t('links.privacy')}
+          </Link>
+
+          <Link
+            href="/terms"
+            onClick={() => onClose()}
+            className="flex items-center px-2 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-accent-500 dark:hover:text-primary-900 rounded-md transition-all group"
+          >
+            <Scale className="mr-3 h-5 w-5 text-[var(--text-muted)] group-hover:text-primary-900 transition-colors" />
+            {t('links.terms')}
           </Link>
 
           <button

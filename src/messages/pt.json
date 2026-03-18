@@ -11,8 +11,26 @@
     "feature2": "Médias Automáticas",
     "feature3": "Gestão de Alunos",
     "feature4": "Exportação para CSV",
-    "footerRights": "Todos los derechos reservados.",
-    "privacyPolicy": "Política de Privacidade"
+    "featureQRTitle": "Inscrição por QR",
+    "featureQRDesc": "Seus alunos se registram sozinhos escaneando um código QR, facilitando o gerenciamento de dados.",
+    "featureBioTitle": "Segurança Biométrica",
+    "featureBioDesc": "Acesse mais rápido com FaceID ou Impressão Digital através do Passkeys.",
+    "featureGradesTitle": "Médias Automáticas",
+    "featureGradesDesc": "Calculamos as notas finais automaticamente.",
+    "featureExportTitle": "Relatórios Completos",
+    "featureExportDesc": "Exporte presença e notas para CSV em um clique.",
+    "howItWorksTitle": "Como funciona o AulaCheck?",
+    "step1Title": "Crie seus cursos",
+    "step1Desc": "Defina as disciplinas e modalidades.",
+    "step2Title": "Convide seus alunos",
+    "step2Desc": "Compartilhe um link ou mostre o código QR na tela.",
+    "step3Title": "Simplifique o seu dia",
+    "step3Desc": "Faça a chamada em segundos sem usar papel.",
+    "ctaTitle": "Pronto para transformar sua sala de aula?",
+    "ctaDesc": "Junte-se aos professores que já otimizam seu tempo com o AulaCheck.",
+    "footerRights": "Todos os direitos reservados.",
+    "privacyPolicy": "Privacidade",
+    "terms": "Termos"
   },
   "login": {
     "description": "Gestão inteligente de presenças e notas para professores.",
@@ -25,8 +43,10 @@
     "registerPasskey": "Ativar acesso com digital / FaceID",
     "passkeySuccess": "Passkey configurada com sucesso!",
     "loggingIn": "Iniciando sessão...",
-    "termsText1": "Ao continuar, você concorda com nossa",
-    "termsText2": "política de privacidade",
+    "termsText1": "Ao continuar, você concorda con nossos",
+    "termsText2": "termos e condições",
+    "termsText3": "e nossa",
+    "termsText4": "política de privacidade",
     "needHelp": "Precisa de ajuda?",
     "contactSupport": "Contatar suporte"
   },
@@ -62,6 +82,7 @@
     },
     "links": {
       "privacy": "Privacidade",
+      "terms": "Termos",
       "security": "Segurança",
       "logout": "Sair"
     }
@@ -488,5 +509,21 @@
     "light": "Claro",
     "dark": "Escuro",
     "system": "Sistema"
+  },
+  "terms": {
+    "title": "Termos e Condições",
+    "updated": "Última atualização: 17 de março de 2026",
+    "introTitle": "1. Aceitação dos Termos",
+    "introDesc": "Ao acessar e usar o AulaCheck, você concorda em cumprir e estar vinculado a estes Termos e Condições de Uso, todas as leis e regulamentos aplicáveis.",
+    "usageTitle": "2. Licença de Uso",
+    "usageDesc": "A permissão para usar, copiar, modificar e/ou distribuir este software para qualquer finalidade, com ou sem taxa, é concedida sob a licença ISC, desde que o aviso de copyright acima e este aviso de permissão apareçam em todas as cópias.",
+    "disclaimerTitle": "3. Isenção de Responsabilidade",
+    "disclaimerDesc": "O software é fornecido 'como está', sem garantia de cualquier tipo, expressa ou implícita. O AulaCheck não garante a precisão ou confiabilidade do uso dos materiais em seu aplicativo.",
+    "limitationsTitle": "4. Limitações",
+    "limitationsDesc": "Em nenhum caso o AulaCheck ou seus fornecedores serão responsáveis por quaisquer danos (incluindo, sem limitação, danos por perda de dados ou lucro, ou devido à interrupção dos negócios) decorrentes do uso ou da incapacidade de usar o AulaCheck.",
+    "dataTitle": "5. Proteção de Dados",
+    "dataDesc": "O AulaCheck está comprometido em proteger a privacidade dos dados de alunos e professores. Os dados são armazenados de forma segura e não são compartilhados com terceiros para fins comerciais.",
+    "conductTitle": "6. Conduta do Usuário",
+    "conductDesc": "Você concorda em não usar o aplicativo para cualquier finalidade ilegal ou proibida por estes termos. Você é responsável por manter a confidencialidade de suas credenciais de acesso."
   }
 }

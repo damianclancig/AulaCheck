@@ -20,19 +20,48 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 
-export const metadata: Metadata = {
-  title: "AulaCheck",
-  description: "Gestión inteligente de asistencias y calificaciones",
-  icons: {
-    icon: [
-      { url: "/assets/icon.webp", type: "image/webp" },
-    ],
-    apple: [
-      { url: "/assets/icon.webp", type: "image/webp" },
-    ],
-  },
-  manifest: "/manifest.json",
-};
+import { getTranslations } from 'next-intl/server';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'login' });
+
+  return {
+    title: {
+      template: '%s | AulaCheck',
+      default: 'AulaCheck',
+    },
+    description: t('description'),
+    keywords: ["educación", "asistencias", "notas", "software docentes", "app escolar", "passkeys", "biometría"],
+    authors: [{ name: 'Damian Clancig' }],
+    openGraph: {
+      title: "AulaCheck",
+      description: t('description'),
+      url: "https://aulacheck.clancig.com.ar",
+      siteName: "AulaCheck",
+      locale: locale,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "AulaCheck",
+      description: t('description'),
+    },
+    icons: {
+      icon: [
+        { url: "/assets/icon.webp", type: "image/webp" },
+      ],
+      apple: [
+        { url: "/assets/icon.webp", type: "image/webp" },
+      ],
+    },
+    manifest: "/manifest.json",
+  };
+}
 
 export default async function RootLayout({
   children,
