@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/routing';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, ShieldCheck, Lock, EyeOff, UserCircle } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Lock, EyeOff, UserCircle, Trash2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 
@@ -78,6 +78,18 @@ export default function PrivacyPage() {
                             </p>
                         </section>
                     </div>
+
+                    <section className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-sm border border-[var(--border)]">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+                            </div>
+                            <h2 className="text-2xl font-semibold">{t('dataDeletion')}</h2>
+                        </div>
+                        <p className="leading-relaxed text-gray-700 dark:text-gray-300">
+                            {t('dataDeletionDesc')}
+                        </p>
+                    </section>
 
                     <section className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-sm border border-[var(--border)]">
                         <div className="flex items-center gap-3 mb-4">

@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/routing';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, Scale, BookOpen, ShieldAlert, Ban, Database, UserCheck } from 'lucide-react';
+import { ArrowLeft, Scale, BookOpen, ShieldAlert, Ban, Database, UserCheck, UserX } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 
@@ -105,6 +105,18 @@ export default function TermsPage() {
                         </div>
                         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                             {t('conductDesc')}
+                        </p>
+                    </section>
+
+                    <section className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-sm border border-[var(--border)]">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                                <UserX className="w-6 h-6 text-red-600 dark:text-red-400" />
+                            </div>
+                            <h2 className="text-xl font-bold">{t('accountDeletionTitle')}</h2>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {t('accountDeletionDesc')}
                         </p>
                     </section>
                 </div>

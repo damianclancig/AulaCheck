@@ -57,12 +57,14 @@
   },
   "privacy": {
     "title": "Política de Privacidad",
-    "updated": "Última actualización: 11 de marzo de 2026",
+    "updated": "Última actualización: 18 de marzo de 2026",
     "introduction": "En AulaCheck, valoramos tu privacidad y nos comprometemos a proteger tus datos personales.",
     "dataCollection": "Información que recopilamos",
     "dataCollectionDesc": "Recopilamos información básica como nombre y correo electrónico a través de la autenticación de Google para gestionar tu acceso.",
     "usage": "Uso de la información",
     "usageDesc": "Tus datos se utilizan exclusivamente para proporcionar el servicio de AulaCheck y mejorar la experiencia docente.",
+    "dataDeletion": "Eliminación de Datos",
+    "dataDeletionDesc": "Tienes derecho a solicitar la eliminación definitiva de tu cuenta y todos los datos asociados (cursos, alumnos, calificaciones). Esto se puede realizar directamente desde la sección Cuenta en el Dashboard. Al hacerlo, toda la información se eliminará permanentemente de nuestros servidores sin posibilidad de recuperación.",
     "contact": "Contacto",
     "contactDesc": "Si tienes preguntas sobre esta política, contáctanos a soporte@aulacheck.com"
   },
@@ -78,12 +80,14 @@
     },
     "nav": {
       "dashboard": "Dashboard",
-      "security": "Seguridad"
+      "security": "Seguridad",
+      "account": "Cuenta"
     },
     "links": {
       "privacy": "Privacidad",
       "terms": "Términos",
       "security": "Seguridad",
+      "account": "Cuenta",
       "logout": "Cerrar Sesión"
     }
   },
@@ -101,6 +105,25 @@
       "removeTitle": "Eliminar Passkey",
       "removeConfirm": "¿Estás seguro de que quieres eliminar esta Passkey?",
       "addFirst": "Protege tu cuenta con biometría"
+    }
+  },
+  "account": {
+    "title": "Cuenta",
+    "description": "Gestiona tu cuenta y elimina tu información permanentemente.",
+    "dangerZone": "Zona de Peligro",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteWarning": "Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate de estar completamente seguro.",
+    "deleteModal": {
+      "title": "Eliminar cuenta definitivamente",
+      "description": "Estás a punto de eliminar tu cuenta permanentemente. Esta acción es **irreversible** y eliminará todos tus datos, incluyendo:",
+      "warning1": "Todos los cursos creados",
+      "warning2": "Todos los alumnos y sus registros",
+      "warning3": "Calificaciones, planillas y asistencias",
+      "warning4": "Datos de acceso biométricos (Passkeys)",
+      "confirmButton": "Sí, eliminar mi cuenta",
+      "cancelButton": "Cancelar",
+      "success": "Tu cuenta ha sido eliminada. Redirigiendo...",
+      "error": "Ocurrió un error al intentar eliminar la cuenta."
     }
   },
   "passkeyBanner": {
@@ -522,7 +545,7 @@
   },
   "terms": {
     "title": "Términos y Condiciones",
-    "updated": "Última actualización: 17 de marzo de 2026",
+    "updated": "Última actualización: 18 de marzo de 2026",
     "introTitle": "1. Aceptación de los Términos",
     "introDesc": "Al acceder y utilizar AulaCheck, usted acepta cumplir y estar sujeto a estos Términos y Condiciones de Uso, todas las leyes y reglamentos aplicables.",
     "usageTitle": "2. Licencia de Uso",
@@ -534,6 +557,8 @@
     "dataTitle": "5. Protección de Datos",
     "dataDesc": "AulaCheck se compromete a proteger la privacidad de los datos de los estudiantes y docentes. Los datos se almacenan de forma segura y no se comparten con terceros con fines comerciales.",
     "conductTitle": "6. Conducta del Usuario",
-    "conductDesc": "Usted acepta no utilizar la aplicación para ningún propósito ilegal o prohibido por estos términos. Usted es responsable de mantener la confidencialidad de sus credenciales de acceso."
+    "conductDesc": "Usted acepta no utilizar la aplicación para ningún propósito ilegal o prohibido por estos términos. Usted es responsable de mantener la confidencialidad de sus credenciales de acceso.",
+    "accountDeletionTitle": "7. Eliminación de Cuenta",
+    "accountDeletionDesc": "El usuario puede optar por eliminar su cuenta de forma permanente en cualquier momento. Esta acción es irreversible y conlleva la pérdida definitiva de todos los datos asociados (cursos, alumnos, registros)."
   }
 }

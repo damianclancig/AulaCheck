@@ -57,12 +57,14 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "updated": "Last updated: March 11, 2026",
+    "updated": "Last updated: March 18, 2026",
     "introduction": "At AulaCheck, we value your privacy and are committed to protecting your personal data.",
     "dataCollection": "Information We Collect",
     "dataCollectionDesc": "We collect basic information such as your name and email through Google authentication to manage your access.",
     "usage": "Use of Information",
     "usageDesc": "Your data is used exclusively to provide the AulaCheck service and improve the teaching experience.",
+    "dataDeletion": "Data Deletion",
+    "dataDeletionDesc": "You have the right to request the permanent deletion of your account and all associated data (courses, students, grades). This can be done directly from the Account section in the Dashboard. Upon doing so, all information will be permanently removed from our servers with no possibility of recovery.",
     "contact": "Contact",
     "contactDesc": "If you have questions about this policy, contact us at support@aulacheck.com"
   },
@@ -78,12 +80,14 @@
     },
     "nav": {
       "dashboard": "Dashboard",
-      "security": "Security"
+      "security": "Security",
+      "account": "Account"
     },
     "links": {
       "privacy": "Privacy",
       "terms": "Terms",
       "security": "Security",
+      "account": "Account",
       "logout": "Sign Out"
     }
   },
@@ -101,6 +105,25 @@
       "removeTitle": "Remove Passkey",
       "removeConfirm": "Are you sure you want to remove this Passkey?",
       "addFirst": "Protect your account with biometrics"
+    }
+  },
+  "account": {
+    "title": "Account",
+    "description": "Manage your account and permanently delete your information.",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete account",
+    "deleteWarning": "Once you delete your account, there is no going back. Please be certain.",
+    "deleteModal": {
+      "title": "Permanently delete account",
+      "description": "You are about to permanently delete your account. This action is **irreversible** and will delete all your data, including:",
+      "warning1": "All created courses",
+      "warning2": "All students and their records",
+      "warning3": "Grades, attendance sheets, and metrics",
+      "warning4": "Biometric access data (Passkeys)",
+      "confirmButton": "Yes, delete my account",
+      "cancelButton": "Cancel",
+      "success": "Your account has been deleted. Redirecting...",
+      "error": "An error occurred while trying to delete the account."
     }
   },
   "passkeyBanner": {
@@ -518,7 +541,7 @@
   },
   "terms": {
     "title": "Terms and Conditions",
-    "updated": "Last updated: March 17, 2026",
+    "updated": "Last updated: March 18, 2026",
     "introTitle": "1. Acceptance of Terms",
     "introDesc": "By accessing and using AulaCheck, you agree to comply with and be bound by these Terms and Conditions of Use, all applicable laws and regulations.",
     "usageTitle": "2. License to Use",
@@ -530,6 +553,8 @@
     "dataTitle": "5. Data Protection",
     "dataDesc": "AulaCheck is committed to protecting the privacy of student and teacher data. Data is stored securely and is not shared with third parties for commercial purposes.",
     "conductTitle": "6. User Conduct",
-    "conductDesc": "You agree not to use the application for any purpose that is unlawful or prohibited by these terms. You are responsible for maintaining the confidentiality of your access credentials."
+    "conductDesc": "You agree not to use the application for any purpose that is unlawful or prohibited by these terms. You are responsible for maintaining the confidentiality of your access credentials.",
+    "accountDeletionTitle": "7. Account Deletion",
+    "accountDeletionDesc": "The user may opt to permanently delete their account at any time. This action is irreversible and entails the definitive loss of all associated data (courses, students, records)."
   }
 }
