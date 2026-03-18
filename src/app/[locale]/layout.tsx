@@ -53,13 +53,13 @@ export async function generateMetadata({
     },
     icons: {
       icon: [
-        { url: "/assets/icon.webp", type: "image/webp" },
+        { url: "/assets/icon.webp?v=2", type: "image/webp" },
       ],
       apple: [
-        { url: "/assets/icon.webp", type: "image/webp" },
+        { url: "/assets/icon.webp?v=2", type: "image/webp" },
       ],
     },
-    manifest: "/manifest.json",
+    manifest: "/manifest.json?v=2",
   };
 }
 
