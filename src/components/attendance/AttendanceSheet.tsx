@@ -371,6 +371,52 @@ export function AttendanceSheet({
     })
   }, [])
 
+  // Totals calculation
+  const totalsByDate = useMemo(() => {
+    const totals: Record<
+      string,
+      {
+        present: number
+        absent: number
+        totalActive: number
+        presentPercentage: string
+        hasRecordsLoaded: boolean
+      }
+    > = {}
+
+    dates.forEach((date) => {
+      let presentCount = 0
+      let absentCount = 0
+      let totalActive = 0
+      let hasRecordsLoaded = false
+
+      students.forEach((student) => {
+        if (student.enrollmentStatus !== 'inactive') {
+          totalActive++
+          const status = records[student._id.toString()]?.[date]
+          if (status) hasRecordsLoaded = true
+          if (status === 'present') presentCount++
+          if (status === 'absent') absentCount++
+        }
+      })
+
+      let presentPercentage = t('totals.empty')
+      if (hasRecordsLoaded && totalActive > 0) {
+        presentPercentage = ((presentCount / totalActive) * 100).toFixed(1).replace(/\.0$/, '')
+      }
+
+      totals[date] = {
+        present: presentCount,
+        absent: absentCount,
+        totalActive,
+        presentPercentage,
+        hasRecordsLoaded,
+      }
+    })
+
+    return totals
+  }, [dates, students, records, t])
+
   if (dates.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500 dark:text-gray-400">
@@ -549,6 +595,50 @@ export function AttendanceSheet({
               )
             })}
           </tbody>
+          <tfoot className="bg-gray-50 dark:bg-gray-800 sticky bottom-0 z-10 border-t border-gray-200 dark:border-gray-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <tr>
+              <td className="sticky left-0 z-20 bg-gray-50 dark:bg-gray-800 px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 border-r border-gray-200 dark:border-gray-700 whitespace-nowrap">
+                {t('totals.presentAbsent')}
+              </td>
+              {dates.map((date) => {
+                const total = totalsByDate[date]
+                return (
+                  <td
+                    key={date}
+                    className="px-4 py-3 text-center text-xs font-medium border-r border-gray-200 border-opacity-50 dark:border-gray-700 dark:border-opacity-50 last:border-0"
+                  >
+                    {total.hasRecordsLoaded ? (
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span className="text-green-700 dark:text-green-400">{total.present}</span>
+                        <span className="text-gray-400 dark:text-gray-500">/</span>
+                        <span className="text-red-700 dark:text-red-400">{total.absent}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 dark:text-gray-500 break-words line-clamp-1">{t('totals.empty')}</span>
+                    )}
+                  </td>
+                )
+              })}
+              <td className="px-6 py-3 border-l border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" />
+            </tr>
+            <tr>
+              <td className="sticky left-0 z-20 bg-gray-50 dark:bg-gray-800 px-6 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-100 border-r border-gray-200 dark:border-gray-700 whitespace-nowrap">
+                {t('totals.rate')}
+              </td>
+              {dates.map((date) => {
+                const total = totalsByDate[date]
+                return (
+                  <td
+                    key={date}
+                    className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 border-r border-gray-200 border-opacity-50 dark:border-gray-700 dark:border-opacity-50 last:border-0"
+                  >
+                    {total.hasRecordsLoaded ? `${total.presentPercentage}%` : t('totals.empty')}
+                  </td>
+                )
+              })}
+              <td className="px-6 py-3 border-l border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800" />
+            </tr>
+          </tfoot>
         </table>
         {visibleStudents < students.length && (
           <div
@@ -585,6 +675,73 @@ export function AttendanceSheet({
             {t('loading')}
           </div>
         )}
+
+
+        {/* Mobile Totals Card - Horizontal Scroll consistent with student cards */}
+        <Card className="p-0 overflow-hidden mt-6 border-blue-100 dark:border-blue-900/50 bg-white dark:bg-gray-900 shadow-md">
+          {/* Header */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 px-4 py-3 border-b border-blue-100 dark:border-blue-900/30">
+            <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100 uppercase tracking-wider">
+              {t('totals.title')}
+            </h3>
+          </div>
+
+          {/* Scrollable Content */}
+          <div className="relative">
+            <div
+              ref={(el) => {
+                if (el) scrollRefs.current.set('totals', el)
+              }}
+              className="overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              onScroll={(e) => syncScroll(e, 'totals')}
+            >
+              <div className="flex gap-2 p-4 min-w-min">
+                {dates.map((date) => {
+                  const total = totalsByDate[date]
+                  return (
+                    <div
+                      key={date}
+                      className="flex flex-col items-center gap-2.5 min-w-[80px] snap-start"
+                    >
+                      {/* Date Header */}
+                      <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-center">
+                        {formatDate(date)}
+                      </div>
+
+                      {/* Content Box */}
+                      <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 w-full min-h-[60px] transition-colors">
+                        {total.hasRecordsLoaded ? (
+                          <>
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <span className="text-green-700 dark:text-green-400 font-bold">
+                                {total.present}
+                              </span>
+                              <span className="text-gray-300 dark:text-gray-600">/</span>
+                              <span className="text-red-700 dark:text-red-400 font-bold">
+                                {total.absent}
+                              </span>
+                            </div>
+                            <div className="text-[10px] font-bold text-gray-900 dark:text-gray-100 mt-1 bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded shadow-sm border border-gray-100 dark:border-gray-700">
+                              {total.presentPercentage}%
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-gray-400 dark:text-gray-500 text-xs font-medium italic">
+                            {t('totals.empty')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            {/* Gradients to hint scroll */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none opacity-50" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none opacity-50" />
+          </div>
+        </Card>
       </div>
     </div>
   )

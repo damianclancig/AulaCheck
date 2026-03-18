@@ -417,6 +417,12 @@
         "future": "Future class",
         "suspended": "Suspended class",
         "inactive": "Inactive student"
+      },
+      "totals": {
+        "title": "Control Totals",
+        "presentAbsent": "Present / Absent",
+        "rate": "Attendance %",
+        "empty": "-"
       }
     },
     "modal": {

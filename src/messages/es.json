@@ -421,6 +421,12 @@
         "future": "Clase futura",
         "suspended": "Clase suspendida",
         "inactive": "Alumno inactivo"
+      },
+      "totals": {
+        "title": "Totales de Control",
+        "presentAbsent": "Presentes / Ausentes",
+        "rate": "% Asistencia",
+        "empty": "-"
       }
     },
     "modal": {
