@@ -173,6 +173,8 @@
       "shift": "Shift",
       "noDescription": "No description",
       "students": "students",
+      "institutionLabel": "Institution",
+      "courseLabel": "Course",
       "stats": {
         "avgAttendance": "Average Attendance",
         "overallAvg": "Overall Average"

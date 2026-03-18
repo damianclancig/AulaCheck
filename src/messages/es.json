@@ -173,6 +173,8 @@
       "shift": "Turno",
       "noDescription": "Sin descripción",
       "students": "alumnos",
+      "institutionLabel": "Institución",
+      "courseLabel": "Curso",
       "stats": {
         "avgAttendance": "Asistencia Promedio",
         "overallAvg": "Promedio General"

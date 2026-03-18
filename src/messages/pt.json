@@ -173,6 +173,8 @@
       "shift": "Turno",
       "noDescription": "Sem descrição",
       "students": "alunos",
+      "institutionLabel": "Instituição",
+      "courseLabel": "Curso",
       "stats": {
         "avgAttendance": "Média de Presença",
         "overallAvg": "Média Geral"

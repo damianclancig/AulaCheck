@@ -218,38 +218,53 @@ export default function CourseDetailPage() {
           </Link>
 
           <div className="flex-1">
-            <p className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-1">
-              {course.institutionName}
-            </p>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{course.name}</h1>
-              <button
-                onClick={() => setIsEditCourseModalOpen(true)}
-                className="p-2 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
-                title={tShifts('morning')} // This title should probably be something like "Edit Course"
-              >
-                <Edit className="w-6 h-6" />
-              </button>
-            </div>
-            {course.shift && (
-              <p
-                className={`text-sm font-semibold mt-1 ${course.shift === 'Mañana'
-                    ? 'text-amber-600 dark:text-amber-400'
-                    : course.shift === 'Tarde'
-                      ? 'text-orange-600 dark:text-orange-400'
-                      : 'text-indigo-600 dark:text-indigo-400'
-                  }`}
-              >
-                {t('shift')}:{' '}
-                {course.shift === 'Mañana'
-                  ? tShifts('morning')
-                  : course.shift === 'Tarde'
-                    ? tShifts('afternoon')
-                    : course.shift === 'Noche'
-                      ? tShifts('night')
-                      : course.shift}
+            <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-0.5 mb-1">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-right">
+                {t('institutionLabel')}:
+              </span>
+              <p className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider leading-tight m-0">
+                {course.institutionName}
               </p>
-            )}
+
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-right">
+                {t('courseLabel')}:
+              </span>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight m-0">
+                  {course.name}
+                </h1>
+                <button
+                  onClick={() => setIsEditCourseModalOpen(true)}
+                  className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+                  title="Editar curso"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+              </div>
+              {course.shift && (
+                <>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 text-right">
+                    {t('shift')}:
+                  </span>
+                  <p
+                    className={`text-sm font-semibold leading-tight m-0 ${course.shift === 'Mañana'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : course.shift === 'Tarde'
+                          ? 'text-orange-600 dark:text-orange-400'
+                          : 'text-indigo-600 dark:text-indigo-400'
+                      }`}
+                  >
+                    {course.shift === 'Mañana'
+                      ? tShifts('morning')
+                      : course.shift === 'Tarde'
+                        ? tShifts('afternoon')
+                        : course.shift === 'Noche'
+                          ? tShifts('night')
+                          : course.shift}
+                  </p>
+                </>
+              )}
+            </div>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
               {course.description || t('noDescription')} • {activeStudents.length} {t('students')}
             </p>
