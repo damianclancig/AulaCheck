@@ -193,6 +193,10 @@
         "export": "Exportar",
         "invite": "Invitar Alumnos",
         "addStudent": "Agregar Alumno"
+      },
+      "empty": {
+        "title": "No hay alumnos registrados",
+        "description": "Agregue algunos estudiantes o invítelos para comenzar a gestionar asistencias y calificaciones."
       }
     },
     "invite": {

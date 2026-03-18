@@ -274,7 +274,7 @@ export default function CourseDetailPage() {
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-3 md:gap-4 md:w-fit">
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
+        <div className={`grid gap-3 md:gap-4 ${students && students.length > 0 ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <button
             onClick={() => setIsAddStudentModalOpen(true)}
             className="flex flex-col items-center justify-center py-2 md:py-4 md:px-8 gap-2 bg-[var(--bg-card)] border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-400 rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
@@ -304,29 +304,42 @@ export default function CourseDetailPage() {
             )}
           </button>
 
-          <button
-            onClick={() => setIsExportModalOpen(true)}
-            className="flex flex-col items-center justify-center py-2 md:py-4 md:px-8 gap-2 bg-[var(--bg-card)] border border-gray-300 dark:border-gray-700 text-[var(--text-secondary)] rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
-          >
-            <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
-              <Download className="w-4 h-4 md:w-6 md:h-6" />
-            </div>
-            <span className="text-xs md:text-sm font-semibold text-center leading-tight">
-              {t('buttons.export')}
-            </span>
-          </button>
+          {students && students.length > 0 && (
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="flex flex-col items-center justify-center py-2 md:py-4 md:px-8 gap-2 bg-[var(--bg-card)] border border-gray-300 dark:border-gray-700 text-[var(--text-secondary)] rounded-2xl hover:bg-accent-100 dark:hover:bg-accent-500/20 transition-colors shadow-sm active:scale-95"
+            >
+              <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <Download className="w-4 h-4 md:w-6 md:h-6" />
+              </div>
+              <span className="text-xs md:text-sm font-semibold text-center leading-tight">
+                {t('buttons.export')}
+              </span>
+            </button>
+          )}
         </div>
 
-        <button
-          onClick={() => setIsAttendanceModalOpen(true)}
-          className="w-full py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-3 text-base md:text-lg font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
-        >
-          <CalendarCheck className="w-6 h-6" />
-          {t('buttons.attendance')}
-        </button>
+        {students && students.length > 0 && (
+          <button
+            onClick={() => setIsAttendanceModalOpen(true)}
+            className="w-full py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-3 text-base md:text-lg font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
+          >
+            <CalendarCheck className="w-6 h-6" />
+            {t('buttons.attendance')}
+          </button>
+        )}
       </div>
 
-      {/* Stats Cards */}
+      {students && students.length === 0 && (
+        <div className="mt-6 text-center bg-[var(--bg-card)] rounded-2xl p-8 border border-[var(--border)] shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('empty.title')}</h3>
+          <p className="text-gray-500 dark:text-gray-400">{t('empty.description')}</p>
+        </div>
+      )}
+
+      {students && students.length > 0 && (
+        <>
+          {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         <div className="bg-[var(--bg-card)] p-3 md:p-4 rounded-xl border border-[var(--border)] shadow-sm transition-colors flex flex-col items-center md:items-start">
           <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
@@ -451,6 +464,8 @@ export default function CourseDetailPage() {
           )}
         </div>
       </div>
+      </>
+      )}
 
       <AddStudentModal
         isOpen={isAddStudentModalOpen}

@@ -193,6 +193,10 @@
         "export": "Export",
         "invite": "Invite Students",
         "addStudent": "Add Student"
+      },
+      "empty": {
+        "title": "No students registered",
+        "description": "Add some students or invite them to start managing attendance and grades."
       }
     },
     "invite": {

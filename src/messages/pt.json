@@ -193,6 +193,10 @@
         "export": "Exportar",
         "invite": "Convidar Alunos",
         "addStudent": "Adicionar Aluno"
+      },
+      "empty": {
+        "title": "Não há alunos registrados",
+        "description": "Adicione alguns alunos ou convide-os para começar a gerenciar presenças e notas."
       }
     },
     "invite": {
