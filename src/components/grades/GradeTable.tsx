@@ -152,11 +152,11 @@ export function GradeTable({ period, year }: GradeTableProps) {
               className="p-2.5 space-y-3"
             >
               {/* Encabezado: Nombre + Puntos (Consistencia con Asistencia) */}
-              <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex items-center gap-3">
+              <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex items-center gap-2">
                 <StudentAvatar firstName={row.firstName} lastName={row.lastName} />
-                <h4 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
                   {row.lastName}, {row.firstName}
-                </h4>
+                </h3>
                 <div className="flex-shrink-0 scale-90 origin-left">
                   <BehavioralBadge 
                     points={row.behavioralPoints} 
@@ -279,7 +279,7 @@ export function GradeTable({ period, year }: GradeTableProps) {
                     className="w-full text-xs px-1 py-0.5 border border-indigo-400 rounded outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     maxLength={30}
                   />
-                  <button onClick={handleAddActivity} className="text-green-500 flex-shrink-0">
+                  <button onClick={handleAddActivity} className="text-green-500 flex-shrink-0" aria-label={tCommon('save')}>
                     <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -447,12 +447,14 @@ export function GradeTable({ period, year }: GradeTableProps) {
             <button
               onClick={handleAddActivity}
               className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/30 active:scale-95 transition-all"
+              aria-label={tCommon('save')}
             >
               <Plus className="w-5 h-5" />
             </button>
             <button
               onClick={() => setShowAddInput(false)}
               className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              aria-label={tCommon('cancel')}
             >
               <X className="w-5 h-5" />
             </button>

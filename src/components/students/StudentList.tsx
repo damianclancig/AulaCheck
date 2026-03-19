@@ -772,10 +772,10 @@ export function StudentList({
                   const attendanceColor = isInactive
                     ? 'text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-800'
                     : (student.attendancePercentage || 0) >= 0.75
-                      ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30'
+                      ? 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30'
                       : (student.attendancePercentage || 0) >= 0.6
-                        ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30'
-                        : 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30'
+                        ? 'text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30'
+                        : 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30'
 
                   return (
                     <tr
@@ -889,10 +889,10 @@ export function StudentList({
             const attendanceColor = isInactive
               ? 'text-gray-400 bg-gray-100'
               : (student.attendancePercentage || 0) >= 0.75
-                ? 'text-green-600 bg-green-50'
+                ? 'text-green-700 bg-green-50'
                 : (student.attendancePercentage || 0) >= 0.6
-                  ? 'text-yellow-600 bg-yellow-50'
-                  : 'text-red-600 bg-red-50'
+                  ? 'text-yellow-700 bg-yellow-50'
+                  : 'text-red-700 bg-red-50'
 
             return (
               <Card
@@ -936,15 +936,15 @@ export function StudentList({
                   }
                 }}
               >
-                <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-4 transition-colors">
-                  <div className="flex items-center gap-3">
+                <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-2 transition-colors">
+                  <div className="flex items-center gap-2">
                     <StudentAvatar 
                       firstName={student.firstName} 
                       lastName={student.lastName} 
                       isInactive={isInactive} 
                     />
                     <div className="flex items-center gap-2">
-                      <h4 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
                         <span
                           className={
                             student.requiresAttention
@@ -954,7 +954,7 @@ export function StudentList({
                         >
                           {student.lastName}, {student.firstName}
                         </span>
-                      </h4>
+                      </h3>
                       <div className="flex items-center gap-1">
                         {student.isRepeating && (
                           <div
@@ -978,6 +978,7 @@ export function StudentList({
                       handleContextMenu(e, student._id.toString())
                     }}
                     className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
+                    aria-label={t('actions.options')}
                   >
                     <MoreVertical className="w-4 h-4 text-gray-500" />
                   </button>
@@ -1036,9 +1037,9 @@ export function StudentList({
       {totalInactiveStudents > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {t('inactiveSection.title')}
-            </h3>
+            </h2>
             <button
               type="button"
               onClick={() => setShowInactiveStudents((prev) => !prev)}
@@ -1266,8 +1267,8 @@ export function StudentList({
                           }
                         }}
                       >
-                        <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-4 transition-colors">
-                          <div className="flex items-center gap-3">
+                        <div className="bg-gray-50 dark:bg-gray-800 -mx-2.5 -mt-2.5 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center mb-2 transition-colors">
+                          <div className="flex items-center gap-2">
                             <StudentAvatar 
                               firstName={student.firstName} 
                               lastName={student.lastName} 

@@ -292,9 +292,9 @@
       "actions": {
         "edit": "Edit",
         "addComment": "Add comment",
-        "withdrawal": "Withdraw",
         "withdrawalDetails": "View withdrawal details",
-        "hardDelete": "Delete permanently"
+        "hardDelete": "Delete permanently",
+        "options": "More options"
       },
       "inactiveSection": {
         "title": "Withdrawn students",
@@ -524,6 +524,7 @@
     "switchLanguage": "Switch Language",
     "cancel": "Cancel",
     "save": "Save",
+    "back": "Back",
     "confirm": "Confirm",
     "close": "Close",
     "error": "Error",

@@ -79,15 +79,15 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
     >
       {/* Student Header */}
       <div
-        className={`${isInactive ? 'bg-gray-200/70 dark:bg-gray-700/60' : 'bg-gray-50 dark:bg-gray-800'} -mx-2.5 -mt-2.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center gap-2`}
+        className={`${isInactive ? 'bg-gray-200/70 dark:bg-gray-700/60' : 'bg-gray-50 dark:bg-gray-800'} -mx-2.5 -mt-2.5 px-3 py-1.5 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl flex justify-between items-center gap-2`}
       >
-        <div className="flex items-center gap-3 truncate">
+        <div className="flex items-center gap-2 truncate">
           <StudentAvatar firstName={student.firstName} lastName={student.lastName} isInactive={isInactive} />
-          <h4
+          <h3
             className={`text-base font-semibold ${isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'} truncate`}
           >
             {student.lastName}, {student.firstName}
-          </h4>
+          </h3>
         </div>
 
         {/* Statistics in Header */}

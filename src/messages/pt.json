@@ -294,7 +294,8 @@
         "addComment": "Adicionar comentário",
         "withdrawal": "Dar baixa",
         "withdrawalDetails": "Ver detalhes da baixa",
-        "hardDelete": "Excluir permanentemente"
+        "hardDelete": "Excluir permanentemente",
+        "options": "Mais opções"
       },
       "inactiveSection": {
         "title": "Alunos com baixa",
@@ -524,6 +525,7 @@
     "switchLanguage": "Mudar idioma",
     "cancel": "Cancelar",
     "save": "Salvar",
+    "back": "Voltar",
     "confirm": "Confirmar",
     "close": "Fechar",
     "error": "Erro",

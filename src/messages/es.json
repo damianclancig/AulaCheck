@@ -292,9 +292,9 @@
       "actions": {
         "edit": "Editar",
         "addComment": "Añadir comentario",
-        "withdrawal": "Dar de baja",
         "withdrawalDetails": "Ver detalles baja",
-        "hardDelete": "Eliminar definitivamente"
+        "hardDelete": "Eliminar definitivamente",
+        "options": "Más opciones"
       },
       "inactiveSection": {
         "title": "Alumnos dados de baja",
@@ -528,6 +528,7 @@
     "switchLanguage": "Cambiar idioma",
     "cancel": "Cancelar",
     "save": "Guardar",
+    "back": "Volver",
     "confirm": "Confirmar",
     "close": "Cerrar",
     "error": "Error",

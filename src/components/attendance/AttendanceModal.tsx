@@ -338,7 +338,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                         "p-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-all",
                         status === 'present'
                           ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-2 ring-green-500 dark:ring-green-600 ring-offset-1"
-                          : status ? "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-600" : "bg-green-50/30 dark:bg-green-900/10 text-green-600/60 dark:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20"
+                          : status ? "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-600" : "bg-green-50/30 dark:bg-green-900/10 text-green-700/60 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"
                       )}
                     >
                       <Check className="w-4 h-4" />
@@ -507,7 +507,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
           <div className="flex-1 flex items-center justify-center p-8 bg-green-50/10 dark:bg-green-900/5">
             <div className="text-center max-w-md animate-in fade-in zoom-in duration-300">
               <div className="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-100/50 dark:shadow-none border-4 border-white dark:border-gray-900">
-                <Check className="w-12 h-12 text-green-600 dark:text-green-400" />
+                <Check className="w-12 h-12 text-green-700 dark:text-green-400" />
               </div>
               <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-tight">
                 {t('allMarkedTitle')}
@@ -518,7 +518,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
               
               <div className="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-gray-900 rounded-2xl border-2 border-green-100 dark:border-green-900/30 shadow-sm">
                 <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-sm font-black text-green-700 dark:text-green-400 uppercase tracking-widest">
+                <span className="text-sm font-black text-green-800 dark:text-green-400 uppercase tracking-widest">
                   {t('readyToSave')}
                 </span>
               </div>

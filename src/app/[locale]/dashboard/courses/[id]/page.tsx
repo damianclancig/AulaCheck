@@ -213,6 +213,7 @@ export default function CourseDetailPage() {
           <Link
             href="/dashboard"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500 dark:text-gray-400 flex-shrink-0"
+            aria-label={tCommon('back')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -322,7 +323,7 @@ export default function CourseDetailPage() {
         {students && students.length > 0 && (
           <button
             onClick={() => setIsAttendanceModalOpen(true)}
-            className="w-full py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 flex items-center justify-center gap-3 text-base md:text-lg font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
+            className="w-full py-4 bg-indigo-200 dark:bg-indigo-300 text-indigo-950 dark:text-black rounded-2xl hover:bg-indigo-300 dark:hover:bg-indigo-400 flex items-center justify-center gap-3 text-base md:text-lg font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
           >
             <CalendarCheck className="w-6 h-6" />
             {t('buttons.attendance')}
@@ -342,9 +343,9 @@ export default function CourseDetailPage() {
           {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         <div className="bg-[var(--bg-card)] p-3 md:p-4 rounded-xl border border-[var(--border)] shadow-sm transition-colors flex flex-col items-center md:items-start">
-          <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
+          <h2 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
             {t('stats.avgAttendance')}
-          </h3>
+          </h2>
           <div className="flex items-center gap-2">
             <div className="p-1.5 md:p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg">
               <CalendarCheck className="w-4 h-4 md:w-5 h-5" />
@@ -356,9 +357,9 @@ export default function CourseDetailPage() {
         </div>
 
         <div className="bg-[var(--bg-card)] p-3 md:p-4 rounded-xl border border-[var(--border)] shadow-sm transition-colors flex flex-col items-center md:items-start">
-          <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
+          <h2 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center md:text-left">
             {t('stats.overallAvg')}
-          </h3>
+          </h2>
           <div className="flex items-center gap-2">
             <div className="p-1.5 md:p-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg">
               <GraduationCap className="w-4 h-4 md:w-5 h-5" />
@@ -373,13 +374,13 @@ export default function CourseDetailPage() {
       {/* Tabs / Content */}
       <div className="bg-[var(--bg-card)] rounded-xl shadow-sm border border-[var(--border)] transition-colors">
         <div className="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
-          <h3 className="font-semibold text-gray-900 dark:text-white">
+          <h2 className="font-semibold text-gray-900 dark:text-white">
             {viewMode === 'list'
               ? t('tabs.list')
               : viewMode === 'sheet'
                 ? t('tabs.sheet')
                 : t('tabs.grades')}
-          </h3>
+          </h2>
 
           {/* View Mode Toggle */}
           <div className="flex gap-2">
@@ -389,6 +390,7 @@ export default function CourseDetailPage() {
                   ? 'bg-accent-100 dark:bg-accent-500/20 text-primary-900 dark:text-accent-300'
                   : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent-50 dark:hover:bg-accent-500/10'
                 }`}
+              aria-label={t('tabs.listLabel')}
             >
               <List className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.listLabel')}</span>
@@ -399,6 +401,7 @@ export default function CourseDetailPage() {
                   ? 'bg-accent-100 dark:bg-accent-500/20 text-primary-900 dark:text-accent-300'
                   : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent-50 dark:hover:bg-accent-500/10'
                 }`}
+              aria-label={t('tabs.sheetLabel')}
             >
               <Table className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.sheetLabel')}</span>
@@ -409,6 +412,7 @@ export default function CourseDetailPage() {
                   ? 'bg-accent-100 dark:bg-accent-500/20 text-primary-900 dark:text-accent-300'
                   : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent-50 dark:hover:bg-accent-500/10'
                 }`}
+              aria-label={t('tabs.gradesLabel')}
             >
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('tabs.gradesLabel')}</span>
