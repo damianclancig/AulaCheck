@@ -427,6 +427,9 @@
     },
     "modal": {
       "title": "Take Attendance",
+      "editTitle": "Edit Attendance",
+      "deleteDate": "Delete date",
+      "deleteDateConfirm": "Are you sure you want to delete this date and all its records?",
       "count": "{count} students registered",
       "dateLabel": "Class date",
       "statusLabel": "Class status",

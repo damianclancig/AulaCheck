@@ -171,3 +171,50 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// DELETE /api/courses/[id]/attendance - Eliminar registro de un día completo
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const courseId = new ObjectId(id);
+    const userId = session.user.id;
+
+    const isOwner = await verifyCourseOwnership(courseId, userId);
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const date = searchParams.get('date');
+
+    if (!date) {
+      return NextResponse.json({ error: 'date is required' }, { status: 400 });
+    }
+
+    const attendanceCollection = await getAttendanceCollection();
+    
+    // Eliminar todos los registros de la fecha
+    await attendanceCollection.deleteMany({
+      courseId,
+      date
+    });
+
+    // Recalcular promedio de asistencia del curso
+    const avgAttendance = await calculateCourseAttendance(courseId);
+    const coursesCollection = await getCoursesCollection();
+    await coursesCollection.updateOne(
+      { _id: courseId },
+      { $set: { 'meta.avgAttendance': avgAttendance } }
+    );
+
+    return NextResponse.json({ success: true, avgAttendance });
+  } catch (error) {
+    console.error('Error deleting attendance:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -431,6 +431,9 @@
     },
     "modal": {
       "title": "Tomar Asistencia",
+      "editTitle": "Editar Asistencia",
+      "deleteDate": "Eliminar clase",
+      "deleteDateConfirm": "¿Estás seguro de eliminar esta fecha y todos sus registros?",
       "count": "{count} alumnos registrados",
       "dateLabel": "Fecha de la clase",
       "statusLabel": "Estado de la clase",

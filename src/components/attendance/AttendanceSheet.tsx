@@ -3,7 +3,7 @@
 import { Student } from '@/types/models'
 import { AttendanceIcon } from './AttendanceIcon'
 import { useEffect, useRef, useState, useTransition, useMemo, useCallback, memo } from 'react'
-import { Check, XCircle, Clock, X as XIcon, Info } from 'lucide-react'
+import { Check, XCircle, Clock, X as XIcon, Info, Edit2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useModal } from '@/hooks/useModal'
@@ -19,6 +19,7 @@ interface AttendanceSheetProps {
   records: Record<string, Record<string, AttendanceStatus>>
   suspensions?: Record<string, { reason: string; note?: string }>
   onUpdate?: () => void
+  onEditClass?: (date: string) => void
 }
 
 interface ContextMenuState {
@@ -57,7 +58,9 @@ interface StudentAttendanceCardProps {
   ) => void
   scrollRef: (el: HTMLDivElement | null) => void
   onScroll: (e: React.UIEvent<HTMLDivElement>) => void
+  onEditClass?: (date: string) => void
   t: any
+  tModal: any
 }
 
 const StudentAttendanceCard = memo(function StudentAttendanceCard({
@@ -68,7 +71,9 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
   onContextMenu,
   scrollRef,
   onScroll,
+  onEditClass,
   t,
+  tModal,
 }: StudentAttendanceCardProps) {
   const isInactive = student.enrollmentStatus === 'inactive'
 
@@ -143,11 +148,26 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
                   key={date}
                   className={`flex flex-col items-center gap-2 min-w-[70px] snap-start ${isDisabled ? 'opacity-70' : ''}`}
                   onContextMenu={(e) => {
-                    if (!isDisabled) onContextMenu(e, student._id.toString(), date, status)
-                    else e.preventDefault()
+                    if (isSuspended && onEditClass) {
+                      e.preventDefault()
+                      onEditClass(date)
+                    } else if (!isDisabled) {
+                      onContextMenu(e, student._id.toString(), date, status)
+                    } else e.preventDefault()
                   }}
                   onTouchStart={(e) => {
-                    if (isDisabled) return
+                    if (isDisabled) {
+                      if (isSuspended && onEditClass) {
+                        const touch = e.touches[0]
+                        const timer = setTimeout(() => {
+                           onEditClass(date)
+                        }, 500)
+                        const cancel = () => clearTimeout(timer)
+                        e.currentTarget.addEventListener('touchend', cancel, { once: true })
+                        e.currentTarget.addEventListener('touchmove', cancel, { once: true })
+                      }
+                      return
+                    }
                     const touch = e.touches[0]
                     const timer = setTimeout(() => {
                       onContextMenu(
@@ -179,7 +199,14 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
                       const [, month, day] = date.split('-').map(Number)
                       return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`
                     })()}
-                    {isSuspended && <Info className="w-3 h-3 mt-0.5" />}
+                    {isSuspended && (
+                      <div className="flex items-center gap-0.5 mt-0.5">
+                        <span className="text-[9px] uppercase font-bold truncate max-w-[40px]">
+                          {suspensions?.[date]?.reason === 'class_suspension' ? 'Susp.' : suspensions?.[date]?.reason === 'teacher_leave' ? 'Lic.' : 'Otro'}
+                        </span>
+                        <Edit2 className="w-2.5 h-2.5 opacity-70" />
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center justify-center">
                     {isSuspended ? (
@@ -210,11 +237,13 @@ export function AttendanceSheet({
   records,
   suspensions,
   onUpdate,
+  onEditClass,
 }: AttendanceSheetProps) {
   const { data: session } = useSession()
   const params = useParams()
   const courseId = params.id as string
   const t = useTranslations('attendance.sheet')
+  const tModal = useTranslations('attendance.modal')
   const tCommon = useTranslations('common')
   const [visibleStudents, setVisibleStudents] = useState(20)
   const observerRef = useRef<HTMLDivElement>(null)
@@ -381,6 +410,8 @@ export function AttendanceSheet({
         totalActive: number
         presentPercentage: string
         hasRecordsLoaded: boolean
+        isSuspended: boolean
+        suspensionReason?: string
       }
     > = {}
 
@@ -411,6 +442,8 @@ export function AttendanceSheet({
         totalActive,
         presentPercentage,
         hasRecordsLoaded,
+        isSuspended: !!suspensions?.[date],
+        suspensionReason: suspensions?.[date]?.reason
       }
     })
 
@@ -501,11 +534,21 @@ export function AttendanceSheet({
                 return (
                   <th
                     key={date}
-                    className={`px-4 py-3 text-center text-xs font-medium uppercase tracking-wider whitespace-nowrap group relative ${suspension ? 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400' : isFuture ? 'text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-gray-800/50' : 'text-gray-500 dark:text-gray-400'}`}
+                    className={`px-4 py-3 text-center text-xs font-medium uppercase tracking-wider whitespace-nowrap group relative ${suspension ? 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-colors' : isFuture ? 'text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-gray-800/50' : 'text-gray-500 dark:text-gray-400'}`}
+                    onClick={() => {
+                      if (suspension && onEditClass) {
+                        onEditClass(date)
+                      }
+                    }}
                   >
                     <div className="flex flex-col items-center gap-1">
                       <span className={isFuture ? 'italic' : ''}>{formatDate(date)}</span>
-                      {suspension && <Info className="w-3 h-3" />}
+                      {suspension && (
+                        <div className="flex items-center gap-1 font-bold mt-0.5">
+                          {suspension.reason === 'class_suspension' ? tModal('suspension') : suspension.reason === 'teacher_leave' ? tModal('teacherLeave') : tModal('otherReason')}
+                          <Edit2 className="w-3 h-3 ml-0.5 opacity-50 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      )}
                     </div>
                   </th>
                 )
@@ -664,7 +707,9 @@ export function AttendanceSheet({
               if (el) scrollRefs.current.set(student._id.toString(), el)
             }}
             onScroll={(e) => syncScroll(e, student._id.toString())}
+            onEditClass={onEditClass}
             t={t}
+            tModal={tModal}
           />
         ))}
         {visibleStudents < students.length && (

@@ -85,6 +85,7 @@ export default function CourseDetailPage() {
 
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false)
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false)
+  const [editingAttendanceDate, setEditingAttendanceDate] = useState<string | null>(null)
   const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false)
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
@@ -442,6 +443,10 @@ export default function CourseDetailPage() {
                 dates={attendanceData.dates}
                 records={attendanceData.records}
                 suspensions={attendanceData.suspensions}
+                onEditClass={(date) => {
+                  setEditingAttendanceDate(date);
+                  setIsAttendanceModalOpen(true);
+                }}
                 onUpdate={() => {
                   mutateStudents()
                   mutate(`/api/courses/${courseId}/attendance-records`)
@@ -479,9 +484,14 @@ export default function CourseDetailPage() {
 
       <AttendanceModal
         isOpen={isAttendanceModalOpen}
-        onClose={() => setIsAttendanceModalOpen(false)}
+        onClose={() => {
+          setIsAttendanceModalOpen(false)
+          setEditingAttendanceDate(null)
+        }}
         students={activeStudents}
         existingDates={attendanceData?.dates || []}
+        attendanceData={attendanceData}
+        editingDate={editingAttendanceDate}
         onAttendanceSaved={() => {
           mutateStudents() // Update metrics
           mutateAttendance() // Update attendance data

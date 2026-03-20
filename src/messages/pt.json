@@ -428,6 +428,9 @@
     },
     "modal": {
       "title": "Fazer Chamada",
+      "editTitle": "Editar Presença",
+      "deleteDate": "Excluir data",
+      "deleteDateConfirm": "Tem certeza de que deseja excluir esta data e todos os seus registros?",
       "count": "{count} alunos registrados",
       "dateLabel": "Data da aula",
       "statusLabel": "Status da aula",

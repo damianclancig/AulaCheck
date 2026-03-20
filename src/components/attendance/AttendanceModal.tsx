@@ -10,18 +10,25 @@ import { useModal } from '@/hooks/useModal';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmationModal } from '@/components/common/ConfirmationModal';
 
 interface AttendanceModalProps {
   isOpen: boolean;
   onClose: () => void;
   students: Student[];
   existingDates?: string[];
+  editingDate?: string | null;
+  attendanceData?: {
+    dates: string[];
+    records: Record<string, Record<string, AttendanceStatus>>;
+    suspensions: Record<string, { reason: string; note?: string }>;
+  };
   onAttendanceSaved: () => void;
 }
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
-export function AttendanceModal({ isOpen, onClose, students, existingDates = [], onAttendanceSaved }: AttendanceModalProps) {
+export function AttendanceModal({ isOpen, onClose, students, existingDates = [], editingDate, attendanceData, onAttendanceSaved }: AttendanceModalProps) {
   const params = useParams();
   const courseId = params.id as string;
 
@@ -44,6 +51,7 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
   const tLegends = useTranslations('attendance.sheet.legends');
   const tCommon = useTranslations('common');
   const [showStatusSelector, setShowStatusSelector] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
 
 
@@ -65,18 +73,42 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
   // Inicializar sin selección por defecto y resetear estado al abrir
   useEffect(() => {
     if (isOpen && students.length > 0) {
-      setAttendanceMap({});
+      if (editingDate) {
+        setDate(editingDate);
+        
+        // Load attendance mapping
+        const initialMap: Record<string, AttendanceStatus> = {};
+        if (attendanceData && attendanceData.records) {
+          students.forEach(s => {
+            const status = attendanceData.records[s._id.toString()]?.[editingDate];
+            if (status) initialMap[s._id.toString()] = status;
+          });
+        }
+        setAttendanceMap(initialMap);
+
+        // Load suspension reason
+        const susp = attendanceData?.suspensions?.[editingDate];
+        if (susp) {
+          setSuspensionReason(susp.reason as any);
+          setSuspensionNote(susp.note || '');
+        } else {
+          setSuspensionReason('none');
+          setSuspensionNote('');
+        }
+      } else {
+        setAttendanceMap({});
+        setDate(getLocalDateString()); // Reset to today's date
+        setSuspensionReason('none'); // Reset to normal class
+        setSuspensionNote(''); // Clear suspension note
+      }
       setCurrentIndex(0); // Reset carousel to start
-      setDate(getLocalDateString()); // Reset to today's date
-      setSuspensionReason('none'); // Reset to normal class
-      setSuspensionNote(''); // Clear suspension note
     }
-  }, [isOpen, students]);
+  }, [isOpen, students, editingDate, attendanceData]);
 
   if (!isOpen) return null;
 
-  // Verificar si la fecha seleccionada ya tiene asistencia
-  const isDuplicateDate = existingDates.includes(date);
+  // Verificar si la fecha seleccionada ya tiene asistencia (ignorando la fecha actual en edición)
+  const isDuplicateDate = existingDates.includes(date) && date !== editingDate;
 
   // Check if all students have attendance marked
   const allStudentsMarked = sortedStudents.length > 0 && sortedStudents.every(student =>
@@ -119,6 +151,25 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
           setIsTransitioning(false);
         }, 300);
       }
+    }
+  };
+
+  const handleDeleteDate = async () => {
+    if (!editingDate) return;
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/courses/${courseId}/attendance?date=${editingDate}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error(tCommon('error'));
+      onAttendanceSaved();
+      onClose();
+    } catch (error) {
+      console.error('Error deleting attendance:', error);
+      await showAlert({ title: tCommon('error'), description: tCommon('error'), variant: 'danger' });
+    } finally {
+      setLoading(false);
+      setIsDeleteConfirmOpen(false);
     }
   };
 
@@ -207,7 +258,9 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         {/* Header */}
         <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div>
-            <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
+              {editingDate ? t('editTitle') : t('title')}
+            </h2>
             <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
               {t('count', { count: sortedStudents.length })}
             </p>
@@ -230,16 +283,21 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                 {t('dateLabel')}
               </label>
               <button
-                onClick={() => dateInputRef.current?.showPicker()}
-                className="w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-600 transition-all text-sm font-medium text-gray-900 dark:text-white group"
+                onClick={() => { if (!editingDate) dateInputRef.current?.showPicker(); }}
+                disabled={!!editingDate}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl transition-all text-sm font-medium",
+                  editingDate ? "opacity-70 cursor-not-allowed bg-gray-50 dark:bg-gray-800 text-gray-500" : "hover:border-indigo-500 dark:hover:border-indigo-600 text-gray-900 dark:text-white group"
+                )}
               >
                 <span className="truncate">{new Date(date + 'T12:00:00').toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                <Calendar className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors flex-shrink-0" />
+                <Calendar className={cn("w-4 h-4 flex-shrink-0 transition-colors", editingDate ? "text-gray-400" : "text-gray-400 group-hover:text-indigo-500")} />
               </button>
               <input
                 ref={dateInputRef}
                 type="date"
                 id="date"
+                disabled={!!editingDate}
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 className="hidden"
@@ -660,6 +718,16 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
 
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
+            {editingDate && (
+              <Button
+                onClick={() => setIsDeleteConfirmOpen(true)}
+                variant="danger"
+                disabled={loading}
+                className="flex-1 sm:flex-none"
+              >
+                {t('deleteDate')}
+              </Button>
+            )}
             <Button
               onClick={onClose}
               variant={isDuplicateDate ? 'primary' : 'secondary'}
@@ -675,12 +743,23 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                 className="flex-1 sm:flex-none"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {t('saveButton').toUpperCase()}
+                {t('saveButton')}
               </Button>
             )}
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={handleDeleteDate}
+        title={t('deleteDate')}
+        description={t('deleteDateConfirm')}
+        confirmText={t('deleteDate')}
+        variant="danger"
+        isLoading={loading}
+      />
     </div>
   );
 }
