@@ -14,7 +14,7 @@ interface StudentContextMenuProps {
   x: number;
   y: number;
   student: {
-    _id: string;
+    _id: any;
     firstName: string;
     lastName: string;
     requiresAttention?: boolean;
