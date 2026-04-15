@@ -292,6 +292,7 @@
       "actions": {
         "edit": "Edit",
         "addComment": "Add comment",
+        "withdrawal": "Withdraw",
         "withdrawalDetails": "View withdrawal details",
         "hardDelete": "Delete permanently",
         "options": "More options"

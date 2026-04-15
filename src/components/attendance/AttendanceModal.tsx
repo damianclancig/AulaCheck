@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Loader2, Check, XCircle, Clock, ChevronLeft, ChevronRight, Calendar, AlertTriangle, UserX, MessageSquare, School } from 'lucide-react';
+import { X, Loader2, Check, XCircle, Clock, ChevronLeft, ChevronRight, Calendar, AlertTriangle, UserX, MessageSquare, School, MoreVertical } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { Student } from '@/types/models';
 import { useParams } from 'next/navigation';
@@ -11,6 +11,11 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ConfirmationModal } from '@/components/common/ConfirmationModal';
+import { StudentContextMenu } from '../students/StudentContextMenu';
+import { useStudentActions } from '@/hooks/useStudentActions';
+import { EditStudentModal } from '../students/EditStudentModal';
+import { WithdrawalModal } from '../students/WithdrawalModal';
+import { AddCommentModal } from '../students/AddCommentModal';
 
 interface AttendanceModalProps {
   isOpen: boolean;
@@ -61,6 +66,31 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  // Context Menu State
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    studentId: string;
+  }>({
+    visible: false,
+    x: 0,
+    y: 0,
+    studentId: '',
+  });
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState(false);
+  const [isAddCommentModalOpen, setIsAddCommentModalOpen] = useState(false);
+  const [studentToWithdraw, setStudentToWithdraw] = useState<Student | null>(null);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  const {
+    handleToggleFlag: toggleFlag,
+    handleAddComment: addComment,
+    loadingFlags,
+    optimisticFlags,
+  } = useStudentActions(onAttendanceSaved);
+
   // Min swipe distance (in px)
   const minSwipeDistance = 50;
 
@@ -70,9 +100,16 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
     return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
   });
 
+  const initializedRef = useRef(false);
+
   // Inicializar sin selección por defecto y resetear estado al abrir
   useEffect(() => {
-    if (isOpen && students.length > 0) {
+    if (!isOpen) {
+      initializedRef.current = false;
+      return;
+    }
+
+    if (isOpen && students.length > 0 && !initializedRef.current) {
       if (editingDate) {
         setDate(editingDate);
         
@@ -102,10 +139,9 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         setSuspensionNote(''); // Clear suspension note
       }
       setCurrentIndex(0); // Reset carousel to start
+      initializedRef.current = true;
     }
   }, [isOpen, students, editingDate, attendanceData]);
-
-  if (!isOpen) return null;
 
   // Verificar si la fecha seleccionada ya tiene asistencia (ignorando la fecha actual en edición)
   const isDuplicateDate = existingDates.includes(date) && date !== editingDate;
@@ -249,6 +285,88 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
     }
   };
 
+  const handleContextMenu = (
+    e: React.MouseEvent | React.TouchEvent,
+    studentId: string
+  ) => {
+    if (e.type === 'contextmenu') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+
+    let clientX = 0;
+    let clientY = 0;
+
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = (e as React.MouseEvent).clientX;
+      clientY = (e as React.MouseEvent).clientY;
+    }
+
+    const menuWidth = 220;
+    const menuHeight = 280;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let x = clientX;
+    if (x + menuWidth > windowWidth) x = clientX - menuWidth;
+
+    let y = clientY;
+    if (y + menuHeight > windowHeight) y = clientY - menuHeight;
+
+    x = Math.max(10, x);
+    y = Math.max(10, y);
+
+    setContextMenu({ visible: true, x, y, studentId });
+  };
+
+  const handleExecuteWithdrawal = async (reason: string, note?: string) => {
+    if (!studentToWithdraw) return;
+    setIsWithdrawing(true);
+
+    try {
+      const response = await fetch(`/api/courses/${courseId}/students/${studentToWithdraw._id.toString()}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason, note }),
+      });
+
+      if (!response.ok) throw new Error(tCommon('error'));
+      
+      onAttendanceSaved();
+      setStudentToWithdraw(null);
+    } catch (error) {
+      console.error('Error withrawing student:', error);
+      await showAlert({
+        title: tCommon('error'),
+        description: tCommon('error'),
+        variant: 'danger',
+      });
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
+  // Close context menu on click outside
+  useEffect(() => {
+    const handleClick = () => setContextMenu((prev) => ({ ...prev, visible: false }));
+    const handleScroll = () => setContextMenu((prev) => ({ ...prev, visible: false }));
+
+    if (contextMenu.visible) {
+      document.addEventListener('click', handleClick);
+      window.addEventListener('scroll', handleScroll, true);
+      return () => {
+        document.removeEventListener('click', handleClick);
+        window.removeEventListener('scroll', handleScroll, true);
+      };
+    }
+  }, [contextMenu.visible]);
+
+  if (!isOpen) return null;
   const currentStudent = sortedStudents[currentIndex];
   const currentStatus = currentStudent ? attendanceMap[currentStudent._id.toString()] : undefined;
 
@@ -380,8 +498,16 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                     )}>
                       {student.firstName[0]}{student.lastName[0]}
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{student.lastName}, {student.firstName}</p>
+                    <div 
+                      className="cursor-context-menu group"
+                      onContextMenu={(e) => handleContextMenu(e, student._id.toString())}
+                    >
+                      <p className="font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors flex items-center gap-2">
+                        {student.lastName}, {student.firstName}
+                        {loadingFlags[student._id.toString()] && Object.values(loadingFlags[student._id.toString()]).some(Boolean) && (
+                          <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
+                        )}
+                      </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Legajo: {student.externalId || '-'}</p>
                       {!status && (
                         <p className="text-xs text-orange-600 dark:text-orange-400 font-medium mt-0.5">{t('missingAttendance')}</p>
@@ -464,11 +590,18 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
                       {currentStudent.firstName[0]}{currentStudent.lastName[0]}
                     </div>
                     <div className="flex flex-col items-start overflow-hidden">
-                      <h3 className="text-base font-black text-gray-900 dark:text-white leading-tight tracking-tight truncate w-full">
-                        {currentStudent.lastName.toUpperCase()}
+                      <h3 
+                        className="text-base font-black text-gray-900 dark:text-white leading-tight tracking-tight truncate w-full cursor-pointer hover:text-indigo-600 flex items-center justify-between"
+                        onClick={(e) => handleContextMenu(e, currentStudent._id.toString())}
+                      >
+                        <span>{currentStudent.lastName.toUpperCase()}</span>
+                        <MoreVertical className="w-4 h-4 text-gray-400" />
                       </h3>
-                      <p className="text-sm text-indigo-600 dark:text-indigo-400 font-bold truncate w-full">
+                      <p className="text-sm text-indigo-600 dark:text-indigo-400 font-bold truncate w-full flex items-center gap-2">
                         {currentStudent.firstName}
+                        {loadingFlags[currentStudent._id.toString()] && Object.values(loadingFlags[currentStudent._id.toString()]).some(Boolean) && (
+                          <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
+                        )}
                       </p>
                       <p className="text-[9px] text-gray-500 dark:text-gray-400 mt-0.5 font-bold px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full inline-block">
                         ID: {currentStudent.externalId || '---'}
@@ -760,6 +893,81 @@ export function AttendanceModal({ isOpen, onClose, students, existingDates = [],
         variant="danger"
         isLoading={loading}
       />
+
+      {/* Student Action Modals */}
+      {contextMenu.visible && sortedStudents.find(s => s._id.toString() === contextMenu.studentId) && (
+        <StudentContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          student={{
+            ...sortedStudents.find(s => s._id.toString() === contextMenu.studentId)!,
+            _id: contextMenu.studentId // Ya es un string
+          } as any}
+          loadingFlags={loadingFlags[contextMenu.studentId]}
+          onToggleFlag={(flag: 'requiresAttention' | 'isRepeating') => {
+            const student = sortedStudents.find(s => s._id.toString() === contextMenu.studentId);
+            if (student) {
+              const currentValue = optimisticFlags[student._id.toString()]?.[flag] ?? (student as any)[flag] ?? false;
+              toggleFlag(student._id.toString(), flag, currentValue);
+            }
+          }}
+          onAddComment={() => {
+            setSelectedStudent(sortedStudents.find(s => s._id.toString() === contextMenu.studentId)!);
+            setIsAddCommentModalOpen(true);
+            setContextMenu({ ...contextMenu, visible: false });
+          }}
+          onEdit={() => {
+            setSelectedStudent(sortedStudents.find(s => s._id.toString() === contextMenu.studentId)!);
+            setIsEditStudentModalOpen(true);
+            setContextMenu({ ...contextMenu, visible: false });
+          }}
+          onWithdraw={() => {
+            setStudentToWithdraw(sortedStudents.find(s => s._id.toString() === contextMenu.studentId)!);
+            setContextMenu({ ...contextMenu, visible: false });
+          }}
+          onClose={() => setContextMenu({ ...contextMenu, visible: false })}
+        />
+      )}
+
+      {selectedStudent && (
+        <>
+          <EditStudentModal
+            isOpen={isEditStudentModalOpen}
+            onClose={() => {
+              setIsEditStudentModalOpen(false);
+              setSelectedStudent(null);
+            }}
+            student={selectedStudent}
+            onStudentUpdated={onAttendanceSaved}
+          />
+          <AddCommentModal
+            isOpen={isAddCommentModalOpen}
+            onClose={() => {
+              setIsAddCommentModalOpen(false);
+              setSelectedStudent(null);
+            }}
+            studentName={selectedStudent ? `${selectedStudent.lastName}, ${selectedStudent.firstName}` : ''}
+            onConfirm={async (comment) => {
+              const success = await addComment(selectedStudent._id.toString(), selectedStudent.notes || '', comment);
+              if (success) {
+                setIsAddCommentModalOpen(false);
+                setSelectedStudent(null);
+              }
+            }}
+            isLoading={loadingFlags[selectedStudent._id.toString()]?.comment}
+          />
+        </>
+      )}
+
+      {studentToWithdraw && (
+        <WithdrawalModal
+          isOpen={!!studentToWithdraw}
+          onClose={() => setStudentToWithdraw(null)}
+          onConfirm={handleExecuteWithdrawal}
+          studentName={`${studentToWithdraw.lastName}, ${studentToWithdraw.firstName}`}
+          isLoading={isWithdrawing}
+        />
+      )}
     </div>
   );
 }

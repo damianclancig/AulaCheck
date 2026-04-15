@@ -29,6 +29,8 @@ import { AddCommentModal } from './AddCommentModal'
 import { ConfirmationModal } from '@/components/common/ConfirmationModal'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
+import { useStudentActions } from '@/hooks/useStudentActions'
+import { StudentContextMenu } from './StudentContextMenu'
 
 interface ContextMenuState {
   visible: boolean
@@ -129,12 +131,13 @@ export function StudentList({
   })
   const [studentToHardDelete, setStudentToHardDelete] = useState<Student | null>(null)
   const [isHardDeletingStudent, setIsHardDeletingStudent] = useState(false)
-  const [loadingFlags, setLoadingFlags] = useState<
-    Record<string, Record<string, boolean | undefined>>
-  >({})
-  const [optimisticFlags, setOptimisticFlags] = useState<
-    Record<string, Record<string, boolean | undefined>>
-  >({})
+  
+  const {
+    handleToggleFlag: toggleFlag,
+    handleAddComment: addComment,
+    loadingFlags,
+    optimisticFlags,
+  } = useStudentActions(onStudentUpdated)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [, startTransition] = useTransition()
 
@@ -248,113 +251,18 @@ export function StudentList({
 
   const handleToggleFlag = async (flag: 'requiresAttention' | 'isRepeating') => {
     if (!currentStudentContextMenu) return
-
     const studentId = currentStudentContextMenu._id.toString()
-    const oldValue = currentStudentContextMenu[flag]
-    const newValue = !oldValue
-
-    // Configurar actualización optimista
-    setOptimisticFlags((prev) => ({
-      ...prev,
-      [studentId]: {
-        ...(prev[studentId] || {}),
-        [flag]: newValue,
-      },
-    }))
-
-    // Configurar estado de carga
-    setLoadingFlags((prev) => ({
-      ...prev,
-      [studentId]: {
-        ...(prev[studentId] || {}),
-        [flag]: true,
-      },
-    }))
-
-    try {
-      const response = await fetch(`/api/students/${studentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          [flag]: newValue,
-        }),
-      })
-
-      if (!response.ok) throw new Error('Error al actualizar el alumno')
-
-      if (onStudentUpdated) {
-        onStudentUpdated()
-      }
-
-      router.refresh()
-    } catch (error) {
-      console.error('Error updating flag:', error)
-      // Revertir cambio optimista en caso de error
-      setOptimisticFlags((prev) => ({
-        ...prev,
-        [studentId]: {
-          ...(prev[studentId] || {}),
-          [flag]: oldValue,
-        },
-      }))
-    } finally {
-      // Quitar estado de carga
-      setLoadingFlags((prev) => ({
-        ...prev,
-        [studentId]: {
-          ...(prev[studentId] || {}),
-          [flag]: false,
-        },
-      }))
-    }
+    const currentValue = currentStudentContextMenu[flag] || false
+    await toggleFlag(studentId, flag, currentValue)
   }
 
   const handleAddComment = async (comment: string) => {
     if (!currentStudentContextMenu) return
-
     const studentId = currentStudentContextMenu._id.toString()
-    const oldNotes = currentStudentContextMenu.notes || ''
-    const newNotes = oldNotes ? `${oldNotes}\n\n${comment}` : comment
-
-    setLoadingFlags((prev) => ({
-      ...prev,
-      [studentId]: {
-        ...(prev[studentId] || {}),
-        comment: true,
-      },
-    }))
-
-    try {
-      const response = await fetch(`/api/students/${studentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          notes: newNotes,
-        }),
-      })
-
-      if (!response.ok) throw new Error('Error al actualizar el alumno')
-
-      if (onStudentUpdated) {
-        onStudentUpdated()
-      }
-
-      router.refresh()
+    const currentNotes = currentStudentContextMenu.notes || ''
+    const success = await addComment(studentId, currentNotes, comment)
+    if (success) {
       setIsAddCommentModalOpen(false)
-    } catch (error) {
-      console.error('Error adding comment:', error)
-    } finally {
-      setLoadingFlags((prev) => ({
-        ...prev,
-        [studentId]: {
-          ...(prev[studentId] || {}),
-          comment: false,
-        },
-      }))
     }
   }
 
@@ -580,136 +488,28 @@ export function StudentList({
 
       {/* Context Menu */}
       {contextMenu.visible && currentStudentContextMenu && (
-        <div
-          className="fixed bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-100 min-w-[220px] transition-colors"
-          style={{ left: contextMenu.x, top: contextMenu.y }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {contextMenu.mode === 'active' ? (
-            <>
-              <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-800 mb-1">
-                {t('indicators')}
-              </div>
-              <button
-                onClick={() => handleToggleFlag('requiresAttention')}
-                disabled={loadingFlags[contextMenu.studentId]?.requiresAttention}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="flex items-center gap-3">
-                  <AlertTriangle
-                    className={`w-4 h-4 ${currentStudentContextMenu.requiresAttention ? 'text-fuchsia-600 dark:text-fuchsia-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-fuchsia-500'}`}
-                  />
-                  <span
-                    className={
-                      currentStudentContextMenu.requiresAttention
-                        ? 'text-gray-900 dark:text-gray-100'
-                        : 'text-gray-600 dark:text-gray-400'
-                    }
-                  >
-                    {t('requiresAttention')}
-                  </span>
-                </div>
-                {loadingFlags[contextMenu.studentId]?.requiresAttention ? (
-                  <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
-                ) : (
-                  currentStudentContextMenu.requiresAttention && (
-                    <Check className="w-4 h-4 text-fuchsia-600 dark:text-fuchsia-400" />
-                  )
-                )}
-              </button>
-
-              <button
-                onClick={() => handleToggleFlag('isRepeating')}
-                disabled={loadingFlags[contextMenu.studentId]?.isRepeating}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="flex items-center gap-3">
-                  <RefreshCw
-                    className={`w-4 h-4 ${currentStudentContextMenu.isRepeating ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-amber-500'}`}
-                  />
-                  <span
-                    className={
-                      currentStudentContextMenu.isRepeating
-                        ? 'text-gray-900 dark:text-gray-100'
-                        : 'text-gray-600 dark:text-gray-400'
-                    }
-                  >
-                    {t('isRepeating')}
-                  </span>
-                </div>
-                {loadingFlags[contextMenu.studentId]?.isRepeating ? (
-                  <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
-                ) : (
-                  currentStudentContextMenu.isRepeating && (
-                    <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                  )
-                )}
-              </button>
-
-              <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-
-              <button
-                onClick={() => {
-                  setIsAddCommentModalOpen(true)
-                  setContextMenu({ ...contextMenu, visible: false })
-                }}
-                disabled={loadingFlags[contextMenu.studentId]?.comment}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-between group transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="flex items-center gap-3">
-                  <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-indigo-500" />
-                  <span className="text-gray-700 dark:text-gray-300">
-                    {t('actions.addComment')}
-                  </span>
-                </div>
-                {loadingFlags[contextMenu.studentId]?.comment && (
-                  <Loader2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 animate-spin" />
-                )}
-              </button>
-
-              <div className="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-
-              <button
-                onClick={() => {
-                  onEditStudent(currentStudentContextMenu)
-                  setContextMenu({ ...contextMenu, visible: false })
-                }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 transition-colors"
-              >
-                <UserCog className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-700 dark:text-gray-300">{t('actions.edit')}</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  onDeleteStudent(currentStudentContextMenu)
-                  setContextMenu({ ...contextMenu, visible: false })
-                }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
-              >
-                <Trash2 className="w-4 h-4 text-red-500" />
-                <span className="text-red-600 dark:text-red-400">
-                  {isStudentInactive(currentStudentContextMenu)
-                    ? t('actions.withdrawalDetails')
-                    : t('actions.withdrawal')}
-                </span>
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase border-b border-gray-100 dark:border-gray-800 mb-1">
-                {t('inactiveSection.title')}
-              </div>
-              <button
-                onClick={() => handleRequestHardDelete(currentStudentContextMenu)}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
-              >
-                <Trash2 className="w-4 h-4 text-red-500" />
-                <span className="text-red-600 dark:text-red-400">{t('actions.hardDelete')}</span>
-              </button>
-            </>
-          )}
-        </div>
+        <StudentContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          student={currentStudentContextMenu}
+          mode={contextMenu.mode}
+          loadingFlags={loadingFlags[contextMenu.studentId]}
+          onToggleFlag={handleToggleFlag}
+          onAddComment={() => {
+            setIsAddCommentModalOpen(true)
+            setContextMenu({ ...contextMenu, visible: false })
+          }}
+          onEdit={() => {
+            onEditStudent(currentStudentContextMenu)
+            setContextMenu({ ...contextMenu, visible: false })
+          }}
+          onWithdraw={() => {
+            onDeleteStudent(currentStudentContextMenu)
+            setContextMenu({ ...contextMenu, visible: false })
+          }}
+          onHardDelete={() => handleRequestHardDelete(currentStudentContextMenu)}
+          onClose={() => setContextMenu({ ...contextMenu, visible: false })}
+        />
       )}
 
       {/* Desktop Table View */}

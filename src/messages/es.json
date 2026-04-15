@@ -292,6 +292,7 @@
       "actions": {
         "edit": "Editar",
         "addComment": "Añadir comentario",
+        "withdrawal": "Dar de baja",
         "withdrawalDetails": "Ver detalles baja",
         "hardDelete": "Eliminar definitivamente",
         "options": "Más opciones"
