@@ -182,16 +182,31 @@ export default function CourseDetailPage() {
       if (options.grades) params.append('grades', 'true')
       if (options.attendanceStats) params.append('attendanceStats', 'true')
       if (options.attendanceDetails) params.append('attendanceDetails', 'true')
+      if (options.format) params.append('format', options.format)
 
       const res = await fetch(`/api/courses/${courseId}/report?${params.toString()}`)
 
-      if (!res.ok) throw new Error('Error descargando reporte')
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.stack || 'Error descargando reporte');
+      }
 
       const blob = await res.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${course.name}_reporte.csv`
+      const extension = options.format === 'excel' ? 'xlsx' : 'csv'
+      let filename = `${course.name}_reporte.${extension}`
+      
+      const contentDisposition = res.headers.get('Content-Disposition')
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/)
+        if (filenameMatch && filenameMatch.length === 2) {
+          filename = filenameMatch[1]
+        }
+      }
+      
+      a.download = filename
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)

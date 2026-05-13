@@ -10,9 +10,9 @@ AulaCheck es una plataforma web moderna, rápida y "Mobile-First" diseñada para
 * **Seguridad Biométrica (Passkeys)**: Los docentes pueden acceder al sistema de forma instantánea y segura usando FaceID o huella dactilar, sin depender exclusivamente de correos electrónicos.
 * **Promedios Automáticos**: Sistema avanzado de evaluación con peso (ponderación) de notas para calcular promedios y definir condiciones finales (TEA, TEP, TED, etc.).
 * **Gestión de Alumnos**: Fichas completas de alumnos, notas de seguimiento, estado de recursantes y gestión de solicitudes de admisión.
+* **Reportes Profesionales**: Exportación avanzada de planillas a formatos **Excel (.xlsx)** y **CSV**. Los reportes incluyen estilos visuales (colores TEA/TEP/TED), diseño cebra, branding institucional y logo.
 * **Soporte Multi-idioma (i18n)**: Aplicación completa traducida al Español (es), Inglés (en) y Portugués (pt).
 * **Diseño Dual Theme**: Interfaz moderna adaptable a Modo Claro y Modo Oscuro para reducir la fatiga visual.
-* **Reportes y Exportación**: Generación y exportación de planillas de asistencia y calificaciones a formato CSV en un clic.
 
 ## Stack Tecnológico
 
@@ -23,6 +23,17 @@ Este proyecto utiliza tecnologías web modernas y escalables:
 * **Base de Datos**: MongoDB (mediante Mongoose).
 * **Autenticación**: NextAuth para el flujo clásico y `@simplewebauthn` para Passkeys (Biometría).
 * **Internacionalización**: `next-intl` para el manejo de idiomas y metadatos dinámicos.
+* **Generación de Reportes**: `exceljs` para la creación de archivos de hojas de cálculo con estilos.
+
+## Scripts Disponibles
+
+En el directorio del proyecto, puedes ejecutar:
+
+* **`npm run dev`**: Inicia el servidor de desarrollo en `http://localhost:3000`.
+* **`npm run build`**: Realiza un chequeo de tipos estricto con TypeScript y genera la compilación de producción.
+* **`npm run typecheck`**: Ejecuta únicamente el chequeo de tipos de TypeScript sin generar archivos.
+* **`npm run lint`**: Ejecuta el análisis estático de código para encontrar errores de formato o lógica.
+* **`npm run start`**: Inicia el servidor en modo producción (requiere `npm run build` previo).
 
 ## Arquitectura y Estándares de Clean Code
 

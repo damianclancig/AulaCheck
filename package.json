@@ -1,12 +1,13 @@
 {
   "name": "aula-check",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "tsc --noEmit && next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "create-indexes": "tsx scripts/create-indexes.ts"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
     "@simplewebauthn/server": "^13.3.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
+    "exceljs": "^4.4.0",
     "lucide-react": "^0.555.0",
     "mongodb": "^7.0.0",
     "mongoose": "^9.2.2",

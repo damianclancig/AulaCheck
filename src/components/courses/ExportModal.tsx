@@ -18,6 +18,7 @@ export interface ExportOptions {
   grades: boolean;
   attendanceStats: boolean;
   attendanceDetails: boolean;
+  format: 'csv' | 'excel';
 }
 
 export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportModalProps) {
@@ -31,6 +32,7 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
     grades: true,
     attendanceStats: true,
     attendanceDetails: true,
+    format: 'excel',
   });
 
   const [expandedSections, setExpandedSections] = useState({
@@ -114,7 +116,8 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
         <div className="p-6 overflow-y-auto flex-1">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             {t.rich('description', {
-              course: (chunks) => <span className="font-medium text-gray-900 dark:text-white">{courseName}</span>
+              courseName: courseName,
+              course: (chunks) => <span className="font-medium text-gray-900 dark:text-white">{chunks}</span>
             })}
             <br />
             <span className="text-xs text-gray-400 dark:text-gray-500 mt-1 block">
@@ -123,6 +126,42 @@ export function ExportModal({ isOpen, onClose, onExport, courseName }: ExportMod
           </p>
 
           <div className="space-y-4">
+            {/* Sección Formato */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden p-4 bg-white dark:bg-gray-900">
+              <h3 className="font-medium text-sm text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                {t('format')}
+              </h3>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="format"
+                    value="excel"
+                    checked={options.format === 'excel'}
+                    onChange={() => setOptions(prev => ({ ...prev, format: 'excel' }))}
+                    className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-600 dark:border-gray-600 dark:bg-gray-800"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                    {t('formatExcel')}
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="format"
+                    value="csv"
+                    checked={options.format === 'csv'}
+                    onChange={() => setOptions(prev => ({ ...prev, format: 'csv' }))}
+                    className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-600 dark:border-gray-600 dark:bg-gray-800"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                    {t('formatCsv')}
+                  </span>
+                </label>
+              </div>
+            </div>
+
             {/* Sección Datos Personales */}
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">

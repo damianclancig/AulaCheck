@@ -251,19 +251,22 @@
     },
     "export": {
       "title": "Export Data",
-      "description": "Configure the report for {course}.",
+      "description": "Configure the report for <course>{courseName}</course>.",
+      "format": "Export Format",
+      "formatCsv": "CSV (Plain text)",
+      "formatExcel": "Excel (.xlsx with colors)",
       "automaticNotice": "* Last Name and First Name are always included automatically.",
       "personalData": "Student Data",
       "dni": "ID / DNI",
       "email": "Email",
       "phone": "Phone",
       "metrics": "Metrics and Averages",
-      "gradesAvg": "Grade Average",
+      "gradesAvg": "Annual Spreadsheet (Semesters, Averages, Final Condition)",
       "attendanceStats": "Attendance Statistics (Present/Absent)",
       "details": "Details",
       "attendanceDetails": "Attendance Detail by Date",
       "attendanceDetailsDesc": "Includes one column per class day with status (P/A/T)",
-      "button": "Export CSV"
+      "button": "Export"
     }
   },
   "students": {
