@@ -18,7 +18,8 @@ AulaCheck es una plataforma web moderna, rápida y "Mobile-First" diseñada para
 
 Este proyecto utiliza tecnologías web modernas y escalables:
 
-* **Framework Base**: Next.js (App Router) y React 19.
+* **Framework Base**: Next.js 16 (App Router) y React 19.
+* **Gestor de Paquetes**: pnpm (v11+).
 * **Estilos y UI**: Tailwind CSS v4, interfaces fluidas e iconos de Lucide-React.
 * **Base de Datos**: MongoDB (mediante Mongoose).
 * **Autenticación**: NextAuth para el flujo clásico y `@simplewebauthn` para Passkeys (Biometría).
@@ -29,11 +30,11 @@ Este proyecto utiliza tecnologías web modernas y escalables:
 
 En el directorio del proyecto, puedes ejecutar:
 
-* **`npm run dev`**: Inicia el servidor de desarrollo en `http://localhost:3000`.
-* **`npm run build`**: Realiza un chequeo de tipos estricto con TypeScript y genera la compilación de producción.
-* **`npm run typecheck`**: Ejecuta únicamente el chequeo de tipos de TypeScript sin generar archivos.
-* **`npm run lint`**: Ejecuta el análisis estático de código para encontrar errores de formato o lógica.
-* **`npm run start`**: Inicia el servidor en modo producción (requiere `npm run build` previo).
+* **`pnpm dev`**: Inicia el servidor de desarrollo en `http://localhost:3000`.
+* **`pnpm build`**: Realiza un chequeo de tipos estricto con TypeScript y genera la compilación de producción.
+* **`pnpm typecheck`**: Ejecuta únicamente el chequeo de tipos de TypeScript sin generar archivos.
+* **`pnpm lint`**: Ejecuta el análisis estático de código para encontrar errores de formato o lógica.
+* **`pnpm start`**: Inicia el servidor en modo producción (requiere `pnpm build` previo).
 
 ## Arquitectura y Estándares de Clean Code
 
