@@ -195,12 +195,16 @@ export function GradeTable({ period, year }: GradeTableProps) {
                           {avg.toFixed(1)}
                         </span>
                       )}
-                      <OverrideMenu
-                        target={period === 1 ? 'semester1' : 'semester2'}
-                        currentStatus={status}
-                        isManual={!!row.statusOverride}
-                        onSelect={(val) => handleOverride(row.studentId, val)}
-                      />
+                      {period === 2 && avg === null ? (
+                        <span className="text-gray-400 font-medium px-2">—</span>
+                      ) : (
+                        <OverrideMenu
+                          target={period === 1 ? 'semester1' : 'semester2'}
+                          currentStatus={status}
+                          isManual={!!row.statusOverride}
+                          onSelect={(val) => handleOverride(row.studentId, val)}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -387,9 +391,9 @@ export function GradeTable({ period, year }: GradeTableProps) {
                       <span
                         className={`font-bold text-sm ${
                           avg >= 7
-                            ? 'text-green-600 dark:text-green-400'
+                            ? 'text-blue-600 dark:text-blue-400'
                             : avg >= 4
-                            ? 'text-amber-600 dark:text-amber-400'
+                            ? 'text-green-600 dark:text-green-400'
                             : 'text-red-600 dark:text-red-400'
                         }`}
                       >
@@ -411,12 +415,16 @@ export function GradeTable({ period, year }: GradeTableProps) {
                   </td>
                   {/* Informe / Estado */}
                   <td className="px-3 py-2 text-center bg-gray-50 dark:bg-gray-800/30">
-                    <OverrideMenu
-                      target={period === 1 ? 'semester1' : 'semester2'}
-                      currentStatus={effectiveStatus}
-                      isManual={!!row.statusOverride}
-                      onSelect={(val) => handleOverride(row.studentId, val)}
-                    />
+                    {period === 2 && avg === null ? (
+                      <span className="text-gray-400 dark:text-gray-500">—</span>
+                    ) : (
+                      <OverrideMenu
+                        target={period === 1 ? 'semester1' : 'semester2'}
+                        currentStatus={effectiveStatus}
+                        isManual={!!row.statusOverride}
+                        onSelect={(val) => handleOverride(row.studentId, val)}
+                      />
+                    )}
                   </td>
                 </tr>
               );

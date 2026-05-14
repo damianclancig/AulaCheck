@@ -112,8 +112,8 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                     <td className="px-3 py-3 text-center">
                       {row.semester1Average !== null ? (
                         <span className={`font-semibold text-sm ${
-                          row.semester1Average >= 7 ? 'text-green-600 dark:text-green-400'
-                          : row.semester1Average >= 4 ? 'text-amber-600 dark:text-amber-400'
+                          row.semester1Average >= 7 ? 'text-blue-600 dark:text-blue-400'
+                          : row.semester1Average >= 4 ? 'text-green-600 dark:text-green-400'
                           : 'text-red-600 dark:text-red-400'
                         }`}>
                           {row.semester1Average.toFixed(2)}
@@ -128,8 +128,8 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                     <td className="px-3 py-3 text-center">
                       {row.semester2Average !== null ? (
                         <span className={`font-semibold text-sm ${
-                          row.semester2Average >= 7 ? 'text-green-600 dark:text-green-400'
-                          : row.semester2Average >= 4 ? 'text-amber-600 dark:text-amber-400'
+                          row.semester2Average >= 7 ? 'text-blue-600 dark:text-blue-400'
+                          : row.semester2Average >= 4 ? 'text-green-600 dark:text-green-400'
                           : 'text-red-600 dark:text-red-400'
                         }`}>
                           {row.semester2Average.toFixed(2)}
@@ -138,14 +138,18 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                     </td>
                     {/* Estado C2 */}
                     <td className="px-3 py-3 text-center border-r-2 border-r-gray-100 dark:border-r-gray-800">
-                      <StatusBadge status={row.semester2Status as BadgeType} />
+                      {row.semester2Average !== null ? (
+                        <StatusBadge status={row.semester2Status as BadgeType} />
+                      ) : (
+                        '—'
+                      )}
                     </td>
                     {/* Promedio Final */}
                     <td className="px-3 py-3 text-center bg-indigo-50/50 dark:bg-indigo-900/10">
                       {row.finalAverage !== null ? (
                         <span className={`font-bold text-base ${
-                          row.finalAverage >= 7 ? 'text-emerald-600 dark:text-emerald-400'
-                          : row.finalAverage >= 4 ? 'text-amber-600 dark:text-amber-400'
+                          row.finalAverage >= 7 ? 'text-blue-600 dark:text-blue-400'
+                          : row.finalAverage >= 4 ? 'text-green-600 dark:text-green-400'
                           : 'text-red-600 dark:text-red-400'
                         }`}>
                           {row.finalAverage.toFixed(2)}
@@ -160,12 +164,16 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                     </td>
                     {/* Condición final (con override) */}
                     <td className="px-3 py-3 text-center bg-indigo-50/50 dark:bg-indigo-900/10">
-                      <OverrideMenu
-                        target="annual"
-                        currentStatus={effectiveCondition}
-                        isManual={row.isManual}
-                        onSelect={(val) => handleOverride(row.studentId, val)}
-                      />
+                      {row.semester2Average !== null ? (
+                        <OverrideMenu
+                          target="annual"
+                          currentStatus={effectiveCondition}
+                          isManual={row.isManual}
+                          onSelect={(val) => handleOverride(row.studentId, val)}
+                        />
+                      ) : (
+                        '—'
+                      )}
                     </td>
                   </tr>
                 );
@@ -192,12 +200,16 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                     {row.lastName}, {row.firstName}
                   </p>
                 </div>
-                <OverrideMenu
-                  target="annual"
-                  currentStatus={effectiveCondition}
-                  isManual={row.isManual}
-                  onSelect={(val) => handleOverride(row.studentId, val)}
-                />
+                {row.semester2Average !== null ? (
+                  <OverrideMenu
+                    target="annual"
+                    currentStatus={effectiveCondition}
+                    isManual={row.isManual}
+                    onSelect={(val) => handleOverride(row.studentId, val)}
+                  />
+                ) : (
+                  <span className="text-gray-400 font-medium px-2">—</span>
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
@@ -216,7 +228,11 @@ export function AnnualCloseTable({ year }: AnnualCloseTableProps) {
                     {row.semester2Average?.toFixed(2) ?? '—'}
                   </p>
                   <div className="mt-1">
-                    <StatusBadge status={row.semester2Status as BadgeType} size="sm" />
+                    {row.semester2Average !== null ? (
+                      <StatusBadge status={row.semester2Status as BadgeType} size="sm" />
+                    ) : (
+                      <span className="text-gray-400 dark:text-gray-500">—</span>
+                    )}
                   </div>
                 </div>
                 <Card variant="highlight" className="p-2 flex flex-col items-center justify-center rounded-lg shadow-none">

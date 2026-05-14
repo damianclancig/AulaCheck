@@ -130,8 +130,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (showPhone) headers.push('Teléfono');
 
     if (showAttendanceStats) {
-      headers.push('Asistencia (%)');
-      headers.push('Inasistencia (%)');
+      headers.push('Asistencia');
+      headers.push('Inasistencia');
     }
     if (showGrades) {
       headers.push('Prom. 1er Cuat.');
@@ -208,8 +208,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           const attendance = attendanceMap.get(student._id.toString()) || 0;
           const attendancePercent = Math.round(attendance * 100);
           const absencePercent = 100 - attendancePercent;
-          rowDataArray.push(attendancePercent);
-          rowDataArray.push(absencePercent);
+          rowDataArray.push(`${attendancePercent}%`);
+          rowDataArray.push(`${absencePercent}%`);
         }
 
         if (showGrades) {
@@ -226,9 +226,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             rowDataArray.push(rowData.semester1Average !== null ? Number(rowData.semester1Average.toFixed(2)) : '-');
             rowDataArray.push(rowData.semester1Status);
             rowDataArray.push(rowData.semester2Average !== null ? Number(rowData.semester2Average.toFixed(2)) : '-');
-            rowDataArray.push(rowData.semester2Status);
+            rowDataArray.push(rowData.semester2Average !== null ? rowData.semester2Status : '-');
             rowDataArray.push(rowData.finalAverage !== null ? Number(rowData.finalAverage.toFixed(2)) : '-');
-            rowDataArray.push(translatedCondition);
+            rowDataArray.push(rowData.semester2Average !== null ? translatedCondition : '-');
           } else {
             rowDataArray.push('-', '-', '-', '-', '-', '-');
           }
@@ -369,8 +369,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const attendancePercent = Math.round(attendance * 100);
         const absencePercent = 100 - attendancePercent;
 
-        row.push(attendancePercent.toString());
-        row.push(absencePercent.toString());
+        row.push(`"${attendancePercent}%"`);
+        row.push(`"${absencePercent}%"`);
       }
 
       if (showGrades) {
@@ -387,9 +387,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           row.push(rowData.semester1Average !== null ? rowData.semester1Average.toFixed(2) : '-');
           row.push(`"${rowData.semester1Status}"`);
           row.push(rowData.semester2Average !== null ? rowData.semester2Average.toFixed(2) : '-');
-          row.push(`"${rowData.semester2Status}"`);
+          row.push(rowData.semester2Average !== null ? `"${rowData.semester2Status}"` : '-');
           row.push(rowData.finalAverage !== null ? rowData.finalAverage.toFixed(2) : '-');
-          row.push(`"${translatedCondition}"`);
+          row.push(rowData.semester2Average !== null ? `"${translatedCondition}"` : '-');
         } else {
           row.push('-', '-', '-', '-', '-', '-');
         }
