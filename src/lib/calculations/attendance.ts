@@ -13,21 +13,15 @@ export async function calculateCourseAttendance(
     const attendanceCollection = await getAttendanceCollection();
     const enrollmentsCollection = await getEnrollmentsCollection();
 
-    // Obtener número de alumnos activos
-    const activeStudents = await enrollmentsCollection.countDocuments({
+    // Contar todos los registros reales (sin contar suspensiones)
+    // Esto refleja el total de "posibles presentes" basado en alumnos que realmente
+    // tuvieron un estado marcado.
+    const totalPossible = await attendanceCollection.countDocuments({
       courseId,
-      status: 'active',
+      status: { $exists: true }
     });
 
-    if (activeStudents === 0) {
-      return 0;
-    }
-
-    // Obtener todas las fechas únicas de asistencia
-    const distinctDates = await attendanceCollection.distinct('date', { courseId });
-    const totalSessions = distinctDates.length;
-
-    if (totalSessions === 0) {
+    if (totalPossible === 0) {
       return 0;
     }
 
@@ -36,9 +30,6 @@ export async function calculateCourseAttendance(
       courseId,
       status: { $in: ['present', 'late'] },
     });
-
-    // Total posible = alumnos * sesiones
-    const totalPossible = activeStudents * totalSessions;
 
     return presentCount / totalPossible;
   } catch (error) {
@@ -60,9 +51,12 @@ export async function calculateStudentAttendance(
   try {
     const attendanceCollection = await getAttendanceCollection();
 
-    // Obtener todas las fechas del curso
-    const allDates = await attendanceCollection.distinct('date', { courseId });
-    const totalSessions = allDates.length;
+    // Obtener total de sesiones donde el alumno tenga un estado
+    const totalSessions = await attendanceCollection.countDocuments({ 
+      courseId,
+      studentId,
+      status: { $exists: true }
+    });
 
     if (totalSessions === 0) {
       return 0;
@@ -99,26 +93,35 @@ export async function calculateAllStudentsAttendance(
       .find({ courseId, status: 'active' })
       .toArray();
 
-    // Obtener total de sesiones
-    const allDates = await attendanceCollection.distinct('date', { courseId });
-    const totalSessions = allDates.length;
-
-    if (totalSessions === 0) {
-      return new Map();
-    }
+    // Utilizar aggregate para obtener total y presentes por alumno en un solo viaje
+    const aggregation = await attendanceCollection.aggregate([
+      { $match: { courseId, status: { $exists: true } } },
+      { 
+        $group: { 
+          _id: "$studentId", 
+          totalSessions: { $sum: 1 },
+          presentCount: { 
+            $sum: { 
+              $cond: [{ $in: ["$status", ["present", "late"]] }, 1, 0] 
+            } 
+          }
+        }
+      }
+    ]).toArray();
 
     const result = new Map<string, number>();
 
-    // Calcular para cada alumno
+    // Inicializar a 0 para todos los alumnos activos
     for (const enrollment of enrollments) {
-      const presentCount = await attendanceCollection.countDocuments({
-        courseId,
-        studentId: enrollment.studentId,
-        status: { $in: ['present', 'late'] },
-      });
+      result.set(enrollment.studentId.toString(), 0);
+    }
 
-      const percentage = presentCount / totalSessions;
-      result.set(enrollment.studentId.toString(), percentage);
+    // Rellenar con los resultados del aggregation
+    for (const record of aggregation) {
+      const studentId = record._id.toString();
+      if (result.has(studentId) && record.totalSessions > 0) {
+        result.set(studentId, record.presentCount / record.totalSessions);
+      }
     }
 
     return result;

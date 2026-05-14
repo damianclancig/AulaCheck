@@ -91,6 +91,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Obtener detalles de asistencia si es necesario
     let attendanceDates: string[] = [];
     let attendanceRecords: Record<string, Record<string, string>> = {}; // studentId -> date -> status
+    let suspensions: Record<string, string> = {};
 
     if (showAttendanceDetails) {
       const attendanceCollection = await import('@/lib/mongodb/collections').then(m => m.getAttendanceCollection());
@@ -99,10 +100,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         .sort({ date: 1 })
         .toArray();
 
-      // Extraer fechas únicas
+      // Extraer fechas únicas y suspensiones
       const datesSet = new Set<string>();
       allRecords.forEach(record => {
         if (record.date) datesSet.add(record.date);
+        if (record.suspensionReason && record.suspensionReason !== 'none') {
+          suspensions[record.date] = record.suspensionReason;
+        }
       });
       attendanceDates = Array.from(datesSet).sort();
 
@@ -235,7 +239,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           attendanceDates.forEach(date => {
             const status = studentRecords[date];
             let statusSymbol = '-';
-            if (status === 'present') statusSymbol = 'P';
+            if (suspensions[date]) statusSymbol = 'S';
+            else if (status === 'present') statusSymbol = 'P';
             else if (status === 'absent') statusSymbol = 'A';
             else if (status === 'late') statusSymbol = 'T';
             rowDataArray.push(statusSymbol);
@@ -395,7 +400,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         attendanceDates.forEach(date => {
           const status = studentRecords[date];
           let statusSymbol = '-';
-          if (status === 'present') statusSymbol = 'P';
+          if (suspensions[date]) statusSymbol = 'S';
+          else if (status === 'present') statusSymbol = 'P';
           else if (status === 'absent') statusSymbol = 'A';
           else if (status === 'late') statusSymbol = 'T';
           row.push(statusSymbol);

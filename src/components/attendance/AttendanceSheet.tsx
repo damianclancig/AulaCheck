@@ -10,6 +10,7 @@ import { useModal } from '@/hooks/useModal'
 import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/Card'
 import { StudentAvatar } from '../students/StudentAvatar'
+import { calculateStudentAttendanceStats } from '@/lib/utils/attendanceUtils'
 
 type AttendanceStatus = 'present' | 'absent' | 'late'
 
@@ -98,13 +99,8 @@ const StudentAttendanceCard = memo(function StudentAttendanceCard({
         {/* Statistics in Header */}
         <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
           {(() => {
-            const totalClasses = dates.length
-            const presentCount = dates.filter((date) => studentRecords[date] === 'present').length
-            const absentCount = dates.filter((date) => studentRecords[date] === 'absent').length
-            const presentPercentage =
-              totalClasses > 0 ? ((presentCount / totalClasses) * 100).toFixed(0) : '0'
-            const absentPercentage =
-              totalClasses > 0 ? ((absentCount / totalClasses) * 100).toFixed(0) : '0'
+            const { presentCount, absentCount, presentPercentage, absentPercentage } = 
+              calculateStudentAttendanceStats(dates, studentRecords, suspensions)
             return (
               <>
                 <div className="flex items-center gap-1.5 text-xs">
@@ -562,13 +558,8 @@ export function AttendanceSheet({
             {displayedStudents.map((student) => {
               const studentId = student._id.toString()
               const studentRecords = records[studentId] || {}
-              const totalClasses = dates.length
-              const presentCount = dates.filter((date) => studentRecords[date] === 'present').length
-              const absentCount = dates.filter((date) => studentRecords[date] === 'absent').length
-              const presentPercentage =
-                totalClasses > 0 ? ((presentCount / totalClasses) * 100).toFixed(0) : '0'
-              const absentPercentage =
-                totalClasses > 0 ? ((absentCount / totalClasses) * 100).toFixed(0) : '0'
+              const { presentCount, absentCount, presentPercentage, absentPercentage } = 
+                calculateStudentAttendanceStats(dates, studentRecords, suspensions)
 
               const isInactive = student.enrollmentStatus === 'inactive'
 

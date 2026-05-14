@@ -111,6 +111,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       studentId: { $exists: false }
     });
 
+    // Si la nueva clase es una suspensión, eliminar todos los registros de estudiantes previos
+    if (suspensionReason && suspensionReason !== 'none') {
+      await attendanceCollection.deleteMany({
+        courseId,
+        date,
+        studentId: { $exists: true }
+      });
+    }
+
     // Procesar cada registro (upsert)
     const operations = records.map((record: { studentId: string; status: 'present' | 'absent' | 'late' }) => {
       const updateData: any = {
